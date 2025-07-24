@@ -58,6 +58,7 @@ const ExamPage = () => {
 
     return () => clearInterval(timer);
   }, [isPaused]);
+  console.log(loading);
 
   // Fetch current question + exercise + user
   useEffect(() => {
