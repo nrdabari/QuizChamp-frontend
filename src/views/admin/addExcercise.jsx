@@ -53,10 +53,16 @@ export default function AddExercise() {
     validationSchema: ExerciseSchema,
     onSubmit: async (values, { setSubmitting, resetForm }) => {
       try {
+        const payload = { ...values };
+
+        // Remove empty string fields
+        if (!payload.chapterId) delete payload.chapterId;
+        if (!payload.subjectId) delete payload.subjectId;
+
         const res = await fetch("http://localhost:5000/api/exercises", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(values),
+          body: JSON.stringify(payload),
         });
         const data = await res.json();
         if (res.ok) {
