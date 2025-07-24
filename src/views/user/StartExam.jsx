@@ -200,7 +200,9 @@ const StartExam = () => {
                   </td>
                   <td className="p-3">{Math.floor(sub.totalTimeTaken / 60)}</td>
                   <td className="p-3">
-                    {new Date(sub.endedAt).toLocaleString()}
+                    {sub?.endedAt
+                      ? new Date(sub.endedAt).toLocaleString()
+                      : "-"}
                   </td>
                   <td className="p-3">
                     {sub.status === "paused" ? (

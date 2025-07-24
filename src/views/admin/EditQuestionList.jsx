@@ -216,9 +216,10 @@ const EditQuestionList = () => {
                 init={{
                   height: 200,
                   menubar: false,
-                  plugins: "autolink codesample image link media table lists",
+                  plugins:
+                    "autolink codesample image link media table lists code",
                   toolbar:
-                    "blocks fontfamily fontsize | bold italic underline | align numlist bullist | forecolor backcolor | image  | table  | codesample",
+                    "blocks fontfamily fontsize | bold italic underline | align numlist bullist | forecolor backcolor | image  | table  | code",
                   block_formats:
                     "Paragraph=p; Heading 1=h1; Heading 2=h2; Heading 3=h3",
                 }}
