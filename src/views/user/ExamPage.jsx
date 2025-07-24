@@ -326,16 +326,7 @@ const ExamPage = () => {
                     ))
                   )}
                 </h2>
-                {/* <span
-                  style={{
-                    fontWeight: "bold",
-                    WebkitTextStroke: "1px black",
-                    color: "transparent",
-                    fontSize: '32px',
-                  }}
-                >
-                  Z
-                </span> */}
+                {/* <p><span style="font-weight: bold; -webkit-text-stroke: 1px black; color: transparent; font-size: 54pt;"> F R A M E </span></p> */}
                 {currentQuestion.imagePath && (
                   <img
                     src={`http://localhost:5000${currentQuestion.imagePath}`}

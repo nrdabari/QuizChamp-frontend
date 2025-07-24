@@ -1,73 +1,77 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useFormik } from "formik";
 import { Plus, Trash2 } from "lucide-react";
 import { sourceOptions } from "../../helper/helpers";
 import * as Yup from "yup";
 
-
 export default function AddExercise() {
+  const [subjects, setSubjects] = useState([]);
+  const [chapters, setChapters] = useState([]);
+
   const ExerciseSchema = Yup.object().shape({
-  class: Yup.number()
-    .required('Class is required')
-    .min(1, 'Class must be at least 1')
-    .max(12, 'Class must be at most 12'),
-  subject: Yup.string().required('Subject is required'),
-  chapter: Yup.string(),
-  source: Yup.string().required('Source is required'),
-  directions: Yup.array().of(
-    Yup.object().shape({
-      text: Yup.string().required('Direction text is required'),
-      start: Yup.number().required('Start is required'),
-      end: Yup.number().required('End is required'),
-    })
-  ),
-  // headers: Yup.array().of(
-  //   Yup.object().shape({
-  //     text: Yup.string().required('Header text is required'),
-  //     start: Yup.number().required('Start is required'),
-  //     end: Yup.number().required('End is required'),
-  //   })
-  // ),
-  sections: Yup.array().of(
-    Yup.object().shape({
-      text: Yup.string().required('Section text is required'),
-      start: Yup.number().required('Start is required'),
-      end: Yup.number().required('End is required'),
-    })
-  ),
-});
+    class: Yup.number()
+      .required("Class is required")
+      .min(1, "Class must be at least 1")
+      .max(12, "Class must be at most 12"),
+    subjectId: Yup.string().required("Subject is required"),
+    chapter: Yup.string(),
+    source: Yup.string().required("Source is required"),
+    directions: Yup.array().of(
+      Yup.object().shape({
+        text: Yup.string().required("Direction text is required"),
+        start: Yup.number().required("Start is required"),
+        end: Yup.number().required("End is required"),
+      })
+    ),
+    // headers: Yup.array().of(
+    //   Yup.object().shape({
+    //     text: Yup.string().required('Header text is required'),
+    //     start: Yup.number().required('Start is required'),
+    //     end: Yup.number().required('End is required'),
+    //   })
+    // ),
+    sections: Yup.array().of(
+      Yup.object().shape({
+        text: Yup.string().required("Section text is required"),
+        start: Yup.number().required("Start is required"),
+        end: Yup.number().required("End is required"),
+      })
+    ),
+  });
   const formik = useFormik({
     initialValues: {
-      class:5,
+      class: 5,
       subject: "",
       chapter: "",
-      source:"",
+      subjectId: "",
+      chapterId: "",
+      source: "",
       directions: [{ text: "", start: "", end: "" }],
       headers: [{ text: "", start: "", end: "" }],
       sections: [{ text: "", start: "", end: "" }],
     },
-     validationSchema: ExerciseSchema,
-     onSubmit: async (values, { setSubmitting, resetForm }) => {
-    try {
-      const res = await fetch('http://localhost:5000/api/exercises', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(values),
-      });
-      const data = await res.json();
-      if (res.ok) {
-        alert('✅ Exercise saved successfully!');
-        resetForm();
-      } else {
-        alert(`❌ Server error: ${data.message}`);
+    validationSchema: ExerciseSchema,
+    onSubmit: async (values, { setSubmitting, resetForm }) => {
+      try {
+        const res = await fetch("http://localhost:5000/api/exercises", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(values),
+        });
+        const data = await res.json();
+        if (res.ok) {
+          alert("✅ Exercise saved successfully!");
+          resetForm();
+        } else {
+          alert(`❌ Server error: ${data.message}`);
+        }
+      } catch (err) {
+        console.error(err);
+        alert("❌ Network error while saving exercise");
+      } finally {
+        setSubmitting(false);
       }
-    } catch (err) {
-      console.error(err);
-      alert('❌ Network error while saving exercise');
-    } finally {
-      setSubmitting(false);
-    }
-  },
+    },
   });
 
   const inputStyles =
@@ -139,6 +143,27 @@ export default function AddExercise() {
     </div>
   );
 
+  useEffect(() => {
+    fetch(`http://localhost:5000/api/subjects?classLevel=5`)
+      .then((res) => res.json())
+      .then((data) => setSubjects(data))
+      .catch((err) => console.error("Error fetching subjects", err));
+
+    formik.setFieldValue("subjectId", "");
+    formik.setFieldValue("chapterId", "");
+    setChapters([]);
+  }, []);
+
+  useEffect(() => {
+    if (formik.values.subjectId) {
+      fetch(
+        `http://localhost:5000/api/chapters?subjectId=${formik.values.subjectId}&classLevel=5`
+      )
+        .then((res) => res.json())
+        .then((data) => setChapters(data))
+        .catch((err) => console.error("Error fetching chapters", err));
+    }
+  }, [formik.values.subjectId]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-100 to-purple-200 py-8">
@@ -146,7 +171,9 @@ export default function AddExercise() {
         <div className="bg-white rounded-xl shadow-xl overflow-hidden">
           <div className="bg-gradient-to-r from-purple-600 to-purple-800 px-8 py-6">
             <h1 className="text-3xl font-bold text-white">Add Exercise</h1>
-            <p className="text-purple-100 mt-1">Now includes directions, headers & sections</p>
+            <p className="text-purple-100 mt-1">
+              Now includes directions, headers & sections
+            </p>
           </div>
 
           <form onSubmit={formik.handleSubmit} className="p-8 space-y-10">
@@ -157,43 +184,66 @@ export default function AddExercise() {
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block mb-1 font-medium text-purple-700">
-                    Subject
-                  </label>
-                  <input
-                    type="text"
-                    {...formik.getFieldProps("subject")}
-                    className={inputStyles}
-                  />
-                  {formik.touched.subject && formik.errors.subject && (
-  <div className="text-red-500 text-sm mt-1">{formik.errors.subject}</div>
-)}
+                  <label>Subject</label>
+                  <select
+                    name="subjectId"
+                    value={formik.values.subjectId}
+                    onChange={formik.handleChange}
+                    className="w-full border p-2"
+                  >
+                    <option value="">Select Subject</option>
+                    {subjects.map((s) => (
+                      <option key={s._id} value={s._id}>
+                        {s.name}
+                      </option>
+                    ))}
+                  </select>
+                  {formik.touched.subjectId && formik.errors.subjectId && (
+                    <div className="text-red-600">
+                      {formik.errors.subjectId}
+                    </div>
+                  )}
+                </div>
+
+                {/* Chapter Dropdown */}
+                <div>
+                  <label>Chapter</label>
+                  <select
+                    name="chapterId"
+                    value={formik.values.chapterId}
+                    onChange={formik.handleChange}
+                    className="w-full border p-2"
+                  >
+                    <option value="">Select Chapter</option>
+                    {chapters.map((c) => (
+                      <option key={c._id} value={c._id}>
+                        {c.name}
+                      </option>
+                    ))}
+                  </select>
+                  {formik.touched.chapterId && formik.errors.chapterId && (
+                    <div className="text-red-600">
+                      {formik.errors.chapterId}
+                    </div>
+                  )}
                 </div>
                 <div>
-                  <label className="block mb-1 font-medium text-purple-700">
-                    Chapter
+                  <label className="block font-medium mb-1 text-purple-700">
+                    Source
                   </label>
-                  <input
-                    type="text"
-                    {...formik.getFieldProps("chapter")}
-                    className={inputStyles}
-                  />
-                </div>
-                <div>
-                  <label className="block font-medium mb-1 text-purple-700">Source</label>
-<select
-  name="source"
-  value={formik.values.source}
-  onChange={formik.handleChange}
-  className="w-full px-4 py-2 border border-purple-300 rounded-lg"
->
-  <option value="">-- Select Source --</option>
-  {sourceOptions.map((src) => (
-    <option key={src} value={src}>
-      {src}
-    </option>
-  ))}
-</select>
+                  <select
+                    name="source"
+                    value={formik.values.source}
+                    onChange={formik.handleChange}
+                    className="w-full px-4 py-2 border border-purple-300 rounded-lg"
+                  >
+                    <option value="">-- Select Source --</option>
+                    {sourceOptions.map((src) => (
+                      <option key={src} value={src}>
+                        {src}
+                      </option>
+                    ))}
+                  </select>
                 </div>
               </div>
             </div>
