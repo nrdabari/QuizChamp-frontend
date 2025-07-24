@@ -9,6 +9,7 @@ export default function AddExercise() {
   const [chapters, setChapters] = useState([]);
 
   const ExerciseSchema = Yup.object().shape({
+    name: Yup.string().required("Name is required"),
     class: Yup.number()
       .required("Class is required")
       .min(1, "Class must be at least 1")
@@ -40,6 +41,7 @@ export default function AddExercise() {
   });
   const formik = useFormik({
     initialValues: {
+      name: "",
       class: 5,
       subject: "",
       chapter: "",
@@ -189,6 +191,16 @@ export default function AddExercise() {
                 Basic Information
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label>Exercise Name</label>
+                  <input
+                    type="text"
+                    name="name"
+                    value={formik.values.name}
+                    onChange={formik.handleChange}
+                    className="w-full border p-2"
+                  />
+                </div>
                 <div>
                   <label>Subject</label>
                   <select
