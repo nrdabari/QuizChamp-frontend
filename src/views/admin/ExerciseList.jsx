@@ -36,20 +36,23 @@ export default function ExerciseList() {
               key={ex._id}
               className="bg-white rounded-xl shadow-lg border border-purple-200 p-5 space-y-3"
             >
-              <div>
-                <h2 className="text-xl font-bold text-purple-700">
-                  {ex?.subjectId?.name}
-                </h2>
-                <p className="text-sm text-gray-600">Class {ex.class}</p>
-              </div>
-              <div className="text-gray-700">
-                <p>
-                  <strong>Chapter:</strong> {ex?.chapterId?.name || <em>—</em>}
-                </p>
-                <p>
-                  <strong>Source:</strong> {ex.source}
-                </p>
-              </div>
+              <h2 className="text-xl font-bold text-purple-700">
+                {ex?.subjectId?.name}
+              </h2>
+              <p className="text-sm text-gray-600">Class {ex.class}</p>
+              <p>
+                <strong>Chapter: </strong>
+                {ex?.chapterId?.name ? (
+                  <span className="ml-2">{ex?.chapterId?.name}</span>
+                ) : (
+                  " -----"
+                )}{" "}
+              </p>
+              <p>
+                <strong>Source: </strong> {ex.source}
+                {!ex?.chapterId?.name && <span> - {ex?.name}</span>}
+              </p>
+
               {ex.questionCount > 0 ? (
                 <button
                   onClick={() => handleEditQuestion(ex._id)}

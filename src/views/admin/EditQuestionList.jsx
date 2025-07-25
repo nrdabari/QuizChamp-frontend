@@ -463,7 +463,7 @@ const EditQuestionList = () => {
                         )}
                       </h4>
                     </div>
-                    {question.image && (
+                    {question.imagePath && (
                       <img
                         src={`http://localhost:5000${question.imagePath}`}
                         alt="Question"

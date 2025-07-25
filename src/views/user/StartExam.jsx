@@ -82,6 +82,10 @@ const StartExam = () => {
     );
   };
 
+  const handleReport = (submission) => {
+    navigate(`/user/report/${submission._id}`);
+  };
+
   if (loading) return <p className="p-4">Loading submissions...</p>;
 
   return (
@@ -193,7 +197,7 @@ const StartExam = () => {
                   <td className="p-3">{idx + 1}</td>
                   <td className="p-3">{sub.userId?.name || "Unknown"}</td>
                   <td className="p-3">
-                    {sub.exerciseId?.subject} - {sub.exerciseId?.chapter}
+                    {sub.exerciseId?.source} - {sub.exerciseId?.name}
                   </td>
                   <td className="p-3">
                     {sub.score} / {sub.answers.length}
@@ -213,7 +217,12 @@ const StartExam = () => {
                         Resume
                       </button>
                     ) : (
-                      "-"
+                      <button
+                        className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+                        onClick={() => handleReport(sub)}
+                      >
+                        View Report
+                      </button>
                     )}
                   </td>
                 </tr>

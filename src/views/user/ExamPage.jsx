@@ -188,7 +188,8 @@ const ExamPage = () => {
         alert(
           `✅ Report generated!\nScore: ${data.score}/${data.totalQuestions}`
         );
-        navigate(`/user/exam`);
+        navigate(`/user/report/${submissionId}`);
+        // navigate(`/user/exam`);
       } else {
         alert(`❌ Failed: ${data.message}`);
       }
@@ -509,13 +510,22 @@ const ExamPage = () => {
           >
             Previous
           </button>
-          <button
-            onClick={goToNext}
-            disabled={currentIndex >= exerciseData?.questionCount}
-            className="bg-purple-600 text-white hover:bg-purple-700 px-4 py-2 rounded"
-          >
-            Next
-          </button>
+          {currentIndex >= exerciseData?.questionCount ? (
+            <button
+              onClick={() => setShowModal(true)}
+              className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 mt-6"
+            >
+              Submit Test
+            </button>
+          ) : (
+            <button
+              onClick={goToNext}
+              disabled={currentIndex >= exerciseData?.questionCount}
+              className="bg-purple-600 text-white hover:bg-purple-700 px-4 py-2 rounded"
+            >
+              Next
+            </button>
+          )}
         </div>
       </div>
       {exerciseData && exerciseData?.questionCount > 0 && (

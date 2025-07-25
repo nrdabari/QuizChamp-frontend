@@ -5,6 +5,7 @@ import BulkQuestionUpload from "./views/admin/BulkQuestionUpload ";
 import EditQuestionList from "./views/admin/EditQuestionList";
 import StartExam from "./views/user/StartExam";
 import ExamPage from "./views/user/ExamPage";
+import TestReport from "./views/user/ExamReports";
 
 const routes = [
   {
@@ -41,6 +42,15 @@ const routes = [
     path: "test/:exerciseId",
     icon: User,
     component: <ExamPage />,
+    sideBarVisible: false,
+    notificationBarVisible: false,
+  },
+  {
+    name: "Submission Report",
+    layout: "/user",
+    path: "report/:submissionId",
+    icon: User,
+    component: <TestReport />,
     sideBarVisible: false,
     notificationBarVisible: false,
   },
