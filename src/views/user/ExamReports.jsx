@@ -12,6 +12,7 @@ import {
   Check,
   X,
 } from "lucide-react";
+import moment from "moment";
 
 const TestReport = () => {
   const { submissionId } = useParams();
@@ -19,6 +20,12 @@ const TestReport = () => {
   const [testReport, setTestReport] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  const [filterType, setFilterType] = useState("all"); // 'all', 'correct', 'wrong'
+
+  const handleFilterChange = (type) => {
+    setFilterType(type);
+    setOpenAccordion(null); // Close any open accordions when filtering
+  };
   const toggleAccordion = (questionId) => {
     setOpenAccordion(openAccordion === questionId ? null : questionId);
   };
@@ -40,6 +47,30 @@ const TestReport = () => {
 
     fetchReport();
   }, [submissionId]);
+
+  // Filter questions based on selected filter type
+  const getFilteredQuestions = () => {
+    if (!testReport || !Array.isArray(testReport.questions)) return [];
+    switch (filterType) {
+      case "correct":
+        return testReport.questions.filter((q) => q.isCorrect);
+      case "wrong":
+        return testReport.questions.filter((q) => !q.isCorrect);
+      default:
+        return testReport.questions;
+    }
+  };
+
+  const getFilterTitle = () => {
+    switch (filterType) {
+      case "correct":
+        return "Correct Questions";
+      case "wrong":
+        return "Wrong Questions";
+      default:
+        return "All Questions";
+    }
+  };
 
   const letterToIndex = (letter) => {
     return letter && letter.length === 3 ? letter.charCodeAt(1) - 65 : -1;
@@ -147,7 +178,9 @@ const TestReport = () => {
             <div>
               <p className="text-sm opacity-90">Date</p>
               <p className="font-semibold">
-                {testReport.submissionDetails?.endedAt}
+                {moment(testReport.submissionDetails?.endedAt).format(
+                  "MMMM Do YYYY, h:mm A"
+                )}
               </p>
             </div>
           </div>
@@ -165,7 +198,12 @@ const TestReport = () => {
             <div>
               <p className="text-sm opacity-90">Score</p>
               <p className="font-semibold text-2xl">
-                {testReport.submissionDetails?.score}
+                {(
+                  (testReport.questions.filter((q) => q.isCorrect).length /
+                    testReport.questions.length) *
+                  100
+                ).toFixed(2)}
+                %
               </p>
             </div>
           </div>
@@ -175,36 +213,98 @@ const TestReport = () => {
       {/* Summary Section */}
       <div className="bg-gray-50 rounded-lg p-6 mb-8">
         <h2 className="text-xl font-bold mb-4">
-          {testReport.submissionDetails?.exerciseId?.source}-{" "}
-          {testReport.submissionDetails?.exerciseId?.name}
+          {testReport.submissionDetails.exerciseId?.name}
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
-          <div className="bg-white rounded-lg p-4">
+          <div
+            className={`bg-white rounded-lg p-4 cursor-pointer transition-all duration-200 hover:shadow-md border-2 ${
+              filterType === "all"
+                ? "border-blue-500 shadow-md"
+                : "border-transparent hover:border-blue-300"
+            }`}
+            onClick={() => handleFilterChange("all")}
+          >
             <p className="text-2xl font-bold text-blue-600">
               {testReport.questions?.length}
             </p>
             <p className="text-gray-600">Total Attempted Questions</p>
+            {filterType === "all" && (
+              <div className="mt-2">
+                <span className="inline-block px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">
+                  Active Filter
+                </span>
+              </div>
+            )}
           </div>
-          <div className="bg-white rounded-lg p-4">
+          <div
+            className={`bg-white rounded-lg p-4 cursor-pointer transition-all duration-200 hover:shadow-md border-2 ${
+              filterType === "correct"
+                ? "border-green-500 shadow-md"
+                : "border-transparent hover:border-green-300"
+            }`}
+            onClick={() => handleFilterChange("correct")}
+          >
             <p className="text-2xl font-bold text-green-600">
               {testReport.questions?.filter((q) => q.isCorrect).length}
             </p>
             <p className="text-gray-600">Correct Answers</p>
+            {filterType === "correct" && (
+              <div className="mt-2">
+                <span className="inline-block px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">
+                  Active Filter
+                </span>
+              </div>
+            )}
           </div>
-          <div className="bg-white rounded-lg p-4">
+          <div
+            className={`bg-white rounded-lg p-4 cursor-pointer transition-all duration-200 hover:shadow-md border-2 ${
+              filterType === "wrong"
+                ? "border-red-500 shadow-md"
+                : "border-transparent hover:border-red-300"
+            }`}
+            onClick={() => handleFilterChange("wrong")}
+          >
             <p className="text-2xl font-bold text-red-600">
               {testReport.questions?.filter((q) => !q.isCorrect).length}
             </p>
             <p className="text-gray-600">Wrong Answers</p>
+            {filterType === "wrong" && (
+              <div className="mt-2">
+                <span className="inline-block px-2 py-1 bg-red-100 text-red-800 text-xs rounded-full">
+                  Active Filter
+                </span>
+              </div>
+            )}
           </div>
         </div>
+
+        {/* Filter Status Bar */}
+        {filterType !== "all" && (
+          <div className="mt-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-2">
+                <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                <span className="text-blue-800 font-medium">
+                  Showing {getFilteredQuestions()?.length}{" "}
+                  {getFilterTitle().toLowerCase()}
+                </span>
+              </div>
+              <button
+                onClick={() => handleFilterChange("all")}
+                className="text-blue-600 hover:text-blue-800 text-sm font-medium transition-colors"
+              >
+                Clear Filter
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Questions Section */}
       <div className="space-y-6">
         <h2 className="text-2xl font-bold text-gray-800">Question Review</h2>
 
-        {testReport.questions.map((question, index) => (
+        {getFilteredQuestions().map((question) => (
           <div
             key={question.questionId}
             className="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden"
@@ -233,7 +333,7 @@ const TestReport = () => {
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-3">
                   <h3 className="text-lg font-semibold text-gray-800">
-                    Question {index + 1}
+                    Question {question.id}
                   </h3>
                   {(question.subQuestion?.trim() || question.imagePath) && (
                     <div className="flex items-center space-x-2">

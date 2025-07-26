@@ -17,13 +17,13 @@ export default function AddExercise() {
     subjectId: Yup.string().required("Subject is required"),
     chapter: Yup.string(),
     source: Yup.string().required("Source is required"),
-    directions: Yup.array().of(
-      Yup.object().shape({
-        text: Yup.string().required("Direction text is required"),
-        start: Yup.number().required("Start is required"),
-        end: Yup.number().required("End is required"),
-      })
-    ),
+    // directions: Yup.array().of(
+    //   Yup.object().shape({
+    //     text: Yup.string().required("Direction text is required"),
+    //     start: Yup.number().required("Start is required"),
+    //     end: Yup.number().required("End is required"),
+    //   })
+    // ),
     // headers: Yup.array().of(
     //   Yup.object().shape({
     //     text: Yup.string().required('Header text is required'),
@@ -31,13 +31,13 @@ export default function AddExercise() {
     //     end: Yup.number().required('End is required'),
     //   })
     // ),
-    sections: Yup.array().of(
-      Yup.object().shape({
-        text: Yup.string().required("Section text is required"),
-        start: Yup.number().required("Start is required"),
-        end: Yup.number().required("End is required"),
-      })
-    ),
+    // sections: Yup.array().of(
+    //   Yup.object().shape({
+    //     text: Yup.string().required("Section text is required"),
+    //     start: Yup.number().required("Start is required"),
+    //     end: Yup.number().required("End is required"),
+    //   })
+    // ),
   });
   const formik = useFormik({
     initialValues: {

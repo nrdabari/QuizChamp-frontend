@@ -406,7 +406,7 @@ const EditQuestionList = () => {
   return (
     <div className="p-6 bg-purple-50 min-h-screen">
       <h3 className="text-2xl font-bold text-purple-800 mb-4">
-        {exerciseData?.subject}-{exerciseData?.source}-{exerciseData?.chapter}
+        {exerciseData?.source}-{exerciseData?.name}
       </h3>
 
       <div className="flex justify-between items-center mb-6">

@@ -135,7 +135,7 @@ const StartExam = () => {
             <option value="">-- Choose Exercise --</option>
             {exercises.map((ex) => (
               <option key={ex._id} value={ex._id}>
-                {ex.subject} - {ex.source} - {ex.chapter}
+                {ex.source} - {ex.name}
               </option>
             ))}
           </select>
