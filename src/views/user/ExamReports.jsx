@@ -19,8 +19,31 @@ const TestReport = () => {
   const [openAccordion, setOpenAccordion] = useState(null);
   const [testReport, setTestReport] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [zoomLevel, setZoomLevel] = useState(1);
+  const [selectedQuestion, setSelectedQuestion] = useState(null);
 
   const [filterType, setFilterType] = useState("all"); // 'all', 'correct', 'wrong'
+
+  const openModal = (question) => {
+    setSelectedQuestion(question);
+    setIsModalOpen(true);
+    setZoomLevel(1);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setSelectedQuestion(null);
+    setZoomLevel(1);
+  };
+
+  const zoomIn = () => {
+    setZoomLevel((prev) => Math.min(prev + 0.2, 2));
+  };
+
+  const zoomOut = () => {
+    setZoomLevel((prev) => Math.max(prev - 0.2, 0.6));
+  };
 
   const handleFilterChange = (type) => {
     setFilterType(type);
@@ -303,7 +326,6 @@ const TestReport = () => {
       {/* Questions Section */}
       <div className="space-y-6">
         <h2 className="text-2xl font-bold text-gray-800">Question Review</h2>
-
         {getFilteredQuestions().map((question) => (
           <div
             key={question.questionId}
