@@ -358,10 +358,6 @@ const ExamPage = () => {
                         );
                       }
 
-                      const optionLetter = ["(A)", "(B)", "(C)", "(D)"][
-                        rowIndex - 1
-                      ];
-
                       return (
                         <label
                           key={rowIndex}

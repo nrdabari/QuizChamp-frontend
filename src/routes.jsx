@@ -6,6 +6,8 @@ import EditQuestionList from "./views/admin/EditQuestionList";
 import StartExam from "./views/user/StartExam";
 import ExamPage from "./views/user/ExamPage";
 import TestReport from "./views/user/ExamReports";
+import { ROLES } from "./constants/enum";
+import PracticePage from "./views/user/PracticePage";
 
 const routes = [
   {
@@ -85,6 +87,37 @@ const routes = [
     sideBarVisible: false, // not shown in sidebar
     dynamicValue: 1, // optional if you use it in your logic
     secondary: true, // optional, use if needed
+    notificationBarVisible: true,
+  },
+  {
+    name: "Add Employee",
+    layout: "/admin",
+    path: "user/add",
+    // icon: <img src={books} alt="books-icon"></img>,
+    // component: <AddUser />,
+    secondary: true,
+    sideBarVisible: false,
+    dynamicValue: 0,
+    role: [ROLES.ADMIN],
+  },
+  {
+    name: "Edit Employee",
+    layout: "/admin",
+    path: "user/edit/:id",
+    // icon: <img src={books} alt="books-icon"></img>,
+    // component: <AddUser />,
+    secondary: true,
+    sideBarVisible: false,
+    dynamicValue: 0,
+    role: [ROLES.ADMIN],
+  },
+  {
+    name: "Practice Questions",
+    layout: "/user",
+    path: "practice/:exerciseId", // dynamic route
+    icon: User,
+    component: <PracticePage />,
+    sideBarVisible: false,
     notificationBarVisible: true,
   },
 ];
