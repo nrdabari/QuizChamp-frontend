@@ -8,6 +8,8 @@ import ExamPage from "./views/user/ExamPage";
 import TestReport from "./views/user/ExamReports";
 import { ROLES } from "./constants/enum";
 import PracticePage from "./views/user/PracticePage";
+import PDFTextExtractor from "./views/admin/PDFTextExtractor";
+import ChapterAssignmentForm from "./views/admin/ChapterAssignmentForm";
 
 const routes = [
   {
@@ -45,6 +47,24 @@ const routes = [
     path: "exam",
     icon: User,
     component: <StartExam />,
+    sideBarVisible: true,
+    notificationBarVisible: true,
+  },
+  {
+    name: "Assign Chapters",
+    layout: "/admin",
+    path: "assignments/:exerciseId/chapter-assignment",
+    icon: User,
+    component: <ChapterAssignmentForm />,
+    sideBarVisible: false,
+    notificationBarVisible: true,
+  },
+  {
+    name: "PDF Extract",
+    layout: "/admin",
+    path: "extract",
+    icon: User,
+    component: <PDFTextExtractor />,
     sideBarVisible: true,
     notificationBarVisible: true,
   },

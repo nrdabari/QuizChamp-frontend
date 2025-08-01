@@ -271,7 +271,7 @@ const StartExam = () => {
                 <th className="p-3">Score</th>
                 <th className="p-3">Time Taken (min)</th>
                 <th className="p-3">Submitted</th>
-                <th className="p-3">Action</th> {/* Add action column */}
+                <th className="p-3">Action</th>
               </tr>
             </thead>
             <tbody>

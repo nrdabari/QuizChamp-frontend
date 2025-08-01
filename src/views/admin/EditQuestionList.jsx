@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useFormik } from "formik";
 import { Edit, Save, Trash2, Upload, X } from "lucide-react";
 import { Editor } from "@tinymce/tinymce-react";
@@ -15,6 +15,7 @@ const EditQuestionList = () => {
 
   const startBulkEdit = () => setEditMode(true);
   const exitBulkEdit = () => setEditMode(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetch(`http://localhost:5000/api/questions/edit/${exerciseId}`)
@@ -402,12 +403,24 @@ const EditQuestionList = () => {
       </div>
     );
   };
-
+  const handleEditChapter = () => {
+    navigate(
+      `/admin/assignments/${exerciseId}/chapter-assignment?source=${exerciseData?.source}&exerciseName=${exerciseData?.name}`
+    );
+  };
   return (
     <div className="p-6 bg-purple-50 min-h-screen">
       <h3 className="text-2xl font-bold text-purple-800 mb-4">
         {exerciseData?.source}-{exerciseData?.name}
       </h3>
+      {exerciseData?.source === "Previous Years Paper" && (
+        <button
+          className="px-4 py-2 bg-blue-500 text-white rounded-lg"
+          onClick={handleEditChapter}
+        >
+          Assign chapters
+        </button>
+      )}
 
       <div className="flex justify-between items-center mb-6">
         <div className="flex space-x-3">
