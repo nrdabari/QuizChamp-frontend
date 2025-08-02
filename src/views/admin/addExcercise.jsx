@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useFormik } from "formik";
-import { Plus, Trash2 } from "lucide-react";
+import { Camera, Eye, Plus, Trash2, Upload } from "lucide-react";
 import { sourceOptions } from "../../helper/helpers";
 import * as Yup from "yup";
 import { useNavigate, useParams } from "react-router-dom";
@@ -12,7 +12,53 @@ export default function AddExercise() {
   const [chapters, setChapters] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  // const [imageModal, setImageModal] = useState(false);
 
+  const handleImageUpload = async (file, idx) => {
+    if (!file) return;
+    // setIsUploading(true);
+    try {
+      await handleDirectionImageUpload(file, idx);
+    } catch (error) {
+      console.error("Upload error:", error);
+    } finally {
+      // setIsUploading(false);
+    }
+  };
+
+  const removeImage = async (idx) => {
+    const updatedDirections = [...formik.values["directions"]];
+
+    updatedDirections[idx].imagePath = "";
+    formik.setFieldValue("directions", updatedDirections);
+    try {
+      const response = await fetch(
+        `http://localhost:5000/api/exercises/${id}/directions/${idx}/image`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      const data = await response.json();
+
+      if (response.ok) {
+        // Update form state
+        const updatedDirections = [...formik.values["directions"]];
+        updatedDirections[idx].imagePath = "";
+        formik.setFieldValue("directions", updatedDirections);
+
+        alert("✅ Image removed successfully");
+      } else {
+        alert(`❌ Failed to remove image: ${data.error}`);
+      }
+    } catch (error) {
+      console.error("Error removing image:", error);
+      alert("❌ Network error while removing image");
+    }
+  };
   // Determine if we're in edit mode
   const isEditMode = !!id;
 
@@ -120,7 +166,7 @@ export default function AddExercise() {
           directions:
             exerciseData.directions?.length > 0
               ? exerciseData.directions
-              : [{ text: "", start: "", end: "" }],
+              : [{ text: "", start: "", end: "", imagePath: "" }],
           headers:
             exerciseData.headers?.length > 0
               ? exerciseData.headers
@@ -175,6 +221,40 @@ export default function AddExercise() {
     formik.setFieldValue(group, updated);
   };
 
+  const handleDirectionImageUpload = async (file, index) => {
+    if (!id || !file) return;
+    const formData = new FormData();
+    formData.append("image", file);
+    formData.append("directionIndex", index);
+
+    try {
+      const res = await fetch(
+        `http://localhost:5000/api/exercises/${id}/directions/image`,
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
+
+      const data = await res.json();
+
+      if (res.ok) {
+        const updatedDirections = [...formik.values.directions];
+        console.log(data.imagePath);
+
+        updatedDirections[index].imagePath = data.imagePath;
+        formik.setFieldValue("directions", updatedDirections);
+        alert("✅ Image uploaded successfully");
+      } else {
+        alert(`❌ Upload failed: ${data.error}`);
+      }
+    } catch (err) {
+      console.error("Image upload error:", err);
+      alert("❌ Network error during upload");
+    }
+  };
+  console.log(formik.values);
+
   const renderGroup = (group, label) => (
     <div className="bg-purple-50 p-6 rounded-lg border-2 border-purple-200 mb-6">
       <h3 className="text-xl font-bold text-purple-800 mb-4">{label}</h3>
@@ -226,6 +306,98 @@ export default function AddExercise() {
               className={inputStyles}
             />
           </div>
+          {group === "directions" && isEditMode && (
+            <div className="mt-4">
+              <div className="flex items-center justify-between mb-3">
+                <label className="block text-sm font-medium text-purple-700">
+                  Direction Image
+                </label>
+                {formik.values[group][idx]?.imagePath && (
+                  <button
+                    type="button"
+                    onClick={() => removeImage(idx)}
+                    className="text-red-500 hover:text-red-700 transition-colors flex items-center gap-1 text-sm"
+                    title="Remove image"
+                  >
+                    <Trash2 size={14} />
+                    Remove
+                  </button>
+                )}
+              </div>
+              <div className="relative">
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => handleImageUpload(e.target.files[0], idx)}
+                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                  id={`image-upload-${idx}`}
+                />
+                <label
+                  htmlFor={`image-upload-${idx}`}
+                  className="flex flex-col items-center justify-center w-full h-32 border-2 border-purple-300 border-dashed rounded-lg cursor-pointer bg-purple-50 hover:bg-purple-100 transition-colors"
+                >
+                  <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                    <Upload className="w-8 h-8 mb-2 text-purple-400" />
+                    <p className="mb-2 text-sm text-purple-600">
+                      <span className="font-semibold">Click to upload</span> or
+                      drag and drop
+                    </p>
+                    <p className="text-xs text-purple-500">
+                      PNG, JPG, WEBP up to 5MB
+                    </p>
+                  </div>
+                </label>
+              </div>
+              {formik.values[group][idx]?.imagePath && (
+                <div className="space-y-3">
+                  <div className="relative group">
+                    <img
+                      src={`http://localhost:5000${formik.values[group][idx]?.imagePath}`}
+                      alt={`Direction ${idx + 1}`}
+                      className="w-full max-w-md h-48 object-cover rounded-lg shadow-sm border border-gray-200"
+                    />
+
+                    {/* Image Overlay */}
+                    {/* <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-all duration-200 rounded-lg flex items-center justify-center opacity-0 group-hover:opacity-100">
+                      <button
+                        type="button"
+                        onClick={() => setImageModal(true)}
+                        className="bg-white text-gray-700 px-3 py-2 rounded-lg shadow-lg hover:bg-gray-50 transition-colors flex items-center gap-2"
+                      >
+                        <Eye size={16} />
+                        <span className="text-sm">View Full Size</span>
+                      </button>
+                    </div> */}
+
+                    {/* Success Badge */}
+                    <div className="absolute top-2 right-2">
+                      <div className="bg-green-500 text-white px-2 py-1 rounded-full text-xs font-medium flex items-center gap-1">
+                        <Camera size={12} />
+                        Uploaded
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Image Info */}
+                  <div className="p-3 bg-green-50 rounded-lg border border-green-200">
+                    <div className="flex items-center justify-between text-sm text-green-700">
+                      <span className="flex items-center gap-2">
+                        <Camera size={14} />
+                        Image uploaded successfully
+                      </span>
+                      {/* <button
+                        type="button"
+                        onClick={() => setImageModal(true)}
+                        className="text-purple-600 hover:text-purple-800 font-medium"
+                      >
+                        Preview
+                      </button> */}
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       ))}
       <button

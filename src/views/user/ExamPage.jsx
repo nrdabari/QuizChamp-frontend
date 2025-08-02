@@ -258,8 +258,16 @@ const ExamPage = () => {
 
   // if (loading || !currentQuestion) return <p>Loading...</p>;
 
+  const getDirectionForRange = (index, items = []) =>
+    items.find((item) => index >= item.start && index <= item.end) || null;
+
+  const direction = getDirectionForRange(
+    currentIndex,
+    exerciseData?.directions
+  );
+
   // Extract direction/header/section text
-  const directionText = getTextForRange(currentIndex, exerciseData?.directions);
+  const directionText = direction?.text;
   const headerText = getTextForRange(currentIndex, exerciseData?.headers);
   const sectionText = getTextForRange(currentIndex, exerciseData?.sections);
 
@@ -513,9 +521,31 @@ const ExamPage = () => {
         )}
 
         <div className="mt-6 bg-white border rounded p-4 shadow">
-          {directionText && (
+          {direction && (
             <div className="mb-4 p-2 bg-yellow-100 text-sm rounded">
-              {directionText}
+              {directionText && <div className="mb-2">{directionText}</div>}
+              {direction.imagePath && (
+                <div className="mb-4 text-center">
+                  <img
+                    src={`http://localhost:5000${direction.imagePath}`}
+                    alt="Direction"
+                    className="max-w-full h-auto rounded-lg shadow-md mx-auto"
+                    style={{ maxHeight: "500px" }}
+                    onError={(e) => {
+                      e.target.style.display = "none";
+                      if (e.target.nextSibling) {
+                        e.target.nextSibling.style.display = "block";
+                      }
+                    }}
+                  />
+                  <div
+                    style={{ display: "none" }}
+                    className="text-gray-500 text-sm mt-2"
+                  >
+                    Image failed to load
+                  </div>
+                </div>
+              )}
             </div>
           )}
           <button
