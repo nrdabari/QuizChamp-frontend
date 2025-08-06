@@ -27,8 +27,8 @@ export default function ExerciseList() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-100 to-purple-200 p-6">
-      <div className="max-w-6xl mx-auto">
+    <div className=" bg-gradient-to-br from-purple-100 to-purple-200 p-6">
+      <div className="">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-3xl font-bold text-purple-800">Exercise List</h1>
           <button
@@ -53,7 +53,7 @@ export default function ExerciseList() {
           </button>
         </div>
 
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {exercises.map((ex) => (
             <div
               key={ex._id}

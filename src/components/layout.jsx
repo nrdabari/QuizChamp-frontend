@@ -28,7 +28,7 @@ export default function Layout() {
   };
 
   return (
-    <div className="min-h-screen w-[100%] bg-purple-50 flex">
+    <div className="h-screen overflow-hidden w-[100%] bg-purple-50 flex">
       {/* Sidebar */}
       <Sidebar />
 
@@ -119,7 +119,7 @@ export default function Layout() {
         </div>
 
         {/* Main content */}
-        <main className="flex-1 p-6 overflow-y-auto">
+        <main className="flex-1 overflow-y-auto">
           <Outlet />
         </main>
       </div>
