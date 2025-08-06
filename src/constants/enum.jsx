@@ -2,7 +2,7 @@ export const ROLES = {
   SUPERADMIN: "superadmin",
   ADMIN: "admin",
   MANAGER: "manager",
-  USER: "student",
+  USER: "user",
 };
 
 Object.freeze(ROLES);

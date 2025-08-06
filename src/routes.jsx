@@ -21,6 +21,7 @@ const routes = [
     sideBarVisible: false,
     dynamicValue: 0,
     notificationBarVisible: true,
+    role: [ROLES.ADMIN],
   },
   {
     name: "Edit Excercise",
@@ -31,6 +32,7 @@ const routes = [
     sideBarVisible: false,
     dynamicValue: 0,
     notificationBarVisible: true,
+    role: [ROLES.ADMIN],
   },
   {
     name: "Exercise List",
@@ -40,6 +42,7 @@ const routes = [
     component: <ExerciseList />,
     sideBarVisible: true,
     notificationBarVisible: true,
+    role: [ROLES.ADMIN],
   },
   {
     name: "Exam",
@@ -49,6 +52,7 @@ const routes = [
     component: <StartExam />,
     sideBarVisible: true,
     notificationBarVisible: true,
+    role: [ROLES.USER],
   },
   {
     name: "Assign Chapters",
@@ -58,6 +62,7 @@ const routes = [
     component: <ChapterAssignmentForm />,
     sideBarVisible: false,
     notificationBarVisible: true,
+    role: [ROLES.ADMIN],
   },
   {
     name: "PDF Extract",
@@ -67,6 +72,7 @@ const routes = [
     component: <PDFTextExtractor />,
     sideBarVisible: true,
     notificationBarVisible: true,
+    role: [ROLES.ADMIN],
   },
   {
     name: "Test",
@@ -76,6 +82,7 @@ const routes = [
     component: <ExamPage />,
     sideBarVisible: false,
     notificationBarVisible: false,
+    role: [ROLES.USER],
   },
   {
     name: "Submission Report",
@@ -85,6 +92,7 @@ const routes = [
     component: <TestReport />,
     sideBarVisible: false,
     notificationBarVisible: false,
+    role: [ROLES.USER],
   },
 
   {
@@ -97,6 +105,7 @@ const routes = [
     dynamicValue: 1, // optional if you use it in your logic
     secondary: true, // optional, use if needed
     notificationBarVisible: true,
+    role: [ROLES.ADMIN],
   },
   {
     name: "Edit Questions",
@@ -108,6 +117,7 @@ const routes = [
     dynamicValue: 1, // optional if you use it in your logic
     secondary: true, // optional, use if needed
     notificationBarVisible: true,
+    role: [ROLES.ADMIN],
   },
   {
     name: "Add Employee",
@@ -139,6 +149,7 @@ const routes = [
     component: <PracticePage />,
     sideBarVisible: false,
     notificationBarVisible: true,
+    role: [ROLES.USER],
   },
 ];
 

@@ -1,25 +1,26 @@
 import React, { useEffect, useState } from "react";
 import { useFormik } from "formik";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
 
 const StartExam = () => {
-  const [users, setUsers] = useState([]);
   const [exercises, setExercises] = useState([]);
   const navigate = useNavigate();
 
   const [submissions, setSubmissions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [mode, setMode] = useState(""); // "exam" or "practice"
+  const { user } = useAuth();
 
   const formik = useFormik({
     initialValues: {
-      userId: "",
+      userId: user._id,
       exerciseId: "",
       totalTime: "",
     },
     validate: (values) => {
       const errors = {};
-      if (!values.userId) errors.userId = "User is required";
+      // if (!values.userId) errors.userId = "User is required";
       if (!values.exerciseId) errors.exerciseId = "Exercise is required";
 
       if (mode === "exam") {
@@ -77,10 +78,6 @@ const StartExam = () => {
   useEffect(() => {
     const fetchSubmissions = async () => {
       try {
-        fetch("http://localhost:5000/api/users")
-          .then((res) => res.json())
-          .then(setUsers);
-
         fetch("http://localhost:5000/api/exercises")
           .then((res) => res.json())
           .then(setExercises);
@@ -161,31 +158,6 @@ const StartExam = () => {
         {/* Form Fields - Show when mode is selected */}
         {mode !== "" && (
           <>
-            {/* User Dropdown */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Select User
-              </label>
-              <select
-                name="userId"
-                value={formik.values.userId}
-                onChange={formik.handleChange}
-                className="w-full border border-gray-300 p-2 rounded"
-              >
-                <option value="">-- Choose User --</option>
-                {users.map((user) => (
-                  <option key={user._id} value={user._id}>
-                    {user.name} ({user.email})
-                  </option>
-                ))}
-              </select>
-              {formik.errors.userId && (
-                <p className="text-red-500 text-sm mt-1">
-                  {formik.errors.userId}
-                </p>
-              )}
-            </div>
-
             {/* Exercise Dropdown */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
