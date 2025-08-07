@@ -315,16 +315,12 @@ const PracticeFailedQuestions = ({ exerciseId, userId }) => {
             {currentQuestion.imagePath && (
               <div className="mb-4 relative group">
                 <img
-                  src={`${import.meta.env.VITE_BACKEND_URL}
+                  src={`
                   ${currentQuestion.imagePath}`}
                   alt="Question"
                   className="w-full h-36 object-contain rounded-lg shadow-md cursor-pointer transition-transform hover:scale-[1.02]"
                   onClick={() =>
-                    openImageZoom(
-                      `${import.meta.env.VITE_BACKEND_URL}
-                      ${currentQuestion.imagePath}`,
-                      "Question"
-                    )
+                    openImageZoom(`${currentQuestion.imagePath}`, "Question")
                   }
                 />
                 <div className="absolute top-2 right-2 bg-black/50 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">

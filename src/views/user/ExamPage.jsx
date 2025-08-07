@@ -361,9 +361,7 @@ const ExamPage = () => {
                 {question.imagePath && (
                   <div className="mb-4 text-center">
                     <img
-                      src={`${import.meta.env.VITE_BACKEND_URL}${
-                        question.imagePath
-                      }`}
+                      src={`${question.imagePath}`}
                       alt="Question"
                       className="max-w-full h-auto rounded-lg shadow-md mx-auto"
                       style={{ maxHeight: "500px" }}
@@ -474,9 +472,7 @@ const ExamPage = () => {
               <div className="flex flex-col items-center space-y-6">
                 <div className="mb-4 text-center">
                   <img
-                    src={`${import.meta.env.VITE_BACKEND_URL}${
-                      question.imagePath
-                    }`}
+                    src={`${question.imagePath}`}
                     alt="Question"
                     className="max-w-full h-auto rounded-lg shadow-md mx-auto"
                     style={{ maxHeight: "500px" }}
@@ -667,9 +663,7 @@ const ExamPage = () => {
                 {/* <p><span style="font-weight: bold; -webkit-text-stroke: 1px black; color: transparent; font-size: 54pt;"> F R A M E </span></p> */}
                 {currentQuestion.imagePath && (
                   <img
-                    src={`${import.meta.env.VITE_BACKEND_URL}${
-                      currentQuestion.imagePath
-                    }`}
+                    src={`${currentQuestion.imagePath}`}
                     alt="Question"
                     className="w-96 mb-4"
                   />
@@ -807,9 +801,7 @@ const ExamPage = () => {
             ) : currentQuestion?.imagePath ? (
               <div className="flex flex-col items-center space-y-4">
                 <img
-                  src={`${import.meta.env.VITE_BACKEND_URL}${
-                    currentQuestion.imagePath
-                  }`}
+                  src={`${currentQuestion.imagePath}`}
                   alt={`Q${currentIndex}`}
                   className="max-w-full h-auto rounded shadow-md"
                   style={{ maxHeight: "500px" }}

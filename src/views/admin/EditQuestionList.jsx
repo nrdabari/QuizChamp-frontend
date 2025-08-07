@@ -303,10 +303,7 @@ const EditQuestionList = () => {
               {imagePreviews[question._id] || question.imagePath ? (
                 <div className="relative">
                   <img
-                    src={
-                      imagePreviews[question._id] ||
-                      `${import.meta.env.VITE_BACKEND_URL}${question.imagePath}`
-                    }
+                    src={imagePreviews[question._id] || `${question.imagePath}`}
                     alt="Question preview"
                     className="w-20 h-20 object-cover rounded-md border border-purple-300"
                   />
@@ -511,9 +508,7 @@ const EditQuestionList = () => {
                     </div>
                     {question.imagePath && (
                       <img
-                        src={`${import.meta.env.VITE_BACKEND_URL}${
-                          question.imagePath
-                        }`}
+                        src={`${question.imagePath}`}
                         alt="Question"
                         className="w-32 h-32 object-cover rounded-md border border-purple-300 mb-2"
                       />

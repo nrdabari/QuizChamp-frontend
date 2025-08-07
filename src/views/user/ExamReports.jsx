@@ -523,9 +523,7 @@ const TestReport = () => {
                   {question.imagePath && (
                     <div className="mb-6">
                       <img
-                        src={`${import.meta.env.VITE_BACKEND_URL}${
-                          question.imagePath
-                        }`}
+                        src={`${question.imagePath}`}
                         alt="Question illustration"
                         className="w-52 max-w-2xl mx-auto rounded-lg shadow-md"
                       />
