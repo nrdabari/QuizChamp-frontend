@@ -4,15 +4,17 @@ import { Camera, Eye, Plus, Trash2, Upload } from "lucide-react";
 import { sourceOptions } from "../../helper/helpers";
 import * as Yup from "yup";
 import { useNavigate, useParams } from "react-router-dom";
+import { useApiService } from "../../hooks/useApiService";
 
 export default function AddExercise() {
   const { id } = useParams(); // Get exercise ID from URL (undefined for add mode)
   const navigate = useNavigate();
   const [subjects, setSubjects] = useState([]);
   const [chapters, setChapters] = useState([]);
-  const [loading, setLoading] = useState(false);
+  // const [isLoading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   // const [imageModal, setImageModal] = useState(false);
+  const { admin, loading } = useApiService();
 
   const handleImageUpload = async (file, idx) => {
     if (!file) return;
@@ -32,28 +34,14 @@ export default function AddExercise() {
     updatedDirections[idx].imagePath = "";
     formik.setFieldValue("directions", updatedDirections);
     try {
-      const response = await fetch(
-        `http://localhost:5000/api/exercises/${id}/directions/${idx}/image`,
-        {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      await admin.removeDirectionImage(id, idx);
 
-      const data = await response.json();
+      // Update form state
+      const updatedDirections = [...formik.values["directions"]];
+      updatedDirections[idx].imagePath = "";
+      formik.setFieldValue("directions", updatedDirections);
 
-      if (response.ok) {
-        // Update form state
-        const updatedDirections = [...formik.values["directions"]];
-        updatedDirections[idx].imagePath = "";
-        formik.setFieldValue("directions", updatedDirections);
-
-        alert("✅ Image removed successfully");
-      } else {
-        alert(`❌ Failed to remove image: ${data.error}`);
-      }
+      alert("✅ Image removed successfully");
     } catch (error) {
       console.error("Error removing image:", error);
       alert("❌ Network error while removing image");
@@ -97,28 +85,15 @@ export default function AddExercise() {
         if (!payload.chapterId) delete payload.chapterId;
         if (!payload.subjectId) delete payload.subjectId;
 
-        const url = "http://localhost:5000/api/exercises/exercise"; // Single endpoint
-        const res = await fetch(url, {
-          method: "POST", // Always POST
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        });
-
-        const data = await res.json();
-
-        if (res.ok) {
-          const message = values._id
-            ? "✅ Exercise updated successfully!"
-            : "✅ Exercise created successfully!";
-          alert(message);
-
-          if (values._id) {
-            navigate("/admin/exercises"); // Navigate back to list
-          } else {
-            resetForm(); // New entry
-          }
+        await admin.createOrUpdateExercise(payload, resetForm);
+        const message = values._id
+          ? "✅ Exercise updated successfully!"
+          : "✅ Exercise created successfully!";
+        alert(message);
+        if (values._id) {
+          navigate("/admin/exercises"); // Navigate back to list
         } else {
-          alert(`❌ Server error: ${data.message}`);
+          resetForm(); // New entry
         }
       } catch (err) {
         console.error(err);
@@ -144,13 +119,7 @@ export default function AddExercise() {
 
     const fetchExercise = async () => {
       try {
-        setLoading(true);
-        const res = await fetch(`http://localhost:5000/api/exercises/${id}`);
-        if (!res.ok) {
-          throw new Error("Failed to fetch exercise");
-        }
-        const exerciseData = await res.json();
-
+        const exerciseData = await admin.getExercise(id);
         // Set form values with existing data
         formik.setValues({
           _id: exerciseData._id,
@@ -179,8 +148,6 @@ export default function AddExercise() {
       } catch (err) {
         console.error("Error fetching exercise:", err);
         setError("Failed to load exercise data");
-      } finally {
-        setLoading(false);
       }
     };
 
@@ -189,24 +156,34 @@ export default function AddExercise() {
 
   // Load subjects
   useEffect(() => {
-    fetch(`http://localhost:5000/api/subjects?classLevel=5`)
-      .then((res) => res.json())
-      .then((data) => setSubjects(data))
-      .catch((err) => console.error("Error fetching subjects", err));
+    const fetchSubjects = async () => {
+      try {
+        const data = await admin.getSubjects(5); // or whatever the admin service method is
+        setSubjects(data);
+      } catch (err) {
+        console.error("Error fetching subjects", err);
+      }
+    };
+
+    fetchSubjects();
   }, []);
 
   // Load chapters when subject changes
   useEffect(() => {
-    if (formik.values.subjectId) {
-      fetch(
-        `http://localhost:5000/api/chapters?subjectId=${formik.values.subjectId}&classLevel=5`
-      )
-        .then((res) => res.json())
-        .then((data) => setChapters(data))
-        .catch((err) => console.error("Error fetching chapters", err));
-    } else {
-      setChapters([]);
-    }
+    const fetchChapters = async () => {
+      if (formik.values.subjectId) {
+        try {
+          const data = await admin.getChapters(formik.values.subjectId, 5);
+          setChapters(data);
+        } catch (err) {
+          console.error("Error fetching chapters", err);
+        }
+      } else {
+        setChapters([]);
+      }
+    };
+
+    fetchChapters();
   }, [formik.values.subjectId]);
 
   // ── Helpers
@@ -228,26 +205,14 @@ export default function AddExercise() {
     formData.append("directionIndex", index);
 
     try {
-      const res = await fetch(
-        `http://localhost:5000/api/exercises/${id}/directions/image`,
-        {
-          method: "POST",
-          body: formData,
-        }
-      );
+      const data = await admin.uploadDirectionImage(id, formData);
 
-      const data = await res.json();
+      const updatedDirections = [...formik.values.directions];
+      console.log(data.imagePath);
 
-      if (res.ok) {
-        const updatedDirections = [...formik.values.directions];
-        console.log(data.imagePath);
-
-        updatedDirections[index].imagePath = data.imagePath;
-        formik.setFieldValue("directions", updatedDirections);
-        alert("✅ Image uploaded successfully");
-      } else {
-        alert(`❌ Upload failed: ${data.error}`);
-      }
+      updatedDirections[index].imagePath = data.imagePath;
+      formik.setFieldValue("directions", updatedDirections);
+      alert("✅ Image uploaded successfully");
     } catch (err) {
       console.error("Image upload error:", err);
       alert("❌ Network error during upload");
@@ -352,7 +317,9 @@ export default function AddExercise() {
                 <div className="space-y-3">
                   <div className="relative group">
                     <img
-                      src={`http://localhost:5000${formik.values[group][idx]?.imagePath}`}
+                      src={`${import.meta.env.VITE_BACKEND_URL}${
+                        formik.values[group][idx]?.imagePath
+                      }`}
                       alt={`Direction ${idx + 1}`}
                       className="w-full max-w-md h-48 object-cover rounded-lg shadow-sm border border-gray-200"
                     />

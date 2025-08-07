@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
+import api from "../utils/api";
 
 const AuthContext = createContext();
 
@@ -15,26 +16,42 @@ export const AuthProvider = ({ children }) => {
     setLoading(true);
     setError("");
     try {
-      const res = await fetch("http://localhost:5000/api/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include", // ⬅️ important for cookie-based auth
-        body: JSON.stringify({ email, password }),
+      const response = await api.post("/auth/login", {
+        email,
+        password,
       });
+      const userData = response.data.user;
+      setUser(userData);
+      return {
+        success: true,
+        user: userData, // ✅ NEW: Return user data for immediate use
+      };
+    } catch (error) {
+      let errorMessage = "An error occurred during login. Please try again.";
 
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.message || "Login failed");
+      if (error.response?.status === 401 || error.response?.status === 400) {
+        errorMessage =
+          "Invalid email or password. Please check your credentials and try again.";
+      } else if (error.response?.status === 429) {
+        errorMessage =
+          "Too many login attempts. Please wait a few minutes before trying again.";
+      } else if (error.response?.status === 403) {
+        errorMessage =
+          "Account access denied. Please contact your administrator.";
+      } else if (error.response?.status >= 500) {
+        errorMessage =
+          "Server error. Please try again later or contact support.";
+      } else if (error.message) {
+        // Use the original error message if it exists
+        errorMessage = error.message;
       }
 
-      const data = await res.json();
-      setUser(data.user);
-      return { success: true };
-    } catch (err) {
-      setError(err.message);
-      return { success: false };
+      setError(errorMessage);
+
+      return {
+        success: false,
+        error: errorMessage,
+      };
     } finally {
       setLoading(false);
     }
@@ -42,10 +59,7 @@ export const AuthProvider = ({ children }) => {
 
   const logout = async () => {
     try {
-      await fetch("http://localhost:5000/api/auth/logout", {
-        method: "POST",
-        credentials: "include",
-      });
+      await api.post("/auth/logout");
       setUser(null);
     } catch (err) {
       console.error("Logout failed", err);
@@ -55,21 +69,17 @@ export const AuthProvider = ({ children }) => {
   const getProfile = async () => {
     setLoading(true);
     try {
-      const res = await fetch("http://localhost:5000/api/auth/me", {
-        method: "GET",
-        credentials: "include",
-      });
-
-      if (!res.ok) throw new Error("Unauthorized");
-
-      const data = await res.json();
-      console.log(data.user);
-
-      setUser(data.user);
-    } catch {
+      const response = await api.get("/auth/me");
+      console.log("Profile data:", response.data.user);
+      setUser(response.data.user);
+    } catch (error) {
+      console.log(
+        "Profile fetch failed:",
+        error.response?.data?.message || error.message
+      );
       setUser(null);
     } finally {
-      setLoading(false); // ⬅️ Always set loading to false
+      setLoading(false);
     }
   };
 

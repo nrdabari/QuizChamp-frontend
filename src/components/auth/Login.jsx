@@ -1,47 +1,59 @@
 //src/components/auth/login
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useFormik } from "formik";
+import * as Yup from "yup";
 import { useAuth } from "../../context/AuthContext";
 
+// Validation schema
+const validationSchema = Yup.object({
+  email: Yup.string()
+    .email("Please enter a valid email address")
+    .required("Email is required"),
+  password: Yup.string()
+    .min(6, "Password must be at least 6 characters")
+    .required("Password is required"),
+});
+
 const Login = () => {
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-  });
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
 
   const { login, isLoading, error, clearError } = useAuth();
   const navigate = useNavigate();
 
-  // Clear errors when component mounts or form changes
+  // Initialize Formik
+  const formik = useFormik({
+    initialValues: {
+      email: "",
+      password: "",
+    },
+    validationSchema,
+    onSubmit: async (values, { setSubmitting, setFieldError }) => {
+      try {
+        setSubmitting(true);
+        const result = await login(values.email, values.password);
+
+        // Only navigate if login was successful
+        if (result && result.success) {
+          navigate("/", { replace: true });
+        }
+      } catch (error) {
+        // Set field-specific errors if needed
+        setFieldError("email", "Invalid credentials");
+        setFieldError("password", "Invalid credentials");
+      } finally {
+        setSubmitting(false);
+      }
+    },
+  });
+
+  // Clear errors when form values change
   useEffect(() => {
-    clearError();
-  }, [formData, clearError]);
-
-  // Handle input changes
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-
-  // Handle form submission
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    if (!formData.email || !formData.password) {
-      return;
+    if (formik.values.email || formik.values.password) {
+      clearError();
     }
-
-    const result = await login(formData.email, formData.password);
-
-    if (result.success) {
-      navigate("/", { replace: true });
-    }
-  };
+  }, [formik.values, clearError]);
 
   // Toggle password visibility
   const togglePasswordVisibility = () => {
@@ -78,10 +90,10 @@ const Login = () => {
 
         {/* Login Form */}
         <div className="bg-white rounded-lg shadow-md p-8">
-          <form className="space-y-6" onSubmit={handleSubmit}>
-            {/* Error Message */}
+          <form className="space-y-6" onSubmit={formik.handleSubmit} noValidate>
+            {/* Global Error Message */}
             {error && (
-              <div className="bg-red-50 border border-red-200 rounded-md p-4">
+              <div className="bg-red-50 border border-red-200 rounded-md p-4 animate-pulse">
                 <div className="flex">
                   <div className="flex-shrink-0">
                     <svg
@@ -99,7 +111,10 @@ const Login = () => {
                     </svg>
                   </div>
                   <div className="ml-3">
-                    <p className="text-sm text-red-800">{error}</p>
+                    <h3 className="text-sm font-medium text-red-800">
+                      Login Failed
+                    </h3>
+                    <p className="text-sm text-red-700 mt-1">{error}</p>
                   </div>
                 </div>
               </div>
@@ -119,10 +134,12 @@ const Login = () => {
                   name="email"
                   type="email"
                   autoComplete="email"
-                  required
-                  value={formData.email}
-                  onChange={handleChange}
-                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                  {...formik.getFieldProps("email")}
+                  className={`appearance-none block w-full px-3 py-2 border rounded-md placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm ${
+                    formik.touched.email && formik.errors.email
+                      ? "border-red-300 bg-red-50"
+                      : "border-gray-300"
+                  }`}
                   placeholder="Enter your email"
                 />
                 <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
@@ -141,6 +158,12 @@ const Login = () => {
                   </svg>
                 </div>
               </div>
+              {/* Email Error */}
+              {formik.touched.email && formik.errors.email && (
+                <p className="mt-1 text-sm text-red-600">
+                  {formik.errors.email}
+                </p>
+              )}
             </div>
 
             {/* Password Field */}
@@ -157,10 +180,12 @@ const Login = () => {
                   name="password"
                   type={showPassword ? "text" : "password"}
                   autoComplete="current-password"
-                  required
-                  value={formData.password}
-                  onChange={handleChange}
-                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm pr-10"
+                  {...formik.getFieldProps("password")}
+                  className={`appearance-none block w-full px-3 py-2 border rounded-md placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm pr-10 ${
+                    formik.touched.password && formik.errors.password
+                      ? "border-red-300 bg-red-50"
+                      : "border-gray-300"
+                  }`}
                   placeholder="Enter your password"
                 />
                 <button
@@ -170,7 +195,7 @@ const Login = () => {
                 >
                   {showPassword ? (
                     <svg
-                      className="h-5 w-5 text-gray-400"
+                      className="h-5 w-5 text-gray-400 hover:text-gray-600"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -184,7 +209,7 @@ const Login = () => {
                     </svg>
                   ) : (
                     <svg
-                      className="h-5 w-5 text-gray-400"
+                      className="h-5 w-5 text-gray-400 hover:text-gray-600"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -205,6 +230,12 @@ const Login = () => {
                   )}
                 </button>
               </div>
+              {/* Password Error */}
+              {formik.touched.password && formik.errors.password && (
+                <p className="mt-1 text-sm text-red-600">
+                  {formik.errors.password}
+                </p>
+              )}
             </div>
 
             {/* Remember Me & Forgot Password */}
@@ -240,10 +271,10 @@ const Login = () => {
             <div>
               <button
                 type="submit"
-                disabled={isLoading || !formData.email || !formData.password}
+                disabled={isLoading || formik.isSubmitting || !formik.isValid}
                 className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition duration-200"
               >
-                {isLoading ? (
+                {isLoading || formik.isSubmitting ? (
                   <>
                     <svg
                       className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
@@ -289,6 +320,13 @@ const Login = () => {
               </button>
             </div>
           </form>
+        </div>
+
+        {/* Help Text */}
+        <div className="text-center">
+          <p className="text-sm text-gray-600">
+            Need help? Contact your system administrator
+          </p>
         </div>
       </div>
     </div>

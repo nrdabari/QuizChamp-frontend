@@ -28,7 +28,7 @@ function AppRoutes() {
       console.log("Redirecting to:", defaultRoute, "User role:", user.role); // Debug log
       navigate(defaultRoute, { replace: true });
     }
-  }, [user, isLoading, location.pathname, navigate]);
+  }, [user, isLoading, navigate]);
 
   if (isLoading) {
     return (
@@ -37,20 +37,13 @@ function AppRoutes() {
       </div>
     );
   }
+  console.log("user app", user);
 
   return (
     <Routes>
       {/* Public Routes */}
       <Route path="/login" element={<Login />} />
       <Route path="/unauthorized" element={<Unauthorized />} />
-
-      {/* Root route - shows loading or redirects via useEffect */}
-      <Route
-        path="/"
-        element={
-          user ? <div>Redirecting...</div> : <Navigate to="/login" replace />
-        }
-      />
 
       {/* Protected Routes with Layout wrapper */}
       <Route
@@ -101,7 +94,7 @@ function AppRoutes() {
 
       {/* Catch all - redirect based on auth status */}
       <Route
-        path="*"
+        path="/"
         element={
           user ? (
             <Navigate
