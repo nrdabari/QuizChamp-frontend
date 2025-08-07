@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useFormik } from "formik";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
+import { useApiService } from "../../hooks/useApiService";
 
 const StartExam = () => {
   const [exercises, setExercises] = useState([]);
@@ -11,6 +12,7 @@ const StartExam = () => {
   const [loading, setLoading] = useState(true);
   const [mode, setMode] = useState(""); // "exam" or "practice"
   const { user } = useAuth();
+  const { userServ } = useApiService();
 
   const formik = useFormik({
     initialValues: {
@@ -32,30 +34,25 @@ const StartExam = () => {
     },
     onSubmit: async (values) => {
       if (mode === "exam") {
-        const res = await fetch(`http://localhost:5000/api/submissions/start`, {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(values),
-        });
+        try {
+          const data = await userServ.startExam(values);
 
-        if (res.ok) {
-          const data = await res.json();
           console.log("Start Exam Payload:", data);
           navigate(
             `/user/test/${values.exerciseId}?user=${values.userId}&time=${
               values.totalTime * 60
             }&submissionId=${data._id}`
           );
-        } else {
-          alert("❌ Failed to save");
+        } catch (error) {
+          console.error("Start Exam Error: ", error);
         }
       } else {
         try {
-          // Check if user has failed questions for this exercise
-          const response = await fetch(
-            `http://localhost:5000/api/practices/exercises/${formik.values.exerciseId}/failed-questions?userId=${formik.values.userId}`
+          const data = await userServ.getFailedQuestionsForPractice(
+            formik.values.exerciseId,
+            formik.values.userId
           );
-          const data = await response.json();
+          // Check if user has failed questions for this exercise
 
           if (data.questionIds && data.questionIds.length > 0) {
             // Navigate to practice page with exerciseId and userId
@@ -78,13 +75,13 @@ const StartExam = () => {
   useEffect(() => {
     const fetchSubmissions = async () => {
       try {
-        fetch("http://localhost:5000/api/exercises")
-          .then((res) => res.json())
-          .then(setExercises);
+        const [exercisesData, submissionsData] = await Promise.all([
+          userServ.getExercises(),
+          userServ.getAllSubmissions(),
+        ]);
 
-        const res = await fetch("http://localhost:5000/api/submissions");
-        const data = await res.json();
-        setSubmissions(data);
+        setExercises(exercisesData);
+        setSubmissions(submissionsData);
       } catch (err) {
         console.error("❌ Failed to fetch submissions:", err);
       } finally {

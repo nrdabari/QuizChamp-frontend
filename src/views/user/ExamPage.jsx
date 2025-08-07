@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import ConfirmModal from "../../components/ConfirmModal";
 import { ImageIcon, Pause, Play, X, ZoomIn, ZoomOut } from "lucide-react";
+import { useApiService } from "../../hooks/useApiService";
+import { useAuth } from "../../context/AuthContext";
 
 const ExamPage = () => {
   const { exerciseId } = useParams();
@@ -14,7 +16,7 @@ const ExamPage = () => {
 
   const [exerciseData, setExerciseData] = useState(null);
 
-  const [userData, setUserData] = useState(null);
+  // const [userData, setUserData] = useState(null);
   const [currentQuestion, setCurrentQuestion] = useState(null);
   const [currentIndex, setCurrentIndex] = useState(1);
   const [selectedAnswer, setSelectedAnswer] = useState("");
@@ -30,6 +32,8 @@ const ExamPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [zoomLevel, setZoomLevel] = useState(1);
   const [selectedQuestion, setSelectedQuestion] = useState(null);
+  const { userServ } = useApiService();
+  const { user } = useAuth();
 
   const openModal = (question) => {
     setSelectedQuestion(question);
@@ -88,21 +92,8 @@ const ExamPage = () => {
     const fetchData = async () => {
       // setLoading(true);
       try {
-        const [exerciseRes, userRes] = await Promise.all([
-          // fetch(
-          //   `http://localhost:5000/api/questions/single/${exerciseId}/${currentIndex}`
-          // ),
-          fetch(`http://localhost:5000/api/exercises/${exerciseId}?`),
-          fetch(`http://localhost:5000/api/users/${userId}`),
-        ]);
-
-        const [exercise, user] = await Promise.all([
-          exerciseRes.json(),
-          userRes.json(),
-        ]);
-
-        setExerciseData(exercise);
-        setUserData(user);
+        const exerciseData = await userServ.getExercise(exerciseId);
+        setExerciseData(exerciseData);
         setSelectedAnswer(""); // Reset selection
       } catch (err) {
         console.error("❌ Error loading question:", err);
@@ -114,25 +105,24 @@ const ExamPage = () => {
     if (exerciseId && userId && currentIndex) {
       fetchData();
     }
-  }, [exerciseId, userId]);
+  }, [exerciseId, userId, userServ]);
 
   useEffect(() => {
     const fetchQuestionAndAnswer = async () => {
       // setLoading(true);
       try {
-        const res = await fetch(
-          `http://localhost:5000/api/questions/exam/${submissionId}/${exerciseId}/${currentIndex}`
+        const data = await userServ.getExamQuestion(
+          submissionId,
+          exerciseId,
+          currentIndex
         );
-        if (!res.ok) throw new Error("Failed to fetch question");
 
-        const data = await res.json();
         setCurrentQuestion(data.question);
         setSelectedAnswer(data.userAnswer || "");
-
-        // Set the entry time for the new question
         setQuestionEntryTime(Date.now());
-      } catch (err) {
-        console.error("❌ Error loading question:", err);
+      } catch (error) {
+        console.error("❌ Error loading question:", error);
+        // setError(error.response?.data?.message || error.message || "Failed to fetch question");
       } finally {
         setLoading(false);
       }
@@ -141,17 +131,14 @@ const ExamPage = () => {
     if (exerciseId && submissionId && currentIndex >= 1) {
       fetchQuestionAndAnswer();
     }
-  }, [currentIndex, exerciseId, submissionId]);
+  }, [currentIndex, exerciseId, submissionId, userServ]);
 
   useEffect(() => {
     const loadAttemptedAnswers = async () => {
       if (!submissionId) return;
 
       try {
-        const res = await fetch(
-          `http://localhost:5000/api/submissions/attempted/${submissionId}`
-        );
-        const data = await res.json();
+        const data = await userServ.getAttemptedAnswers(submissionId);
 
         // Assume response: { attempts: [ { questionId: 'abc123' }, ... ] }
         const attemptedMap = {};
@@ -160,13 +147,16 @@ const ExamPage = () => {
         });
         console.log(attemptedMap);
         setAttemptedQuestions(attemptedMap);
-      } catch (err) {
-        console.error("❌ Failed to load attempted answers:", err);
+        return attemptedMap;
+      } catch (error) {
+        console.error("❌ Failed to load attempted answers:", error);
+        // setError(error.response?.data?.message || error.message || "Failed to load attempted answers");
+        throw error;
       }
     };
 
     loadAttemptedAnswers();
-  }, [submissionId]);
+  }, [submissionId, userServ]);
 
   // Handle option select and save to backend
   const handleAnswerChange = async (value) => {
@@ -176,80 +166,73 @@ const ExamPage = () => {
     );
 
     try {
-      await fetch(
-        `http://localhost:5000/api/submissions/answer/${submissionId}`,
-        {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            questionId: currentQuestion._id,
-            userAnswer: value,
-            timeTaken: timeTakenInSeconds || 10,
-          }),
-        }
-      );
+      const answerData = {
+        questionId: currentQuestion._id,
+        userAnswer: value,
+        timeTaken: timeTakenInSeconds,
+      };
+
+      await userServ.submitAnswer(submissionId, answerData);
+
       setAttemptedQuestions((prev) => ({
         ...prev,
         [currentQuestion._id]: true,
       }));
-    } catch (err) {
-      console.error("❌ Failed to save answer:", err);
+    } catch (error) {
+      console.error("❌ Failed to save answer:", error);
+      alert(
+        `❌ Failed to save answer: ${
+          error.response?.data?.message || error.message
+        }`
+      );
     }
   };
 
   const handleCompleteTest = async () => {
     try {
-      const res = await fetch(
-        `http://localhost:5000/api/submissions/complete/${submissionId}`,
-        {
-          method: "POST",
-        }
-      );
-      const data = await res.json();
+      const data = await userServ.completeExam(submissionId);
 
-      if (res.ok) {
-        alert(
-          `✅ Report generated!\nScore: ${data.score}/${data.totalQuestions}`
-        );
-        navigate(`/user/report/${submissionId}`);
-        // navigate(`/user/exam`);
-      } else {
-        alert(`❌ Failed: ${data.message}`);
-      }
-    } catch (err) {
-      alert("❌ Error completing exam");
-      console.error(err);
+      alert(
+        `✅ Report generated!\nScore: ${data.score}/${data.totalQuestions}`
+      );
+      navigate(`/user/report/${submissionId}`);
+      // navigate(`/user/exam`);
+    } catch (error) {
+      console.error("❌ Error completing exam:", error);
+      alert(
+        `❌ Error completing exam: ${
+          error.response?.data?.message || error.message
+        }`
+      );
     }
   };
 
   const resumeExam = async () => {
     setIsPaused(false);
     try {
-      await fetch(
-        `http://localhost:5000/api/submissions/resume/${submissionId}`,
-        {
-          method: "PATCH",
-        }
+      await userServ.resumeExam(submissionId);
+    } catch (error) {
+      console.error("❌ Failed to resume exam:", error);
+      alert(
+        `❌ Failed to resume exam: ${
+          error.response?.data?.message || error.message
+        }`
       );
-    } catch (err) {
-      console.error("❌ Failed to resume exam:", err);
     }
   };
 
   const pauseExam = async () => {
     setIsPaused(true);
     try {
-      await fetch(
-        `http://localhost:5000/api/submissions/pause/${submissionId}`,
-        {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ timeLeft }),
-        }
-      );
+      await userServ.pauseExam(submissionId, timeLeft);
       navigate("/user/exam");
-    } catch (err) {
-      console.error("❌ Failed to pause exam:", err);
+    } catch (error) {
+      console.error("❌ Failed to pause exam:", error);
+      alert(
+        `❌ Failed to pause exam: ${
+          error.response?.data?.message || error.message
+        }`
+      );
     }
   };
 
@@ -307,7 +290,9 @@ const ExamPage = () => {
                 {question.imagePath && (
                   <div className="mb-4 text-center">
                     <img
-                      src={`http://localhost:5000${question.imagePath}`}
+                      src={`${import.meta.env.VITE_BACKEND_URL}${
+                        question.imagePath
+                      }`}
                       alt="Question"
                       className="max-w-full h-auto rounded-lg shadow-md mx-auto"
                       style={{ maxHeight: "500px" }}
@@ -418,7 +403,9 @@ const ExamPage = () => {
               <div className="flex flex-col items-center space-y-6">
                 <div className="mb-4 text-center">
                   <img
-                    src={`http://localhost:5000${question.imagePath}`}
+                    src={`${import.meta.env.VITE_BACKEND_URL}${
+                      question.imagePath
+                    }`}
                     alt="Question"
                     className="max-w-full h-auto rounded-lg shadow-md mx-auto"
                     style={{ maxHeight: "500px" }}
@@ -472,7 +459,7 @@ const ExamPage = () => {
       <div className="w-5/6 p-2 overflow-y-auto">
         <h1 className="text-2xl font-bold mb-2">Exam</h1>
         <p>
-          <strong>User:</strong> {userData?.name}
+          <strong>User:</strong> {user?.name}
         </p>
         <p>
           <strong>Time:</strong>{" "}
@@ -527,7 +514,9 @@ const ExamPage = () => {
               {direction.imagePath && (
                 <div className="mb-4 text-center">
                   <img
-                    src={`http://localhost:5000${direction.imagePath}`}
+                    src={`${import.meta.env.VITE_BACKEND_URL}${
+                      direction.imagePath
+                    }`}
                     alt="Direction"
                     className="max-w-full h-auto rounded-lg shadow-md mx-auto"
                     style={{ maxHeight: "500px" }}
@@ -585,7 +574,9 @@ const ExamPage = () => {
                 {/* <p><span style="font-weight: bold; -webkit-text-stroke: 1px black; color: transparent; font-size: 54pt;"> F R A M E </span></p> */}
                 {currentQuestion.imagePath && (
                   <img
-                    src={`http://localhost:5000${currentQuestion.imagePath}`}
+                    src={`${import.meta.env.VITE_BACKEND_URL}${
+                      currentQuestion.imagePath
+                    }`}
                     alt="Question"
                     className="w-96 mb-4"
                   />
@@ -723,7 +714,9 @@ const ExamPage = () => {
             ) : currentQuestion?.imagePath ? (
               <div className="flex flex-col items-center space-y-4">
                 <img
-                  src={`http://localhost:5000${currentQuestion.imagePath}`}
+                  src={`${import.meta.env.VITE_BACKEND_URL}${
+                    currentQuestion.imagePath
+                  }`}
                   alt={`Q${currentIndex}`}
                   className="max-w-full h-auto rounded shadow-md"
                   style={{ maxHeight: "500px" }}

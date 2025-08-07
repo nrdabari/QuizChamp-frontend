@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useFormik } from "formik";
 import { Edit, Save, Trash2, Upload, X } from "lucide-react";
 import { Editor } from "@tinymce/tinymce-react";
+import { useApiService } from "../../hooks/useApiService";
 
 const EditQuestionList = () => {
   const { exerciseId } = useParams();
@@ -16,54 +17,81 @@ const EditQuestionList = () => {
   const startBulkEdit = () => setEditMode(true);
   const exitBulkEdit = () => setEditMode(false);
   const navigate = useNavigate();
+  const { admin, isAdmin } = useApiService();
 
   useEffect(() => {
-    fetch(`http://localhost:5000/api/questions/edit/${exerciseId}`)
-      .then((res) => res.json())
-      .then(setQuestions);
-    fetch(`http://localhost:5000/api/exercises/${exerciseId}`)
-      .then((res) => res.json())
-      .then(setExerciseData);
-  }, [exerciseId]);
+    const fetchData = async () => {
+      if (!exerciseId || !isAdmin) return;
+
+      try {
+        // Fetch both in parallel for better performance
+        const [questionsResult, exerciseResult] = await Promise.all([
+          admin.getQuestionsForEdit(exerciseId),
+          admin.getExercise(exerciseId),
+        ]);
+
+        setQuestions(questionsResult);
+        setExerciseData(exerciseResult);
+      } catch (error) {
+        console.error("❌ Error fetching data:", error);
+        // setError(error.message || "Failed to fetch data");
+      } finally {
+        // setIsLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [exerciseId, admin, isAdmin]);
 
   const uploadImage = async (questionId, file) => {
-    const formData = new FormData();
-    formData.append("image", file);
+    if (!isAdmin) {
+      alert("❌ Unauthorized access");
+      return;
+    }
 
-    const res = await fetch(
-      `http://localhost:5000/api/questions/upload/${questionId}`,
-      {
-        method: "POST",
-        body: formData,
-      }
-    );
+    if (!file) {
+      alert("❌ Please select a file");
+      return;
+    }
 
-    const data = await res.json();
-    if (res.ok) {
-      alert("✅ Image uploaded");
-      return data.question;
-    } else {
-      alert("❌ Upload failed");
+    try {
+      await admin.uploadQuestionImage(questionId, file);
+
+      alert("✅ Image uploaded successfully");
+    } catch (error) {
+      console.error("❌ Upload error:", error);
+      alert(
+        `❌ Upload failed: ${error.response?.data?.message || error.message}`
+      );
     }
   };
 
   const removeImage = async (questionId) => {
-    const res = await fetch(
-      `http://localhost:5000/api/questions/delete-image/${questionId}`,
-      {
-        method: "DELETE",
-      }
-    );
+    if (!isAdmin) {
+      alert("❌ Unauthorized access");
+      return;
+    }
 
-    if (res.ok) {
-      alert("🗑️ Image deleted");
+    try {
+      const result = await admin.removeQuestionImage(questionId);
+
+      alert("🗑️ Image deleted successfully");
+
+      // Update local state
       setImagePreviews((prev) => ({ ...prev, [questionId]: null }));
       setImageFiles((prev) => ({ ...prev, [questionId]: null }));
       setQuestions((prev) =>
         prev.map((q) => (q._id === questionId ? { ...q, imagePath: null } : q))
       );
-    } else {
-      alert("❌ Failed to delete image");
+
+      console.log("Image removed:", result);
+    } catch (error) {
+      console.error("❌ Error removing image:", error);
+      alert(
+        `❌ Failed to delete image: ${
+          error.response?.data?.message || error.message
+        }`
+      );
     }
   };
 
@@ -119,6 +147,10 @@ const EditQuestionList = () => {
         correctAnswer: question.correctAnswer,
       },
       onSubmit: async (values) => {
+        if (!isAdmin) {
+          alert("❌ Unauthorized access");
+          return;
+        }
         let options = [];
         let gridOptionsToSend = [];
         let optionTypeToSend = useGrid ? "grid" : "normal";
@@ -139,33 +171,34 @@ const EditQuestionList = () => {
           const allEmpty = options.every((opt) => opt.trim() === "");
           if (allEmpty) options = [];
         }
-        const correctAnswer = values.correctAnswer;
-        const res = await fetch(
-          `http://localhost:5000/api/questions/${question._id}`,
-          {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              question: values.question,
-              options,
-              gridOptions: gridOptionsToSend,
-              correctAnswer,
-              optionType: optionTypeToSend,
-              subQuestion: values.subQuestion,
-            }),
-          }
-        );
-
-        if (res.ok) {
-          const updated = await res.json();
+        const questionData = {
+          question: values.question,
+          options,
+          gridOptions: gridOptionsToSend,
+          correctAnswer: values.correctAnswer,
+          optionType: optionTypeToSend,
+          subQuestion: values.subQuestion,
+        };
+        try {
+          const updated = await admin.updateQuestion(
+            question._id,
+            questionData
+          );
 
           // ✅ Update the questions state with the new updated data
           setQuestions((prev) =>
             prev.map((q) => (q._id === updated._id ? updated : q))
           );
-          alert("✅ Question saved");
-        } else {
-          alert("❌ Failed to save");
+
+          alert("✅ Question saved successfully");
+          console.log("Question updated:", updated);
+        } catch (error) {
+          console.error("❌ Failed to save question:", error);
+          alert(
+            `❌ Failed to save: ${
+              error.response?.data?.message || error.message
+            }`
+          );
         }
       },
     });
@@ -272,7 +305,7 @@ const EditQuestionList = () => {
                   <img
                     src={
                       imagePreviews[question._id] ||
-                      `http://localhost:5000${question.imagePath}`
+                      `${import.meta.env.VITE_BACKEND_URL}${question.imagePath}`
                     }
                     alt="Question preview"
                     className="w-20 h-20 object-cover rounded-md border border-purple-300"
@@ -478,7 +511,9 @@ const EditQuestionList = () => {
                     </div>
                     {question.imagePath && (
                       <img
-                        src={`http://localhost:5000${question.imagePath}`}
+                        src={`${import.meta.env.VITE_BACKEND_URL}${
+                          question.imagePath
+                        }`}
                         alt="Question"
                         className="w-32 h-32 object-cover rounded-md border border-purple-300 mb-2"
                       />

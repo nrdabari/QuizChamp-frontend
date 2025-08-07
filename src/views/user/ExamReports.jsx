@@ -13,6 +13,7 @@ import {
   X,
 } from "lucide-react";
 import moment from "moment";
+import { useApiService } from "../../hooks/useApiService";
 
 const TestReport = () => {
   const { submissionId } = useParams();
@@ -22,6 +23,7 @@ const TestReport = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [zoomLevel, setZoomLevel] = useState(1);
   const [selectedQuestion, setSelectedQuestion] = useState(null);
+  const { userServ } = useApiService();
 
   const [filterType, setFilterType] = useState("all"); // 'all', 'correct', 'wrong'
 
@@ -56,10 +58,7 @@ const TestReport = () => {
   useEffect(() => {
     const fetchReport = async () => {
       try {
-        const res = await fetch(
-          `http://localhost:5000/api/submissions/report/${submissionId}`
-        );
-        const data = await res.json();
+        const data = await userServ.getExamReport(submissionId);
         setTestReport(data);
         setLoading(false);
       } catch (error) {
@@ -69,7 +68,7 @@ const TestReport = () => {
     };
 
     fetchReport();
-  }, [submissionId]);
+  }, [submissionId, userServ]);
 
   // Filter questions based on selected filter type
   const getFilteredQuestions = () => {
@@ -524,7 +523,9 @@ const TestReport = () => {
                   {question.imagePath && (
                     <div className="mb-6">
                       <img
-                        src={`http://localhost:5000${question.imagePath}`}
+                        src={`${import.meta.env.VITE_BACKEND_URL}${
+                          question.imagePath
+                        }`}
                         alt="Question illustration"
                         className="w-52 max-w-2xl mx-auto rounded-lg shadow-md"
                       />

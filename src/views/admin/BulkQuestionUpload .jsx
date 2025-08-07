@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { UploadCloud, Check, X } from "lucide-react";
+import { useApiService } from "../../hooks/useApiService";
 
 export default function BulkQuestionUpload() {
   const { exerciseId } = useParams();
@@ -11,19 +12,22 @@ export default function BulkQuestionUpload() {
   const [answersTxt, setAnswersTxt] = useState("");
   const [merged, setMerged] = useState([]);
   const [saving, setSaving] = useState(false);
+  const { admin, isAdmin } = useApiService();
 
   // ── Fetch exercise metadata
   useEffect(() => {
     const fetchExercise = async () => {
+      if (!isAdmin) {
+        navigate("/admin/exercises");
+        return;
+      }
       try {
-        const response = await fetch(
-          `http://localhost:5000/api/exercises/${exerciseId}`
-        );
-        if (!response.ok) throw new Error("Not found");
-        const data = await response.json();
+        const data = await admin.getExercise(exerciseId);
         setExercise(data);
-      } catch (err) {
-        console.error("❌ Failed to fetch exercise:", err);
+      } catch (error) {
+        console.error("❌ Failed to fetch exercise:", error);
+
+        // Navigate back on error (404, etc.)
         navigate("/admin/exercises");
       }
     };
@@ -97,18 +101,14 @@ export default function BulkQuestionUpload() {
     if (!exerciseId || merged.length === 0) return;
     setSaving(true);
     try {
-      const res = await fetch("http://localhost:5000/api/questions/bulk", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ exerciseId, questions: merged }),
-      });
-      const data = await res.json();
-      if (res.ok) {
-        alert(`✅ Saved ${data.count} questions`);
+      const result = await admin.bulkCreateQuestions(exerciseId, merged);
+
+      alert(`✅ Saved ${result.count} questions`);
+      setTimeout(() => {
         navigate("/admin/exercises");
-      } else alert("❌ " + data.message);
+      }, 2000);
     } catch (err) {
-      alert("❌ Network error", err);
+      alert("❌ Network error: ", err);
     } finally {
       setSaving(false);
     }

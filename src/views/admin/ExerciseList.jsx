@@ -1,18 +1,36 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useApiService } from "../../hooks/useApiService";
 
 export default function ExerciseList() {
   const [exercises, setExercises] = useState([]);
   const navigate = useNavigate();
-
+  const { admin, isAdmin } = useApiService();
   useEffect(() => {
-    const classLevel = 5; // or from formik / dropdown
+    const fetchExercises = async () => {
+      if (!isAdmin) return;
 
-    fetch(`http://localhost:5000/api/exercises?classLevel=${classLevel}`)
-      .then((res) => res.json())
-      .then((data) => setExercises(data))
-      .catch((err) => console.error("❌ Failed to fetch exercises:", err));
-  }, []);
+      const classLevel = 5; // or from formik / dropdown
+      // setIsLoading(true);
+      // setError(null);
+
+      try {
+        const data = await admin.getExercises(classLevel);
+        setExercises(data);
+      } catch (error) {
+        console.error("❌ Failed to fetch exercises:", error);
+        // setError(
+        //   error.response?.data?.message ||
+        //     error.message ||
+        //     "Failed to fetch exercises"
+        // );
+      } finally {
+        // setIsLoading(false);
+      }
+    };
+
+    fetchExercises();
+  }, [admin, isAdmin]);
 
   const handleUpload = (id) => {
     navigate(`/admin/bulk-upload/${id}`);

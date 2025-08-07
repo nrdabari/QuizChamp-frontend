@@ -7,6 +7,7 @@ import {
   ZoomIn,
   X,
 } from "lucide-react";
+import { useApiService } from "../../hooks/useApiService";
 
 const PracticeFailedQuestions = ({ exerciseId, userId }) => {
   const [questionIds, setQuestionIds] = useState([]);
@@ -18,15 +19,20 @@ const PracticeFailedQuestions = ({ exerciseId, userId }) => {
   const [loading, setLoading] = useState(true);
   const [isCompleted, setIsCompleted] = useState(false);
   const [zoomedImage, setZoomedImage] = useState(null);
+  const { userServ } = useApiService();
 
   // Initialize practice session
   useEffect(() => {
     const initializePractice = async () => {
+      if (!exerciseId || !userId) {
+        return;
+      }
+      setLoading(true);
       try {
-        const response = await fetch(
-          `http://localhost:5000/api/practices/exercises/${exerciseId}/failed-questions?userId=${userId}`
+        const data = await userServ.getFailedQuestionsForPractice(
+          exerciseId,
+          userId
         );
-        const data = await response.json();
 
         if (data.questionIds.length === 0) {
           alert("Great! You have no failed questions to practice.");
@@ -36,21 +42,21 @@ const PracticeFailedQuestions = ({ exerciseId, userId }) => {
         setQuestionIds(data.questionIds);
         loadQuestion(data.questionIds[0]);
       } catch (error) {
-        console.error("Error initializing practice:", error);
+        console.error("❌ Error initializing practice:", error);
+        // setError(error.response?.data?.message || error.message || "Failed to initialize practice");
+      } finally {
+        setLoading(false);
       }
     };
 
     initializePractice();
-  }, [exerciseId, userId]);
+  }, [exerciseId, userId, userServ]);
 
   // Load current question
   const loadQuestion = async (questionId) => {
     try {
       setLoading(true);
-      const response = await fetch(
-        `http://localhost:5000/api/practices/questions/${questionId}`
-      );
-      const question = await response.json();
+      const question = await userServ.getPracticeQuestion(questionId);
       setCurrentQuestion(question);
       setSelectedAnswer("");
       setShowFeedback(false);
@@ -70,16 +76,10 @@ const PracticeFailedQuestions = ({ exerciseId, userId }) => {
     }
 
     try {
-      const response = await fetch(
-        `http://localhost:5000/api/practices/questions/${currentQuestion._id}/check-answer`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ userAnswer: selectedAnswer }),
-        }
+      const feedback = await userServ.checkPracticeAnswer(
+        currentQuestion._id,
+        selectedAnswer
       );
-
-      const feedback = await response.json();
       setFeedbackData(feedback);
       setShowFeedback(true);
     } catch (error) {
@@ -235,12 +235,16 @@ const PracticeFailedQuestions = ({ exerciseId, userId }) => {
               {direction?.imagePath && (
                 <div className="relative group">
                   <img
-                    src={`http://localhost:5000${direction.imagePath}`}
+                    src={`${import.meta.env.VITE_BACKEND_URL}${
+                      direction.imagePath
+                    }`}
                     alt="Direction"
                     className="w-full h-36 object-contain rounded-lg shadow-md cursor-pointer transition-transform hover:scale-[1.02]"
                     onClick={() =>
                       openImageZoom(
-                        `http://localhost:5000${direction.imagePath}`,
+                        `${import.meta.env.VITE_BACKEND_URL}${
+                          direction.imagePath
+                        }`,
                         "Direction"
                       )
                     }
@@ -311,12 +315,14 @@ const PracticeFailedQuestions = ({ exerciseId, userId }) => {
             {currentQuestion.imagePath && (
               <div className="mb-4 relative group">
                 <img
-                  src={`http://localhost:5000${currentQuestion.imagePath}`}
+                  src={`${import.meta.env.VITE_BACKEND_URL}
+                  ${currentQuestion.imagePath}`}
                   alt="Question"
                   className="w-full h-36 object-contain rounded-lg shadow-md cursor-pointer transition-transform hover:scale-[1.02]"
                   onClick={() =>
                     openImageZoom(
-                      `http://localhost:5000${currentQuestion.imagePath}`,
+                      `${import.meta.env.VITE_BACKEND_URL}
+                      ${currentQuestion.imagePath}`,
                       "Question"
                     )
                   }

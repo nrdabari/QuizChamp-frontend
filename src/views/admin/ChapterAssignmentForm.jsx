@@ -9,40 +9,13 @@ import {
   AlertCircle,
 } from "lucide-react";
 import { useParams, useSearchParams } from "react-router-dom";
+import { useApiService } from "../../hooks/useApiService";
 
 const ChapterAssignmentForm = () => {
   const { exerciseId } = useParams();
   const [searchParams] = useSearchParams();
   const source = searchParams.get("source");
   const exerciseName = searchParams.get("exerciseName");
-  // Mock chapters data - would come from API based on exercise subject/class
-  //   const [availableChapters] = useState([
-  //     { _id: "1", name: "Algebra", chapterNumber: 1, code: "ALG" },
-  //     { _id: "2", name: "Geometry", chapterNumber: 2, code: "GEO" },
-  //     { _id: "3", name: "Trigonometry", chapterNumber: 3, code: "TRIG" },
-  //     { _id: "4", name: "Calculus", chapterNumber: 4, code: "CALC" },
-  //     { _id: "5", name: "Statistics", chapterNumber: 5, code: "STAT" },
-  //     { _id: "6", name: "Probability", chapterNumber: 6, code: "PROB" },
-  //   ]);
-
-  // Mock exercise questions data - would come from API
-  //   const [exerciseQuestions] = useState([
-  //     { id: 1 },
-  //     { id: 2 },
-  //     { id: 3 },
-  //     { id: 4 },
-  //     { id: 5 },
-  //     { id: 17 },
-  //     { id: 28 },
-  //     { id: 32 },
-  //     { id: 45 },
-  //     { id: 67 },
-  //     { id: 89 },
-  //     { id: 92 },
-  //     { id: 105 },
-  //     { id: 128 },
-  //     { id: 150 },
-  //   ]); // Total 15 questions in this exercise
 
   const [assignmentRows, setAssignmentRows] = useState([]);
   const [draggedChapter, setDraggedChapter] = useState(null);
@@ -51,8 +24,9 @@ const ChapterAssignmentForm = () => {
   const [inputRowIndex, setInputRowIndex] = useState(null);
   const [availableChapters, setAvailableChapters] = useState([]);
   const [exerciseQuestions, setExerciseQuestions] = useState([]);
-  const [exerciseDetails, setExerciseDetails] = useState({});
-  const [loading, setLoading] = useState(false);
+  // const [exerciseDetails, setExerciseDetails] = useState({});
+  // const [loading, setLoading] = useState(false);
+  const { admin, isAdmin } = useApiService();
 
   // Get chapters that are already assigned to rows
   const assignedChapterIds = assignmentRows
@@ -65,17 +39,15 @@ const ChapterAssignmentForm = () => {
   );
 
   const fetchChapterAssignmentData = async (exerciseId) => {
+    if (!exerciseId || !isAdmin) return;
     //   setLoading(true);
     try {
-      const response = await fetch(
-        `http://localhost:5000/api/exercises/${exerciseId}/chapter-assignment-data`
-      );
-      const result = await response.json();
+      const result = await admin.getChapterAssignmentData(exerciseId);
 
       if (result.success) {
         setAvailableChapters(result.data.chapters);
         setExerciseQuestions(result.data.questions);
-        setExerciseDetails(result.data.exercise);
+        // setExerciseDetails(result.data.exercise);
       }
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -89,7 +61,7 @@ const ChapterAssignmentForm = () => {
     if (exerciseId) {
       fetchChapterAssignmentData(exerciseId);
     }
-  }, [exerciseId]);
+  }, [exerciseId, admin]);
 
   // Get all assigned question numbers across all rows
   const getAllAssignedQuestions = () => {
@@ -252,6 +224,10 @@ const ChapterAssignmentForm = () => {
       alert(`Cannot save: Duplicate questions found: ${duplicates.join(", ")}`);
       return;
     }
+    if (!isAdmin) {
+      alert("❌ Unauthorized access");
+      return;
+    }
 
     const validRows = assignmentRows.filter(
       (row) => row.chapterId && row.questionNumbers.length > 0
@@ -276,28 +252,17 @@ const ChapterAssignmentForm = () => {
         .filter(Boolean),
     }));
     try {
-      const res = await fetch(
-        `http://localhost:5000/api/questions/assign/${exerciseId}/assign-chapters`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(assignments),
-        }
+      const updated = await admin.assignChaptersToQuestions(
+        exerciseId,
+        assignments
       );
-
-      if (!res.ok) {
-        const errorText = await res.text();
-        throw new Error(errorText || "Failed to save");
-      }
-
-      const updated = await res.json();
-
       alert("✅ Chapters saved successfully!");
+
       console.log("Saving assignments:", assignments);
       console.log("update assignments:", updated);
     } catch (error) {
       console.error("❌ Error while saving assignments:", error);
-      alert(`❌ Error: ${error.message}`);
+      alert(`❌ Error: ${error.response?.data?.message || error.message}`);
     }
 
     console.log("Saving assignments:", assignments);
