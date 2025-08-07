@@ -317,9 +317,7 @@ export default function AddExercise() {
                 <div className="space-y-3">
                   <div className="relative group">
                     <img
-                      src={`${import.meta.env.VITE_BACKEND_URL}${
-                        formik.values[group][idx]?.imagePath
-                      }`}
+                      src={`${formik.values[group][idx]?.imagePath}`}
                       alt={`Direction ${idx + 1}`}
                       className="w-full max-w-md h-48 object-cover rounded-lg shadow-sm border border-gray-200"
                     />
