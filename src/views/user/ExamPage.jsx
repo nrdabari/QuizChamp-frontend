@@ -1,9 +1,19 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import ConfirmModal from "../../components/ConfirmModal";
-import { ImageIcon, Pause, Play, X, ZoomIn, ZoomOut } from "lucide-react";
+import {
+  ImageIcon,
+  Pause,
+  Play,
+  X,
+  ZoomIn,
+  ZoomOut,
+  Maximize,
+  Minimize,
+} from "lucide-react";
 import { useApiService } from "../../hooks/useApiService";
 import { useAuth } from "../../context/AuthContext";
+import fscreen from "fscreen";
 
 const ExamPage = () => {
   const { exerciseId } = useParams();
@@ -32,9 +42,64 @@ const ExamPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [zoomLevel, setZoomLevel] = useState(1);
   const [selectedQuestion, setSelectedQuestion] = useState(null);
+
   const { userServ } = useApiService();
   const { user } = useAuth();
+  // Fullscreen state
+  const [isFullscreen, setIsFullscreen] = useState(false);
 
+  // Auto-exit fullscreen when component unmounts (user navigates away)
+  useEffect(() => {
+    const enterFullscreen = async () => {
+      if (fscreen.fullscreenEnabled && !fscreen.fullscreenElement) {
+        try {
+          await fscreen.requestFullscreen(document.documentElement);
+        } catch (error) {
+          console.warn("Could not enter fullscreen:", error);
+        }
+      }
+    };
+
+    // Small delay to ensure DOM is ready
+    const timer = setTimeout(enterFullscreen, 100);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  // Fullscreen functionality
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(fscreen.fullscreenElement !== null);
+    };
+
+    if (fscreen.fullscreenEnabled) {
+      fscreen.addEventListener("fullscreenchange", handleFullscreenChange);
+
+      // Enter fullscreen by default when component mounts
+      if (!fscreen.fullscreenElement) {
+        fscreen.requestFullscreen(document.documentElement);
+      }
+    }
+
+    return () => {
+      if (fscreen.fullscreenEnabled) {
+        fscreen.removeEventListener("fullscreenchange", handleFullscreenChange);
+      }
+    };
+  }, []);
+
+  const toggleFullscreen = () => {
+    if (!fscreen.fullscreenEnabled) {
+      alert("Fullscreen is not supported in your browser");
+      return;
+    }
+
+    if (isFullscreen) {
+      fscreen.exitFullscreen();
+    } else {
+      fscreen.requestFullscreen(document.documentElement);
+    }
+  };
   const openModal = (question) => {
     setSelectedQuestion(question);
     setIsModalOpen(true);
@@ -189,6 +254,9 @@ const ExamPage = () => {
   };
 
   const handleCompleteTest = async () => {
+    if (fscreen.fullscreenElement) {
+      await fscreen.exitFullscreen();
+    }
     try {
       const data = await userServ.completeExam(submissionId);
 
@@ -223,6 +291,9 @@ const ExamPage = () => {
 
   const pauseExam = async () => {
     setIsPaused(true);
+    if (fscreen.fullscreenElement) {
+      await fscreen.exitFullscreen();
+    }
     try {
       await userServ.pauseExam(submissionId, timeLeft);
       navigate("/user/exam");
@@ -455,9 +526,31 @@ const ExamPage = () => {
   };
 
   return (
-    <div className="flex">
+    <div className={`flex ${isFullscreen ? "h-screen" : ""}`}>
       <div className="w-5/6 p-2 overflow-y-auto">
-        <h1 className="text-2xl font-bold mb-2">Exam</h1>
+        <div className="flex justify-between items-center mb-4">
+          <h1 className="text-2xl font-bold">Exam</h1>
+
+          {/* Fullscreen Toggle Button */}
+          <button
+            onClick={toggleFullscreen}
+            className="flex items-center gap-2 bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg transition-colors"
+            title={isFullscreen ? "Exit Fullscreen" : "Enter Fullscreen"}
+          >
+            {isFullscreen ? (
+              <>
+                <Minimize className="w-4 h-4" />
+                <span>Exit Fullscreen</span>
+              </>
+            ) : (
+              <>
+                <Maximize className="w-4 h-4" />
+                <span>Fullscreen</span>
+              </>
+            )}
+          </button>
+        </div>
+
         <p>
           <strong>User:</strong> {user?.name}
         </p>

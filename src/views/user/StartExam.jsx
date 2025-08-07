@@ -16,7 +16,7 @@ const StartExam = () => {
 
   const formik = useFormik({
     initialValues: {
-      userId: user._id,
+      userId: user?.id || user?._id || "",
       exerciseId: "",
       totalTime: "",
     },
@@ -33,13 +33,19 @@ const StartExam = () => {
       return errors;
     },
     onSubmit: async (values) => {
+      const userid = values.userId || user?.id || user?._id;
+      console.log(values.userId);
+      console.log(user);
+
       if (mode === "exam") {
         try {
-          const data = await userServ.startExam(values);
+          const examPayload = { ...values, userid };
+
+          const data = await userServ.startExam(examPayload);
 
           console.log("Start Exam Payload:", data);
           navigate(
-            `/user/test/${values.exerciseId}?user=${values.userId}&time=${
+            `/user/test/${values.exerciseId}?user=${userid}&time=${
               values.totalTime * 60
             }&submissionId=${data._id}`
           );
@@ -50,14 +56,14 @@ const StartExam = () => {
         try {
           const data = await userServ.getFailedQuestionsForPractice(
             formik.values.exerciseId,
-            formik.values.userId
+            userid
           );
           // Check if user has failed questions for this exercise
 
           if (data.questionIds && data.questionIds.length > 0) {
             // Navigate to practice page with exerciseId and userId
             navigate(
-              `/user/practice/${formik.values.exerciseId}?userId=${formik.values.userId}`
+              `/user/practice/${formik.values.exerciseId}?userId=${userid}`
             );
           } else {
             alert(
@@ -112,6 +118,9 @@ const StartExam = () => {
   };
 
   if (loading) return <p className="p-4">Loading submissions...</p>;
+  if (!user) {
+    return <div>Loading user data...</div>;
+  }
 
   return (
     <>

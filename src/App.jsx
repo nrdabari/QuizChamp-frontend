@@ -14,6 +14,9 @@ import Unauthorized from "./views/Unauthorized";
 import Layout from "./components/layout";
 import { useAuth } from "./context/AuthContext";
 
+const shouldRenderOutsideLayout = (route) => {
+  return route?.noLayout === true;
+};
 // Component to handle initial routing logic
 function AppRoutes() {
   const { user, isLoading } = useAuth();
@@ -45,6 +48,41 @@ function AppRoutes() {
       <Route path="/login" element={<Login />} />
       <Route path="/unauthorized" element={<Unauthorized />} />
 
+      {/* Standalone user routes (no layout) */}
+      {routes
+        .filter(
+          (route) =>
+            route.layout === "/user" && shouldRenderOutsideLayout(route)
+        )
+        .map((route, index) => (
+          <Route
+            key={`no-layout-user-${index}`}
+            path={`/user/${route.path}`}
+            element={
+              <ProtectedRoute allowedRoles={route.role || ["user"]}>
+                {route.component}
+              </ProtectedRoute>
+            }
+          />
+        ))}
+
+      {/* Standalone admin routes (no layout) */}
+      {routes
+        .filter(
+          (route) =>
+            route.layout === "/admin" && shouldRenderOutsideLayout(route)
+        )
+        .map((route, index) => (
+          <Route
+            key={`no-layout-admin-${index}`}
+            path={`/admin/${route.path}`}
+            element={
+              <ProtectedRoute allowedRoles={route.role || ["admin"]}>
+                {route.component}
+              </ProtectedRoute>
+            }
+          />
+        ))}
       {/* Protected Routes with Layout wrapper */}
       <Route
         path="/admin/*"
@@ -55,7 +93,10 @@ function AppRoutes() {
         }
       >
         {routes
-          .filter((route) => route.layout === "/admin")
+          .filter(
+            (route) =>
+              route.layout === "/admin" && !shouldRenderOutsideLayout(route)
+          )
           .map((route, index) => (
             <Route
               key={index}
@@ -78,7 +119,10 @@ function AppRoutes() {
         }
       >
         {routes
-          .filter((route) => route.layout === "/user")
+          .filter(
+            (route) =>
+              route.layout === "/user" && !shouldRenderOutsideLayout(route)
+          )
           .map((route, index) => (
             <Route
               key={index}

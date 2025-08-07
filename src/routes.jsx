@@ -82,6 +82,7 @@ const routes = [
     component: <ExamPage />,
     sideBarVisible: false,
     notificationBarVisible: false,
+    noLayout: true, // New field specifically for layout control
     role: [ROLES.USER],
   },
   {
@@ -149,6 +150,7 @@ const routes = [
     component: <PracticePage />,
     sideBarVisible: false,
     notificationBarVisible: true,
+    noLayout: true, // New field specifically for layout control
     role: [ROLES.USER],
   },
 ];
