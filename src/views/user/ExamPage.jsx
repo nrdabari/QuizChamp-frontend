@@ -603,9 +603,7 @@ const ExamPage = () => {
               {direction.imagePath && (
                 <div className="mb-4 text-center">
                   <img
-                    src={`${import.meta.env.VITE_BACKEND_URL}${
-                      direction.imagePath
-                    }`}
+                    src={`${direction.imagePath}`}
                     alt="Direction"
                     className="max-w-full h-auto rounded-lg shadow-md mx-auto"
                     style={{ maxHeight: "500px" }}

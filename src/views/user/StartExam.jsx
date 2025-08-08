@@ -117,18 +117,35 @@ const StartExam = () => {
     formik.resetForm();
   };
 
-  if (loading) return <p className="p-4">Loading submissions...</p>;
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-96">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 dark:border-dark-purple-400"></div>
+        <span className="ml-3 text-text-light-primary dark:text-text-dark-primary font-sans">
+          Loading submissions...
+        </span>
+      </div>
+    );
+  }
+
   if (!user) {
-    return <div>Loading user data...</div>;
+    return (
+      <div className="flex items-center justify-center min-h-96">
+        <span className="text-text-light-primary dark:text-text-dark-primary font-sans">
+          Loading user data...
+        </span>
+      </div>
+    );
   }
 
   return (
-    <>
+    <div className="p-6 space-y-8">
+      {/* Start Exam Form */}
       <form
         onSubmit={formik.handleSubmit}
-        className="max-w-lg mx-auto mt-10 p-6 bg-white rounded shadow space-y-4"
+        className="max-w-lg mx-auto p-6 bg-white dark:bg-dark-bg-secondary rounded-lg shadow-lg dark:shadow-dark border border-gray-200 dark:border-dark-purple-700 space-y-4 transition-colors duration-250"
       >
-        <h2 className="text-xl font-bold mb-4 text-center text-purple-700">
+        <h2 className="text-xl font-bold font-display mb-4 text-center text-primary-700 dark:text-text-dark-primary">
           {mode === ""
             ? "Choose Action"
             : mode === "exam"
@@ -139,14 +156,14 @@ const StartExam = () => {
         {/* Mode Selection */}
         {mode === "" && (
           <div className="space-y-4">
-            <p className="text-center text-gray-600 mb-6">
+            <p className="text-center text-text-light-secondary dark:text-text-dark-secondary mb-6 font-sans">
               What would you like to do?
             </p>
 
             <button
               type="button"
               onClick={() => setMode("exam")}
-              className="w-full bg-purple-600 text-white py-3 rounded hover:bg-purple-700 transition font-medium"
+              className="w-full bg-primary-600 dark:bg-dark-purple-500 text-white py-3 rounded-lg hover:bg-primary-700 dark:hover:bg-dark-purple-600 transition-colors font-medium font-sans shadow-md"
             >
               📝 Start New Exam
             </button>
@@ -154,7 +171,7 @@ const StartExam = () => {
             <button
               type="button"
               onClick={() => setMode("practice")}
-              className="w-full bg-orange-600 text-white py-3 rounded hover:bg-orange-700 transition font-medium"
+              className="w-full bg-orange-600 dark:bg-orange-700 text-white py-3 rounded-lg hover:bg-orange-700 dark:hover:bg-orange-800 transition-colors font-medium font-sans shadow-md"
             >
               🎯 Practice Failed Questions
             </button>
@@ -166,14 +183,14 @@ const StartExam = () => {
           <>
             {/* Exercise Dropdown */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-text-light-primary dark:text-text-dark-primary mb-2 font-sans">
                 Select Exercise
               </label>
               <select
                 name="exerciseId"
                 value={formik.values.exerciseId}
                 onChange={formik.handleChange}
-                className="w-full border border-gray-300 p-2 rounded"
+                className="w-full border border-gray-300 dark:border-dark-purple-600 p-3 rounded-lg bg-white dark:bg-dark-bg-tertiary text-text-light-primary dark:text-text-dark-primary focus:outline-none focus:ring-2 focus:ring-primary-500 dark:focus:ring-dark-purple-400 focus:border-transparent transition-colors font-sans"
               >
                 <option value="">-- Choose Exercise --</option>
                 {exercises.map((ex) => (
@@ -183,7 +200,7 @@ const StartExam = () => {
                 ))}
               </select>
               {formik.errors.exerciseId && (
-                <p className="text-red-500 text-sm mt-1">
+                <p className="text-red-500 dark:text-red-400 text-sm mt-1 font-sans">
                   {formik.errors.exerciseId}
                 </p>
               )}
@@ -192,7 +209,7 @@ const StartExam = () => {
             {/* Total Time Input - Only for exam mode */}
             {mode === "exam" && (
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-text-light-primary dark:text-text-dark-primary mb-2 font-sans">
                   Total Time (minutes)
                 </label>
                 <input
@@ -200,11 +217,11 @@ const StartExam = () => {
                   name="totalTime"
                   value={formik.values.totalTime}
                   onChange={formik.handleChange}
-                  className="w-full border border-gray-300 p-2 rounded"
+                  className="w-full border border-gray-300 dark:border-dark-purple-600 p-3 rounded-lg bg-white dark:bg-dark-bg-tertiary text-text-light-primary dark:text-text-dark-primary placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-500 dark:focus:ring-dark-purple-400 focus:border-transparent transition-colors font-sans"
                   placeholder="Enter exam duration"
                 />
                 {formik.errors.totalTime && (
-                  <p className="text-red-500 text-sm mt-1">
+                  <p className="text-red-500 dark:text-red-400 text-sm mt-1 font-sans">
                     {formik.errors.totalTime}
                   </p>
                 )}
@@ -216,17 +233,17 @@ const StartExam = () => {
               <button
                 type="button"
                 onClick={resetForm}
-                className="flex-1 bg-gray-500 text-white py-2 rounded hover:bg-gray-600 transition"
+                className="flex-1 bg-gray-500 dark:bg-gray-600 text-white py-2 rounded-lg hover:bg-gray-600 dark:hover:bg-gray-700 transition-colors font-sans"
               >
                 ← Back
               </button>
 
               <button
                 type="submit"
-                className={`flex-1 text-white py-2 rounded transition ${
+                className={`flex-1 text-white py-2 rounded-lg transition-colors font-sans ${
                   mode === "exam"
-                    ? "bg-purple-600 hover:bg-purple-700"
-                    : "bg-orange-600 hover:bg-orange-700"
+                    ? "bg-primary-600 dark:bg-dark-purple-500 hover:bg-primary-700 dark:hover:bg-dark-purple-600"
+                    : "bg-orange-600 dark:bg-orange-700 hover:bg-orange-700 dark:hover:bg-orange-800"
                 }`}
               >
                 {mode === "exam" ? "Start Test" : "Start Practice"}
@@ -235,51 +252,67 @@ const StartExam = () => {
           </>
         )}
       </form>
-      <div className="p-6">
-        <h2 className="text-2xl font-bold text-purple-700 mb-4">
-          All Submissions
-        </h2>
-        <div className="overflow-x-auto rounded-lg shadow border">
-          <table className="min-w-full table-auto bg-white text-left">
-            <thead className="bg-purple-100 text-purple-800">
+
+      {/* Submissions Table */}
+      <div className="bg-white dark:bg-dark-bg-secondary rounded-lg shadow-lg dark:shadow-dark border border-gray-200 dark:border-dark-purple-700 transition-colors duration-250">
+        <div className="p-6 border-b border-gray-200 dark:border-dark-purple-700">
+          <h2 className="text-2xl font-bold font-display text-primary-700 dark:text-text-dark-primary">
+            All Submissions
+          </h2>
+        </div>
+
+        <div className="overflow-x-auto">
+          <table className="min-w-full table-auto text-left">
+            <thead className="bg-primary-100 dark:bg-dark-purple-800 text-primary-800 dark:text-text-dark-primary">
               <tr>
-                <th className="p-3">#</th>
-                <th className="p-3">User</th>
-                <th className="p-3">Exercise</th>
-                <th className="p-3">Score</th>
-                <th className="p-3">Time Taken (min)</th>
-                <th className="p-3">Submitted</th>
-                <th className="p-3">Action</th>
+                <th className="p-4 font-semibold font-sans">#</th>
+                <th className="p-4 font-semibold font-sans">User</th>
+                <th className="p-4 font-semibold font-sans">Exercise</th>
+                <th className="p-4 font-semibold font-sans">Score</th>
+                <th className="p-4 font-semibold font-sans">
+                  Time Taken (min)
+                </th>
+                <th className="p-4 font-semibold font-sans">Submitted</th>
+                <th className="p-4 font-semibold font-sans">Action</th>
               </tr>
             </thead>
             <tbody>
               {submissions.map((sub, idx) => (
-                <tr key={sub._id} className="border-t hover:bg-purple-50">
-                  <td className="p-3">{idx + 1}</td>
-                  <td className="p-3">{sub.userId?.name || "Unknown"}</td>
-                  <td className="p-3">
+                <tr
+                  key={sub._id}
+                  className="border-t border-gray-200 dark:border-dark-purple-700 hover:bg-primary-50 dark:hover:bg-dark-purple-800 transition-colors"
+                >
+                  <td className="p-4 text-text-light-primary dark:text-text-dark-primary font-sans">
+                    {idx + 1}
+                  </td>
+                  <td className="p-4 text-text-light-primary dark:text-text-dark-primary font-sans">
+                    {sub.userId?.name || "Unknown"}
+                  </td>
+                  <td className="p-4 text-text-light-primary dark:text-text-dark-primary font-sans">
                     {sub.exerciseId?.source} - {sub.exerciseId?.name}
                   </td>
-                  <td className="p-3">
+                  <td className="p-4 text-text-light-primary dark:text-text-dark-primary font-sans">
                     {sub.score} / {sub.answers.length}
                   </td>
-                  <td className="p-3">{Math.floor(sub.totalTimeTaken / 60)}</td>
-                  <td className="p-3">
+                  <td className="p-4 text-text-light-primary dark:text-text-dark-primary font-sans">
+                    {Math.floor(sub.totalTimeTaken / 60)}
+                  </td>
+                  <td className="p-4 text-text-light-primary dark:text-text-dark-primary font-sans">
                     {sub?.endedAt
                       ? new Date(sub.endedAt).toLocaleString()
                       : "-"}
                   </td>
-                  <td className="p-3">
+                  <td className="p-4">
                     {sub.status === "paused" ? (
                       <button
-                        className="px-3 py-1 bg-blue-800 text-white rounded hover:bg-blue-900 transition"
+                        className="px-4 py-2 bg-blue-800 dark:bg-blue-700 text-white rounded-lg hover:bg-blue-900 dark:hover:bg-blue-800 transition-colors font-sans text-sm"
                         onClick={() => handleResume(sub)}
                       >
                         Resume
                       </button>
                     ) : (
                       <button
-                        className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+                        className="px-4 py-2 bg-blue-600 dark:bg-blue-600 text-white rounded-lg hover:bg-blue-700 dark:hover:bg-blue-700 transition-colors font-sans text-sm"
                         onClick={() => handleReport(sub)}
                       >
                         View Report
@@ -291,8 +324,14 @@ const StartExam = () => {
             </tbody>
           </table>
         </div>
+
+        {submissions.length === 0 && (
+          <div className="p-8 text-center text-text-light-secondary dark:text-text-dark-secondary font-sans">
+            No submissions found.
+          </div>
+        )}
       </div>
-    </>
+    </div>
   );
 };
 

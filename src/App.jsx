@@ -13,6 +13,7 @@ import Login from "./components/auth/Login";
 import Unauthorized from "./views/Unauthorized";
 import Layout from "./components/layout";
 import { useAuth } from "./context/AuthContext";
+import { ThemeProvider } from "./context/ThemeContext";
 
 const shouldRenderOutsideLayout = (route) => {
   return route?.noLayout === true;
@@ -66,23 +67,6 @@ function AppRoutes() {
           />
         ))}
 
-      {/* Standalone admin routes (no layout) */}
-      {routes
-        .filter(
-          (route) =>
-            route.layout === "/admin" && shouldRenderOutsideLayout(route)
-        )
-        .map((route, index) => (
-          <Route
-            key={`no-layout-admin-${index}`}
-            path={`/admin/${route.path}`}
-            element={
-              <ProtectedRoute allowedRoles={route.role || ["admin"]}>
-                {route.component}
-              </ProtectedRoute>
-            }
-          />
-        ))}
       {/* Protected Routes with Layout wrapper */}
       <Route
         path="/admin/*"
@@ -156,9 +140,11 @@ function AppRoutes() {
 
 function App() {
   return (
-    <Router>
-      <AppRoutes />
-    </Router>
+    <ThemeProvider>
+      <Router>
+        <AppRoutes />
+      </Router>
+    </ThemeProvider>
   );
 }
 

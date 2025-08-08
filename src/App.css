@@ -1,37 +1,90 @@
+/* Add to your global CSS file (index.css or App.css) */
 
-
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+/* 1. Better base sizing */
+html {
+  font-size: 14px; /* Smaller base font size */
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
+@media (min-width: 768px) {
+  html {
+    font-size: 16px; /* Normal size on larger screens */
   }
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
+/* 2. Constrain main layout */
+.main-layout {
+  max-width: 1400px; /* Prevent stretching on large screens */
+  margin: 0 auto;
+}
+
+/* 3. Better sidebar sizing */
+.sidebar {
+  width: 240px; /* Fixed smaller width instead of percentage */
+  min-width: 240px;
+}
+
+/* 4. Adjust main content area */
+.main-content {
+  flex: 1;
+  max-width: calc(100vw - 240px);
+}
+
+/* 5. Better form sizing */
+.form-container {
+  max-width: 600px; /* Constrain form width */
+  margin: 0 auto;
+}
+
+/* 6. Table responsiveness */
+.table-container {
+  overflow-x: auto;
+  max-width: 100%;
+}
+
+.table-container table {
+  min-width: 800px; /* Minimum width for readability */
+}
+
+/* 7. Card sizing */
+.card, .submission-card {
+  max-width: none;
+  width: 100%;
+}
+
+/* 8. Button sizing */
+.btn {
+  padding: 8px 16px; /* Smaller padding */
+  font-size: 0.875rem; /* Smaller text */
+}
+
+/* 9. Header adjustments */
+.header {
+  padding: 12px 24px; /* Reduce header padding */
+}
+
+.header h1 {
+  font-size: 1.5rem; /* Smaller title */
+}
+
+/* 10. Responsive breakpoints */
+@media (max-width: 1200px) {
+  .sidebar {
+    width: 200px;
+    min-width: 200px;
   }
 }
 
-.card {
-  padding: 2em;
-}
-
-.read-the-docs {
-  color: #888;
+@media (max-width: 768px) {
+  html {
+    font-size: 14px;
+  }
+  
+  .sidebar {
+    width: 180px;
+    min-width: 180px;
+  }
+  
+  .header {
+    padding: 8px 16px;
+  }
 }

@@ -10,6 +10,7 @@ import { ROLES } from "./constants/enum";
 import PracticePage from "./views/user/PracticePage";
 import PDFTextExtractor from "./views/admin/PDFTextExtractor";
 import ChapterAssignmentForm from "./views/admin/ChapterAssignmentForm";
+import TestPage from "./components/TestPage";
 
 const routes = [
   {
@@ -149,6 +150,17 @@ const routes = [
     icon: User,
     component: <PracticePage />,
     sideBarVisible: false,
+    notificationBarVisible: true,
+    noLayout: true, // New field specifically for layout control
+    role: [ROLES.USER],
+  },
+  {
+    name: "Test PAge",
+    layout: "/user",
+    path: "/testpage", // dynamic route
+    icon: User,
+    component: <TestPage />,
+    sideBarVisible: true,
     notificationBarVisible: true,
     noLayout: true, // New field specifically for layout control
     role: [ROLES.USER],

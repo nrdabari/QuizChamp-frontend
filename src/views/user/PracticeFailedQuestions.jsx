@@ -177,21 +177,21 @@ const PracticeFailedQuestions = ({ exerciseId, userId }) => {
   };
 
   return (
-    <div className="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-lg">
-      <div className="bg-white rounded-2xl shadow-2xl overflow-hidden border border-gray-100">
+    <div className="max-w-2xl mx-auto p-6 bg-white dark:bg-dark-bg-secondary rounded-lg shadow-lg dark:shadow-dark transition-colors duration-250">
+      <div className="bg-white dark:bg-dark-bg-secondary rounded-2xl shadow-2xl dark:shadow-dark overflow-hidden border border-gray-100 dark:border-dark-purple-700">
         {/* Header Section */}
-        <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-6">
+        <div className="bg-gradient-to-r from-blue-600 to-primary-600 dark:from-dark-purple-600 dark:to-dark-purple-500 text-white p-6">
           <div className="flex justify-between items-center mb-4">
-            <span className="text-sm font-medium bg-white/20 px-3 py-1 rounded-full">
+            <span className="text-sm font-medium font-sans bg-white/20 dark:bg-white/30 px-3 py-1 rounded-full">
               Question {currentIndex + 1} of {questionIds.length}
             </span>
-            <span className="text-sm font-medium bg-green-500 px-3 py-1 rounded-full">
+            <span className="text-sm font-medium font-sans bg-green-500 dark:bg-green-600 px-3 py-1 rounded-full">
               Practice Mode
             </span>
           </div>
-          <div className="w-full bg-white/20 rounded-full h-3">
+          <div className="w-full bg-white/20 dark:bg-white/30 rounded-full h-3">
             <div
-              className="bg-gradient-to-r from-green-400 to-green-500 h-3 rounded-full transition-all duration-500 ease-out shadow-lg"
+              className="bg-gradient-to-r from-green-400 to-green-500 dark:from-green-500 dark:to-green-400 h-3 rounded-full transition-all duration-500 ease-out shadow-lg"
               style={{
                 width: `${((currentIndex + 1) / questionIds.length) * 100}%`,
               }}
@@ -202,8 +202,8 @@ const PracticeFailedQuestions = ({ exerciseId, userId }) => {
           {/* Section Display */}
           {sectionText && (
             <div className="mb-4 inline-block">
-              <span className="inline-flex items-center px-3 py-1 bg-emerald-100 text-emerald-800 text-sm font-medium rounded-full border border-emerald-200">
-                <div className="w-1.5 h-1.5 bg-emerald-400 rounded-full mr-2"></div>
+              <span className="inline-flex items-center px-3 py-1 bg-emerald-100 dark:bg-emerald-900 text-emerald-800 dark:text-emerald-200 text-sm font-medium font-sans rounded-full border border-emerald-200 dark:border-emerald-700">
+                <div className="w-1.5 h-1.5 bg-emerald-400 dark:bg-emerald-300 rounded-full mr-2"></div>
                 {sectionText}
               </span>
             </div>
@@ -211,18 +211,18 @@ const PracticeFailedQuestions = ({ exerciseId, userId }) => {
 
           {/* Direction Section */}
           {(direction?.imagePath || directionText) && (
-            <div className="mb-2 p-2 bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-xl shadow-sm">
+            <div className="mb-2 p-2 bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 border border-amber-200 dark:border-amber-700 rounded-xl shadow-sm">
               <div className="flex items-center mb-1">
-                <div className="w-6 file:h-6 bg-amber-400 rounded-full flex items-center justify-center mr-3">
+                <div className="w-6 h-6 bg-amber-400 dark:bg-amber-500 rounded-full flex items-center justify-center mr-3">
                   <span className="text-white font-bold text-sm">!</span>
                 </div>
-                <h3 className="text-base font-semibold text-amber-800">
+                <h3 className="text-base font-semibold font-display text-amber-800 dark:text-amber-200">
                   Instructions
                 </h3>
               </div>
 
               {directionText && (
-                <div className="text-gray-700 mb-2 leading-relaxed">
+                <div className="text-text-light-primary dark:text-text-dark-primary mb-2 leading-relaxed font-sans">
                   {directionText.split("\n").map((line, index) => (
                     <React.Fragment key={index}>
                       {line}
@@ -255,12 +255,12 @@ const PracticeFailedQuestions = ({ exerciseId, userId }) => {
                       }
                     }}
                   />
-                  <div className="absolute top-2 right-2 bg-black/50 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
+                  <div className="absolute top-2 right-2 bg-black/50 dark:bg-black/70 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
                     <ZoomIn className="w-4 h-4" />
                   </div>
                   <div
                     style={{ display: "none" }}
-                    className="text-gray-500 text-sm mt-2 p-4 bg-gray-100 rounded-lg"
+                    className="text-text-light-secondary dark:text-text-dark-secondary text-sm mt-2 p-4 bg-gray-100 dark:bg-dark-bg-tertiary rounded-lg font-sans"
                   >
                     📷 Image failed to load
                   </div>
@@ -271,14 +271,16 @@ const PracticeFailedQuestions = ({ exerciseId, userId }) => {
 
           {/* Header/Passage Section */}
           {headerText && (
-            <div className="mb-6 p-6 bg-gradient-to-r from-blue-50 to-indigo-50 border-l-4 border-blue-400 rounded-r-xl shadow-sm">
+            <div className="mb-6 p-6 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border-l-4 border-blue-400 dark:border-blue-500 rounded-r-xl shadow-sm">
               <div className="flex items-center mb-3">
-                <div className="w-8 h-8 bg-blue-400 rounded-full flex items-center justify-center mr-3">
+                <div className="w-8 h-8 bg-blue-400 dark:bg-blue-500 rounded-full flex items-center justify-center mr-3">
                   <span className="text-white font-bold text-sm">📖</span>
                 </div>
-                <h3 className="text-lg font-semibold text-blue-800">Passage</h3>
+                <h3 className="text-lg font-semibold font-display text-blue-800 dark:text-blue-200">
+                  Passage
+                </h3>
               </div>
-              <div className="text-gray-700 leading-relaxed">
+              <div className="text-text-light-primary dark:text-text-dark-primary leading-relaxed font-sans">
                 {headerText.split("\n").map((line, index) => (
                   <React.Fragment key={index}>
                     {line}
@@ -290,9 +292,9 @@ const PracticeFailedQuestions = ({ exerciseId, userId }) => {
           )}
 
           {/* Question */}
-          <div className="mb-8 p-6 bg-gradient-to-r from-gray-50 to-slate-50 rounded-xl border border-gray-200 shadow-sm">
-            <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center">
-              <span className="bg-blue-600 text-white w-10 h-10 rounded-full flex p-2 text-sm mr-3">
+          <div className="mb-8 p-6 bg-gradient-to-r from-gray-50 to-slate-50 dark:from-gray-800/50 dark:to-slate-800/50 rounded-xl border border-gray-200 dark:border-dark-purple-700 shadow-sm">
+            <h3 className="text-xl font-bold font-display text-text-light-primary dark:text-text-dark-primary mb-4 flex items-center">
+              <span className="bg-blue-600 dark:bg-blue-700 text-white w-10 h-10 rounded-full flex items-center justify-center text-sm mr-3">
                 Q{currentIndex + 1}
               </span>
               {/<\/?[a-z][\s\S]*>/i.test(currentQuestion?.question) ? (
@@ -315,15 +317,14 @@ const PracticeFailedQuestions = ({ exerciseId, userId }) => {
             {currentQuestion.imagePath && (
               <div className="mb-4 relative group">
                 <img
-                  src={`
-                  ${currentQuestion.imagePath}`}
+                  src={`${currentQuestion.imagePath}`}
                   alt="Question"
                   className="w-full h-36 object-contain rounded-lg shadow-md cursor-pointer transition-transform hover:scale-[1.02]"
                   onClick={() =>
                     openImageZoom(`${currentQuestion.imagePath}`, "Question")
                   }
                 />
-                <div className="absolute top-2 right-2 bg-black/50 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
+                <div className="absolute top-2 right-2 bg-black/50 dark:bg-black/70 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
                   <ZoomIn className="w-4 h-4" />
                 </div>
               </div>
@@ -331,7 +332,7 @@ const PracticeFailedQuestions = ({ exerciseId, userId }) => {
 
             {/* Sub Question */}
             {currentQuestion.subQuestion && (
-              <p className="text-gray-600 mb-4 italic pl-4 border-l-2 border-gray-300">
+              <p className="text-text-light-secondary dark:text-text-dark-secondary mb-4 italic pl-4 border-l-2 border-gray-300 dark:border-dark-purple-600 font-sans">
                 {currentQuestion.subQuestion.split("\n").map((line, index) => (
                   <React.Fragment key={index}>
                     {line}
@@ -350,10 +351,10 @@ const PracticeFailedQuestions = ({ exerciseId, userId }) => {
                 return (
                   <label
                     key={index}
-                    className={`flex items-center p-3 border rounded-lg cursor-pointer transition-colors ${
+                    className={`flex items-center p-3 border rounded-lg cursor-pointer transition-colors font-sans ${
                       selectedAnswer === optionLetter
-                        ? "border-blue-500 bg-blue-50"
-                        : "border-gray-300 hover:border-gray-400"
+                        ? "border-blue-500 dark:border-blue-400 bg-blue-50 dark:bg-blue-900/30"
+                        : "border-gray-300 dark:border-dark-purple-600 hover:border-gray-400 dark:hover:border-dark-purple-500 bg-white dark:bg-dark-bg-tertiary"
                     }`}
                   >
                     <input
@@ -362,13 +363,15 @@ const PracticeFailedQuestions = ({ exerciseId, userId }) => {
                       value={optionLetter}
                       checked={selectedAnswer === optionLetter}
                       onChange={(e) => setSelectedAnswer(e.target.value)}
-                      className="mr-3"
+                      className="mr-3 text-blue-600 dark:text-blue-400 focus:ring-blue-500 dark:focus:ring-blue-400"
                       disabled={showFeedback}
                     />
-                    <span className="text-gray-900 font-medium mr-2">
+                    <span className="text-text-light-primary dark:text-text-dark-primary font-medium mr-2">
                       {optionLetter}
                     </span>
-                    <span className="text-gray-900">{option}</span>
+                    <span className="text-text-light-primary dark:text-text-dark-primary">
+                      {option}
+                    </span>
                   </label>
                 );
               })}
@@ -378,14 +381,14 @@ const PracticeFailedQuestions = ({ exerciseId, userId }) => {
             <div className="mb-6">
               <div className="grid gap-2 mb-4">
                 {Array.isArray(currentQuestion.gridOptions) && (
-                  <div className="mt-4  rounded">
+                  <div className="mt-4 rounded border border-gray-200 dark:border-dark-purple-700 overflow-hidden">
                     {currentQuestion.gridOptions.map((row, rowIndex) => {
                       if (rowIndex === 0) {
                         // Header row, skip radio
                         return (
                           <div
                             key={rowIndex}
-                            className="flex font-semibold bg-gray-100 p-2"
+                            className="flex font-semibold font-sans bg-gray-100 dark:bg-dark-purple-800 text-text-light-primary dark:text-text-dark-primary p-2"
                           >
                             {row.map((cell, cellIndex) => (
                               <div
@@ -406,7 +409,7 @@ const PracticeFailedQuestions = ({ exerciseId, userId }) => {
                       return (
                         <label
                           key={rowIndex}
-                          className="flex items-center border-t p-2 cursor-pointer hover:bg-gray-50"
+                          className="flex items-center border-t border-gray-200 dark:border-dark-purple-700 p-2 cursor-pointer hover:bg-gray-50 dark:hover:bg-dark-purple-800 transition-colors"
                         >
                           <input
                             type="radio"
@@ -414,10 +417,13 @@ const PracticeFailedQuestions = ({ exerciseId, userId }) => {
                             value={optionLetter}
                             checked={selectedAnswer === optionLetter}
                             onChange={(e) => setSelectedAnswer(e.target.value)}
-                            className="mr-1"
+                            className="mr-1 text-blue-600 dark:text-blue-400 focus:ring-blue-500 dark:focus:ring-blue-400"
                           />
                           {row.map((cell, cellIndex) => (
-                            <div key={cellIndex} className="flex-1 text-center">
+                            <div
+                              key={cellIndex}
+                              className="flex-1 text-center text-text-light-primary dark:text-text-dark-primary font-sans"
+                            >
                               {cell}
                             </div>
                           ))}
@@ -432,11 +438,11 @@ const PracticeFailedQuestions = ({ exerciseId, userId }) => {
 
           {currentQuestion.gridOptions.length === 0 &&
             currentQuestion.options.length === 0 && (
-              <div className="flex justify-left items-center  gap-3 mt-4">
+              <div className="flex justify-left items-center gap-3 mt-4">
                 {["A", "B", "C", "D"].map((option) => (
                   <label
                     key={option}
-                    className="flex items-center font-medium text-xl space-x-2"
+                    className="flex items-center font-medium text-xl space-x-2 text-text-light-primary dark:text-text-dark-primary font-sans"
                   >
                     <input
                       type="radio"
@@ -444,7 +450,7 @@ const PracticeFailedQuestions = ({ exerciseId, userId }) => {
                       value={`(${option})`}
                       checked={selectedAnswer === `(${option})`}
                       onChange={(e) => setSelectedAnswer(e.target.value)}
-                      className="form-radio font-medium text-xl text-blue-600"
+                      className="form-radio font-medium text-xl text-blue-600 dark:text-blue-400 focus:ring-blue-500 dark:focus:ring-blue-400"
                     />
                     <span>Option {option}</span>
                   </label>
@@ -457,19 +463,21 @@ const PracticeFailedQuestions = ({ exerciseId, userId }) => {
             <div
               className={`p-4 rounded-lg mb-6 ${
                 feedbackData.isCorrect
-                  ? "bg-green-50 border border-green-200"
-                  : "bg-red-50 border border-red-200"
+                  ? "bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-700"
+                  : "bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-700"
               }`}
             >
               <div className="flex items-center mb-2">
                 {feedbackData.isCorrect ? (
-                  <CheckCircle className="h-5 w-5 text-green-600 mr-2" />
+                  <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400 mr-2" />
                 ) : (
-                  <XCircle className="h-5 w-5 text-red-600 mr-2" />
+                  <XCircle className="h-5 w-5 text-red-600 dark:text-red-400 mr-2" />
                 )}
                 <span
-                  className={`font-semibold ${
-                    feedbackData.isCorrect ? "text-green-800" : "text-red-800"
+                  className={`font-semibold font-sans ${
+                    feedbackData.isCorrect
+                      ? "text-green-800 dark:text-green-200"
+                      : "text-red-800 dark:text-red-200"
                   }`}
                 >
                   {feedbackData.isCorrect ? "Correct!" : "Incorrect"}
@@ -477,7 +485,7 @@ const PracticeFailedQuestions = ({ exerciseId, userId }) => {
               </div>
 
               {!feedbackData.isCorrect && (
-                <p className="text-red-700">
+                <p className="text-red-700 dark:text-red-300 font-sans">
                   The correct answer is:{" "}
                   <strong>{feedbackData.correctAnswer}</strong>
                 </p>
@@ -486,8 +494,8 @@ const PracticeFailedQuestions = ({ exerciseId, userId }) => {
           )}
 
           {/* Action Buttons */}
-          <div className="flex justify-between">
-            <div className="text-sm text-gray-500">
+          <div className="flex justify-between items-center">
+            <div className="text-sm text-text-light-secondary dark:text-text-dark-secondary font-sans">
               {showFeedback ? "Ready for next question?" : "Select your answer"}
             </div>
 
@@ -496,14 +504,14 @@ const PracticeFailedQuestions = ({ exerciseId, userId }) => {
                 <button
                   onClick={submitAnswer}
                   disabled={!selectedAnswer}
-                  className="inline-flex items-center px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+                  className="inline-flex items-center px-6 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-lg hover:bg-blue-700 dark:hover:bg-blue-800 disabled:bg-gray-400 dark:disabled:bg-gray-600 disabled:cursor-not-allowed transition-colors font-medium font-sans shadow-md"
                 >
                   Submit Answer
                 </button>
               ) : (
                 <button
                   onClick={nextQuestion}
-                  className="inline-flex items-center px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                  className="inline-flex items-center px-6 py-2 bg-green-600 dark:bg-green-700 text-white rounded-lg hover:bg-green-700 dark:hover:bg-green-800 transition-colors font-medium font-sans shadow-md"
                 >
                   {currentIndex < questionIds.length - 1 ? (
                     <>
@@ -521,11 +529,11 @@ const PracticeFailedQuestions = ({ exerciseId, userId }) => {
       </div>
       {/* Image Zoom Modal */}
       {zoomedImage && (
-        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-black/80 dark:bg-black/90 flex items-center justify-center z-50 p-4">
           <div className="relative max-w-6xl max-h-full">
             <button
               onClick={closeImageZoom}
-              className="absolute top-4 right-4 bg-white/20 hover:bg-white/30 text-white p-2 rounded-full transition-colors z-10"
+              className="absolute top-4 right-4 bg-white/20 hover:bg-white/30 dark:bg-white/30 dark:hover:bg-white/40 text-white p-2 rounded-full transition-colors z-10"
             >
               <X className="w-6 h-6" />
             </button>
