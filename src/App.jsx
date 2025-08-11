@@ -25,7 +25,7 @@ function AppRoutes() {
   const location = useLocation();
 
   useEffect(() => {
-    // Only redirect if we're on the root path and user data is loaded
+   
     if (!isLoading && location.pathname === "/" && user) {
       const defaultRoute =
         user.role === "admin" ? "/admin/exercises" : "/user/exam";

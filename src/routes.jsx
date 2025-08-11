@@ -1,4 +1,4 @@
-import { UploadCloud, User } from "lucide-react";
+import { UploadCloud, User, User2, User2Icon } from "lucide-react";
 import AddExcercise from "./views/admin/addExcercise";
 import ExerciseList from "./views/admin/ExerciseList";
 import BulkQuestionUpload from "./views/admin/BulkQuestionUpload ";
@@ -10,7 +10,8 @@ import { ROLES } from "./constants/enum";
 import PracticePage from "./views/user/PracticePage";
 import PDFTextExtractor from "./views/admin/PDFTextExtractor";
 import ChapterAssignmentForm from "./views/admin/ChapterAssignmentForm";
-import TestPage from "./components/TestPage";
+import Users from "./views/admin/users";
+import AddUser from "./views/admin/users/pages/AddUser";
 
 const routes = [
   {
@@ -83,7 +84,7 @@ const routes = [
     component: <ExamPage />,
     sideBarVisible: false,
     notificationBarVisible: false,
-    noLayout: true, // New field specifically for layout control
+    noLayout: true,
     role: [ROLES.USER],
   },
   {
@@ -122,25 +123,27 @@ const routes = [
     role: [ROLES.ADMIN],
   },
   {
-    name: "Add Employee",
+    name: "Add User",
     layout: "/admin",
     path: "user/add",
-    // icon: <img src={books} alt="books-icon"></img>,
-    // component: <AddUser />,
+    icon: User2Icon,
+    component: <AddUser />,
     secondary: true,
     sideBarVisible: false,
     dynamicValue: 0,
+    notificationBarVisible: false,
     role: [ROLES.ADMIN],
   },
   {
-    name: "Edit Employee",
+    name: "Edit User",
     layout: "/admin",
     path: "user/edit/:id",
-    // icon: <img src={books} alt="books-icon"></img>,
-    // component: <AddUser />,
+    icon: User2Icon,
+    component: <AddUser />,
     secondary: true,
     sideBarVisible: false,
     dynamicValue: 0,
+    notificationBarVisible: false,
     role: [ROLES.ADMIN],
   },
   {
@@ -151,19 +154,19 @@ const routes = [
     component: <PracticePage />,
     sideBarVisible: false,
     notificationBarVisible: true,
-    noLayout: true, // New field specifically for layout control
+    noLayout: true,
     role: [ROLES.USER],
   },
   {
-    name: "Test PAge",
-    layout: "/user",
-    path: "/testpage", // dynamic route
-    icon: User,
-    component: <TestPage />,
+    name: "Users",
+    layout: "/admin",
+    path: "users",
+    icon: User2,
+    activeIcon: User2,
+    component: <Users />,
     sideBarVisible: true,
-    notificationBarVisible: true,
-    noLayout: true, // New field specifically for layout control
-    role: [ROLES.USER],
+    dynamicValue: 0,
+    role: [ROLES.ADMIN],
   },
 ];
 

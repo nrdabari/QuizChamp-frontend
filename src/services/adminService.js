@@ -119,5 +119,88 @@ export const adminService = {
     return response.data;
   },
 
- 
+  getAllUsers: async (params = {}) => {
+    try {
+      const queryParams = new URLSearchParams();
+
+      // Add pagination params
+      if (params.page) queryParams.append("page", params.page);
+      if (params.limit) queryParams.append("limit", params.limit);
+
+      // Add filter params
+      if (params.role) queryParams.append("role", params.role);
+      if (params.isActive !== undefined)
+        queryParams.append("isActive", params.isActive);
+      if (params.grade) queryParams.append("grade", params.grade);
+      if (params.search) queryParams.append("search", params.search);
+
+      const queryString = queryParams.toString();
+      const url = `/users${queryString ? `?${queryString}` : ""}`;
+
+      const response = await api.get(url);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error;
+    }
+  },
+
+  // Get user by ID
+  getUserById: async (userId) => {
+    try {
+      const response = await api.get(`/users/${userId}`);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error;
+    }
+  },
+
+  // Create new user (Admin only)
+  createUser: async (userData) => {
+    try {
+      const response = await api.post("/users", userData);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error;
+    }
+  },
+
+  // Update user
+  updateUser: async (userId, userData) => {
+    try {
+      const response = await api.put(`/users/${userId}`, userData);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error;
+    }
+  },
+
+  // Change user password
+  changePassword: async (userId, passwordData) => {
+    try {
+      const response = await api.put(`/users/${userId}/password`, passwordData);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error;
+    }
+  },
+
+  // Toggle user active status (Admin only)
+  toggleUserStatus: async (userId) => {
+    try {
+      const response = await api.put(`/api/users/${userId}/toggle-status`);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error;
+    }
+  },
+
+  // Get user statistics (Admin only)
+  getUserStatistics: async () => {
+    try {
+      const response = await api.get("/users/statistics");
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error;
+    }
+  },
 };
