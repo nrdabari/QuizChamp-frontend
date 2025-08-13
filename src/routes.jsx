@@ -12,6 +12,10 @@ import PDFTextExtractor from "./views/admin/PDFTextExtractor";
 import ChapterAssignmentForm from "./views/admin/ChapterAssignmentForm";
 import Users from "./views/admin/users";
 import AddUser from "./views/admin/users/pages/AddUser";
+import LanguageTutor from "./views/user/LearnLang";
+import ImageMerger from "./views/admin/ImageMerger";
+import { AdminPanel } from "./views/admin/AdminPanel";
+import { StudentPanel } from "./views/user/StudentPanel";
 
 const routes = [
   {
@@ -164,6 +168,27 @@ const routes = [
     icon: User2,
     activeIcon: User2,
     component: <Users />,
+    sideBarVisible: true,
+    dynamicValue: 0,
+    role: [ROLES.ADMIN],
+  },
+  {
+    name: "Learning Language",
+    layout: "/user",
+    path: "learn",
+    icon: User,
+    component: <LanguageTutor />,
+    sideBarVisible: true,
+    notificationBarVisible: false,
+    role: [ROLES.USER],
+  },
+  {
+    name: "Image Merger",
+    layout: "/admin",
+    path: "img-merge",
+    icon: User2,
+    activeIcon: User2,
+    component: <ImageMerger />,
     sideBarVisible: true,
     dynamicValue: 0,
     role: [ROLES.ADMIN],

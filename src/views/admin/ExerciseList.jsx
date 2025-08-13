@@ -45,7 +45,7 @@ export default function ExerciseList() {
   };
 
   return (
-    <div className=" bg-gradient-to-br from-purple-100 to-purple-200 p-6">
+    <div className="bg-gradient-to-br from-purple-100 to-purple-200 p-6">
       <div className="">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-3xl font-bold text-purple-800">Exercise List</h1>
@@ -75,12 +75,22 @@ export default function ExerciseList() {
           {exercises.map((ex) => (
             <div
               key={ex._id}
-              className="bg-white rounded-xl shadow-lg border border-purple-200 p-5 space-y-3 relative"
+              className={`${
+                !ex.isActive
+                  ? "bg-gray-200 border-gray-300 opacity-75"
+                  : ex.questionCount === 0
+                  ? "bg-gradient-to-br from-blue-50 to-blue-100 border-blue-300"
+                  : "bg-white border-purple-200"
+              } rounded-xl shadow-lg border p-5 space-y-3 relative`}
             >
               {/* Edit Exercise Icon */}
               <button
                 onClick={() => handleEditExercise(ex._id)}
-                className="absolute top-3 right-3 p-2 text-gray-500 hover:text-purple-600 hover:bg-purple-50 rounded-full transition-colors"
+                className={`absolute top-3 right-3 p-2 ${
+                  !ex.isActive
+                    ? "text-gray-400 hover:text-gray-600 hover:bg-gray-100"
+                    : "text-gray-500 hover:text-purple-600 hover:bg-purple-50"
+                } rounded-full transition-colors`}
                 title="Edit Exercise"
               >
                 <svg
@@ -99,19 +109,51 @@ export default function ExerciseList() {
                 </svg>
               </button>
 
-              <h2 className="text-xl font-bold text-purple-700 pr-8">
+              {/* Inactive Badge */}
+              {!ex.isActive && (
+                <div className="absolute top-3 left-3">
+                  <span className="bg-gray-500 text-white text-xs font-semibold px-2 py-1 rounded-full">
+                    Inactive
+                  </span>
+                </div>
+              )}
+
+              {/* Bulk Upload Badge */}
+              {ex.isActive && ex.questionCount === 0 && (
+                <div className="absolute top-3 left-3">
+                  <span className="bg-blue-500 text-white text-xs font-semibold px-2 py-1 rounded-full">
+                    Ready for Upload
+                  </span>
+                </div>
+              )}
+
+              <h2
+                className={`text-xl font-bold pr-8 ${
+                  !ex.isActive
+                    ? "text-gray-600"
+                    : ex.questionCount === 0
+                    ? "text-blue-700"
+                    : "text-purple-700"
+                }`}
+              >
                 {ex?.subjectId?.name}
               </h2>
-              <p className="text-sm text-gray-600">Class {ex.class}</p>
-              <p>
+              <p
+                className={`text-sm ${
+                  !ex.isActive ? "text-gray-500" : "text-gray-600"
+                }`}
+              >
+                Class {ex.class}
+              </p>
+              <p className={!ex.isActive ? "text-gray-600" : "text-gray-800"}>
                 <strong>Chapter: </strong>
                 {ex?.chapterId?.name ? (
                   <span className="ml-2">{ex?.chapterId?.name}</span>
                 ) : (
                   " -----"
-                )}{" "}
+                )}
               </p>
-              <p>
+              <p className={!ex.isActive ? "text-gray-600" : "text-gray-800"}>
                 <strong>Source: </strong> {ex.source}
                 {!ex?.chapterId?.name && <span> - {ex?.name}</span>}
               </p>
@@ -119,14 +161,23 @@ export default function ExerciseList() {
               {ex.questionCount > 0 ? (
                 <button
                   onClick={() => handleEditQuestion(ex._id)}
-                  className="w-full mt-2 bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2 rounded-lg transition"
+                  className={`w-full mt-2 font-semibold py-2 rounded-lg transition ${
+                    !ex.isActive
+                      ? "bg-gray-400 hover:bg-gray-500 text-gray-100"
+                      : "bg-purple-600 hover:bg-purple-700 text-white"
+                  }`}
+                  disabled={!ex.isActive}
                 >
                   Edit Questions
                 </button>
               ) : (
                 <button
                   onClick={() => handleUpload(ex._id)}
-                  className="w-full mt-2 bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2 rounded-lg transition"
+                  className={`w-full mt-2 font-semibold py-2 rounded-lg transition ${
+                    !ex.isActive
+                      ? "bg-gray-600 hover:bg-gray-700 text-white"
+                      : "bg-purple-600 hover:bg-purple-700 text-white"
+                  }`}
                 >
                   📤 Bulk Upload
                 </button>

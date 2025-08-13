@@ -1,6 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { useFormik } from "formik";
-import { Camera, Eye, Plus, Trash2, Upload } from "lucide-react";
+import {
+  Camera,
+  Eye,
+  Plus,
+  ToggleLeft,
+  ToggleRight,
+  Trash2,
+  Upload,
+} from "lucide-react";
 import { sourceOptions } from "../../helper/helpers";
 import * as Yup from "yup";
 import { useNavigate, useParams } from "react-router-dom";
@@ -73,6 +81,7 @@ export default function AddExercise() {
       directions: [{ text: "", start: "", end: "" }],
       headers: [{ text: "", start: "", end: "" }],
       sections: [{ text: "", start: "", end: "" }],
+      isActive: true,
     },
     validationSchema: ExerciseSchema,
     onSubmit: async (values, { setSubmitting, resetForm }) => {
@@ -144,6 +153,7 @@ export default function AddExercise() {
             exerciseData.sections?.length > 0
               ? exerciseData.sections
               : [{ text: "", start: "", end: "" }],
+          isActive: exerciseData.isActive ?? true,
         });
       } catch (err) {
         console.error("Error fetching exercise:", err);
@@ -525,6 +535,36 @@ export default function AddExercise() {
                       {formik.errors.source}
                     </div>
                   )}
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Status
+                  </label>
+                  <div className="flex items-center space-x-3 mt-3">
+                    <button
+                      type="button"
+                      onClick={() =>
+                        formik.setFieldValue(
+                          "isActive",
+                          !formik.values.isActive
+                        )
+                      }
+                      className={`flex items-center space-x-2 ${
+                        formik.values.isActive
+                          ? "text-green-600"
+                          : "text-red-600"
+                      }`}
+                    >
+                      {formik.values.isActive ? (
+                        <ToggleRight size={24} />
+                      ) : (
+                        <ToggleLeft size={24} />
+                      )}
+                      <span className="text-gray-900 font-medium">
+                        {formik.values.isActive ? "Active" : "Inactive"}
+                      </span>
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>

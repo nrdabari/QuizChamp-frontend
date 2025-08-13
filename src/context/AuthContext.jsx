@@ -36,8 +36,7 @@ export const AuthProvider = ({ children }) => {
         errorMessage =
           "Too many login attempts. Please wait a few minutes before trying again.";
       } else if (error.response?.status === 403) {
-        errorMessage =
-          "Account access denied. Please contact your administrator.";
+        errorMessage = "Account is deactivated. Please contact administrator.";
       } else if (error.response?.status >= 500) {
         errorMessage =
           "Server error. Please try again later or contact support.";

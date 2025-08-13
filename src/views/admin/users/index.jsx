@@ -131,8 +131,8 @@ const Users = () => {
                     </td>
                     <td className="px-6 py-4">
                       <div className="text-sm text-gray-900">
-                        {user?.sources?.length > 0
-                          ? user?.sources.join(", ")
+                        {user?.sourceAccess.length > 0
+                          ? user?.sourceAccess.join(", ")
                           : "No sources selected"}
                       </div>
                     </td>
