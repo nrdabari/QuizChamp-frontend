@@ -14,9 +14,22 @@ const EditQuestionList = () => {
   const [imagePreviews, setImagePreviews] = useState({});
   const [imageFiles, setImageFiles] = useState({});
   const [editMode, setEditMode] = useState(false);
+  const [editingQuestions, setEditingQuestions] = useState(new Set());
 
   const startBulkEdit = () => setEditMode(true);
   const exitBulkEdit = () => setEditMode(false);
+
+  const toggleIndividualEdit = (questionId) => {
+    setEditingQuestions((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(questionId)) {
+        newSet.delete(questionId);
+      } else {
+        newSet.add(questionId);
+      }
+      return newSet;
+    });
+  };
   const navigate = useNavigate();
   const { admin, isAdmin } = useApiService();
 
@@ -252,6 +265,16 @@ const EditQuestionList = () => {
           onSubmit={formik.handleSubmit}
           className="p-4 mb-6 bg-white border rounded space-y-6"
         >
+          <div className="flex justify-end mb-4">
+            <button
+              type="button"
+              onClick={() => toggleIndividualEdit(question._id)}
+              className="flex items-center px-3 py-1 bg-gray-500 text-white rounded-md hover:bg-gray-600 transition-colors"
+            >
+              <X className="w-4 h-4 mr-1" />
+              Cancel Edit
+            </button>
+          </div>
           <div>
             <div className="flex items-center mb-4">
               <input
@@ -549,7 +572,13 @@ const EditQuestionList = () => {
         ? filteredQuestions.map((q) => (
             <QuestionEditor key={q._id} question={q} />
           ))
-        : filteredQuestions.map((question) => {
+        : filteredQuestions.map((question, questionIndex) => {
+            const isEditing = editingQuestions.has(question._id);
+
+            if (isEditing) {
+              return <QuestionEditor key={question._id} question={question} />;
+            }
+
             const getCorrectIndex = (correctAnswer) => {
               // Match (A), (B), (C), (D)
               const match = correctAnswer?.match(/\(([A-D])\)/i);
@@ -591,6 +620,13 @@ const EditQuestionList = () => {
                       />
                     )}
                   </div>
+                  <button
+                    onClick={() => toggleIndividualEdit(question._id)}
+                    className="flex items-center px-3 py-1 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition-colors ml-4"
+                  >
+                    <Edit className="w-4 h-4 mr-1" />
+                    Edit
+                  </button>
                 </div>
 
                 {question.optionType === "grid" ? (
