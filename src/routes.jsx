@@ -15,7 +15,7 @@ import AddUser from "./views/admin/users/pages/AddUser";
 import LanguageTutor from "./views/user/LearnLang";
 import ImageMerger from "./views/admin/ImageMerger";
 import { AdminPanel } from "./views/admin/AdminPanel";
-import { StudentPanel } from "./views/user/StudentPanel";
+import StudentPanel from "./views/user/StudentPanel";
 
 const routes = [
   {
@@ -70,16 +70,16 @@ const routes = [
     notificationBarVisible: true,
     role: [ROLES.ADMIN],
   },
-  {
-    name: "PDF Extract",
-    layout: "/admin",
-    path: "extract",
-    icon: User,
-    component: <PDFTextExtractor />,
-    sideBarVisible: true,
-    notificationBarVisible: true,
-    role: [ROLES.ADMIN],
-  },
+  // {
+  //   name: "PDF Extract",
+  //   layout: "/admin",
+  //   path: "extract",
+  //   icon: User,
+  //   component: <PDFTextExtractor />,
+  //   sideBarVisible: true,
+  //   notificationBarVisible: true,
+  //   role: [ROLES.ADMIN],
+  // },
   {
     name: "Test",
     layout: "/user",
@@ -172,16 +172,16 @@ const routes = [
     dynamicValue: 0,
     role: [ROLES.ADMIN],
   },
-  {
-    name: "Learning Language",
-    layout: "/user",
-    path: "learn",
-    icon: User,
-    component: <LanguageTutor />,
-    sideBarVisible: true,
-    notificationBarVisible: false,
-    role: [ROLES.USER],
-  },
+  // {
+  //   name: "Learning Language",
+  //   layout: "/user",
+  //   path: "learn",
+  //   icon: User,
+  //   component: <LanguageTutor />,
+  //   sideBarVisible: true,
+  //   notificationBarVisible: false,
+  //   role: [ROLES.USER],
+  // },
   {
     name: "Image Merger",
     layout: "/admin",
@@ -192,6 +192,30 @@ const routes = [
     sideBarVisible: true,
     dynamicValue: 0,
     role: [ROLES.ADMIN],
+  },
+  // {
+  //   name: "Admin View",
+  //   layout: "/admin",
+  //   path: "admin-task-view",
+  //   icon: User2,
+  //   activeIcon: User2,
+  //   component: <AdminPanel />,
+  //   sideBarVisible: true,
+  //   notificationBarVisible: true,
+  //   dynamicValue: 0,
+  //   role: [ROLES.ADMIN],
+  // },
+  {
+    name: "My Tasks",
+    layout: "/user",
+    path: "my-task",
+    icon: User2,
+    activeIcon: User2,
+    component: <StudentPanel />,
+    notificationBarVisible: true,
+    sideBarVisible: true,
+    dynamicValue: 0,
+    role: [ROLES.USER],
   },
 ];
 

@@ -14,6 +14,7 @@ import Unauthorized from "./views/Unauthorized";
 import Layout from "./components/layout";
 import { useAuth } from "./context/AuthContext";
 import { ThemeProvider } from "./context/ThemeContext";
+import { TaskProvider } from "./context/TaskContext";
 
 const shouldRenderOutsideLayout = (route) => {
   return route?.noLayout === true;
@@ -25,7 +26,6 @@ function AppRoutes() {
   const location = useLocation();
 
   useEffect(() => {
-   
     if (!isLoading && location.pathname === "/" && user) {
       const defaultRoute =
         user.role === "admin" ? "/admin/exercises" : "/user/exam";
@@ -141,9 +141,11 @@ function AppRoutes() {
 function App() {
   return (
     <ThemeProvider>
-      <Router>
-        <AppRoutes />
-      </Router>
+      <TaskProvider>
+        <Router>
+          <AppRoutes />
+        </Router>
+      </TaskProvider>
     </ThemeProvider>
   );
 }

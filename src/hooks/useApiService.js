@@ -2,6 +2,7 @@
 import { useAuth } from "../context/AuthContext";
 import { adminService } from "../services/adminService";
 import { authService } from "../services/authService";
+import { taskService } from "../services/taskService";
 import { userService } from "../services/userService";
 
 export const useApiService = () => {
@@ -31,6 +32,7 @@ export const useApiService = () => {
     return {
       auth: authService,
       userServ: userService,
+      taskService: taskService,
       isAdmin: false,
       isUser: true,
       role: "user",
