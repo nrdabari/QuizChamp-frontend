@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useFormik } from "formik";
-import { Edit, Save, Trash2, Upload, X } from "lucide-react";
+import { Edit, Save, Trash2, Upload, X, Search } from "lucide-react";
 import { Editor } from "@tinymce/tinymce-react";
 import { useApiService } from "../../hooks/useApiService";
 
@@ -9,6 +9,7 @@ const EditQuestionList = () => {
   const { exerciseId } = useParams();
   const [questions, setQuestions] = useState([]);
   const [exerciseData, setExerciseData] = useState([]);
+  const [filteredQuestions, setFilteredQuestions] = useState([]);
 
   const [imagePreviews, setImagePreviews] = useState({});
   const [imageFiles, setImageFiles] = useState({});
@@ -18,6 +19,23 @@ const EditQuestionList = () => {
   const exitBulkEdit = () => setEditMode(false);
   const navigate = useNavigate();
   const { admin, isAdmin } = useApiService();
+
+  // Filter formik
+  const filterFormik = useFormik({
+    initialValues: {
+      questionId: "",
+    },
+    onSubmit: (values) => {
+      if (!values.questionId.trim()) {
+        setFilteredQuestions(questions);
+      } else {
+        const filtered = questions.filter(
+          (q) => q.id.toString() === values.questionId.trim()
+        );
+        setFilteredQuestions(filtered);
+      }
+    },
+  });
 
   useEffect(() => {
     const fetchData = async () => {
@@ -32,6 +50,7 @@ const EditQuestionList = () => {
 
         setQuestions(questionsResult);
         setExerciseData(exerciseResult);
+        setFilteredQuestions(questionsResult); // Initialize filtered questions
       } catch (error) {
         console.error("❌ Error fetching data:", error);
         // setError(error.message || "Failed to fetch data");
@@ -42,6 +61,18 @@ const EditQuestionList = () => {
 
     fetchData();
   }, [exerciseId, admin, isAdmin]);
+
+  // Update filtered questions when questions change
+  useEffect(() => {
+    if (!filterFormik.values.questionId.trim()) {
+      setFilteredQuestions(questions);
+    } else {
+      const filtered = questions.filter(
+        (q) => q.id.toString() === filterFormik.values.questionId.trim()
+      );
+      setFilteredQuestions(filtered);
+    }
+  }, [questions, filterFormik.values.questionId]);
 
   const uploadImage = async (questionId, file) => {
     if (!isAdmin) {
@@ -453,9 +484,49 @@ const EditQuestionList = () => {
         </button>
       )}
 
+      {/* Filter Section */}
+      <div className="bg-white rounded-lg shadow-md p-4 mb-6 border border-purple-200">
+        <form
+          onSubmit={filterFormik.handleSubmit}
+          className="flex items-center space-x-4"
+        >
+          <div className="flex-1">
+            <label className="block text-sm font-medium text-purple-700 mb-2">
+              Filter by Question ID
+            </label>
+            <input
+              type="text"
+              name="questionId"
+              value={filterFormik.values.questionId}
+              onChange={filterFormik.handleChange}
+              placeholder="Enter question ID to filter..."
+              className="w-full px-3 py-2 border border-purple-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+            />
+          </div>
+          <button
+            type="submit"
+            className="flex items-center px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition-colors mt-6"
+          >
+            <Search className="w-4 h-4 mr-2" />
+            Filter
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              filterFormik.resetForm();
+              setFilteredQuestions(questions);
+            }}
+            className="flex items-center px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 transition-colors mt-6"
+          >
+            <X className="w-4 h-4 mr-2" />
+            Clear
+          </button>
+        </form>
+      </div>
+
       <div className="flex justify-between items-center mb-6">
         <div className="flex space-x-3">
-          {questions.length > 0 && (
+          {filteredQuestions.length > 0 && (
             <button
               onClick={editMode ? exitBulkEdit : startBulkEdit}
               className={`flex items-center px-4 py-2 rounded-md transition-colors ${
@@ -469,11 +540,16 @@ const EditQuestionList = () => {
             </button>
           )}
         </div>
+        <div className="text-sm text-purple-600">
+          Showing {filteredQuestions.length} of {questions.length} questions
+        </div>
       </div>
 
       {editMode
-        ? questions.map((q) => <QuestionEditor key={q._id} question={q} />)
-        : questions.map((question, questionIndex) => {
+        ? filteredQuestions.map((q) => (
+            <QuestionEditor key={q._id} question={q} />
+          ))
+        : filteredQuestions.map((question) => {
             const getCorrectIndex = (correctAnswer) => {
               // Match (A), (B), (C), (D)
               const match = correctAnswer?.match(/\(([A-D])\)/i);
@@ -493,7 +569,7 @@ const EditQuestionList = () => {
                   <div className="flex-1">
                     <div className="flex items-center mb-2">
                       <span className="bg-purple-100 text-purple-800 px-2 py-1 rounded-md text-sm font-medium mr-3">
-                        Q{questionIndex + 1}
+                        Q{question.id}
                       </span>
                       <h4>
                         {/<[a-z][\s\S]*>/i.test(question.question) ? (
