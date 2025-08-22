@@ -16,6 +16,7 @@ import LanguageTutor from "./views/user/LearnLang";
 import ImageMerger from "./views/admin/ImageMerger";
 import { AdminPanel } from "./views/admin/AdminPanel";
 import StudentPanel from "./views/user/StudentPanel";
+import MathPracticeApp from "./views/user/AbacusPractice";
 
 const routes = [
   {
@@ -182,6 +183,16 @@ const routes = [
   //   notificationBarVisible: false,
   //   role: [ROLES.USER],
   // },
+  {
+    name: "Abacus",
+    layout: "/user",
+    path: "abacus",
+    icon: User,
+    component: <MathPracticeApp />,
+    sideBarVisible: true,
+    notificationBarVisible: false,
+    role: [ROLES.USER],
+  },
   {
     name: "Image Merger",
     layout: "/admin",
