@@ -69,17 +69,17 @@ const PracticePage = () => {
 
   if (!exerciseId || !userId) {
     return (
-      <div className="min-h-screen bg-gray-100 dark:bg-dark-bg-primary flex items-center justify-center transition-colors duration-250">
-        <div className="text-center bg-white dark:bg-dark-bg-secondary p-8 rounded-lg shadow-lg dark:shadow-dark border border-gray-200 dark:border-dark-purple-700">
-          <h2 className="text-xl font-bold font-display text-red-600 dark:text-red-400 mb-4">
+      <div className="min-h-screen bg-gray-100 dark:bg-dark-bg-primary flex items-center justify-center transition-colors duration-250 p-4">
+        <div className="text-center bg-white dark:bg-dark-bg-secondary p-6 rounded-lg shadow-md border border-gray-200 dark:border-dark-purple-700 max-w-md w-full">
+          <h2 className="text-lg font-bold font-display text-red-600 dark:text-red-400 mb-3">
             Invalid Practice Session
           </h2>
-          <p className="text-text-light-secondary dark:text-text-dark-secondary mb-6 font-sans">
+          <p className="text-text-light-secondary dark:text-text-dark-secondary mb-4 font-sans text-sm">
             Missing required parameters
           </p>
           <button
             onClick={goBack}
-            className="px-6 py-3 bg-primary-600 dark:bg-dark-purple-500 text-white rounded-lg hover:bg-primary-700 dark:hover:bg-dark-purple-600 transition-colors font-medium font-sans shadow-md"
+            className="w-full px-4 py-2 bg-primary-600 dark:bg-dark-purple-500 text-white rounded-md hover:bg-primary-700 dark:hover:bg-dark-purple-600 transition-colors font-medium font-sans text-sm"
           >
             Go Back
           </button>
@@ -96,43 +96,45 @@ const PracticePage = () => {
           : "bg-gray-100 dark:bg-dark-bg-primary"
       }`}
     >
-      {/* Header - Always visible with fullscreen toggle */}
-      <div className="bg-white dark:bg-dark-bg-secondary shadow-sm border-b border-gray-200 dark:border-dark-purple-700 transition-colors duration-250">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
+      {/* Compact Header - Fixed height */}
+      <div className="bg-white dark:bg-dark-bg-secondary shadow-sm border-b border-gray-200 dark:border-dark-purple-700 transition-colors duration-250 h-24">
+        <div className="w-full px-3 py-3 h-full">
+          <div className="flex items-center justify-between h-full">
+            {/* Left side - Back button and title */}
+            <div className="flex items-center space-x-2 min-w-0 flex-1">
               <button
                 onClick={goBack}
-                className="flex items-center px-3 py-2 text-text-light-secondary dark:text-text-dark-secondary hover:text-text-light-primary dark:hover:text-text-dark-primary hover:bg-gray-100 dark:hover:bg-dark-purple-800 rounded-lg transition-colors font-sans"
+                className="flex items-center px-2 py-1.5 text-text-light-secondary dark:text-text-dark-secondary hover:text-text-light-primary dark:hover:text-text-dark-primary hover:bg-gray-100 dark:hover:bg-dark-purple-800 rounded-md transition-colors font-sans text-sm"
               >
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                Back
+                <ArrowLeft className="h-3 w-3 mr-1" />
+                <span className="hidden sm:inline">Back</span>
               </button>
-              <div>
-                <h1 className="text-2xl font-bold font-display text-primary-700 dark:text-text-dark-primary">
+
+              <div className="min-w-0 flex-1">
+                <h1 className="text-sm sm:text-base font-bold font-display text-primary-700 dark:text-text-dark-primary truncate">
                   Practice Failed Questions
                 </h1>
-                <p className="text-text-light-secondary dark:text-text-dark-secondary text-sm font-sans">
+                <p className="text-text-light-secondary dark:text-text-dark-secondary text-xs font-sans truncate hidden sm:block">
                   Review and practice questions you got wrong
                 </p>
               </div>
             </div>
 
-            {/* Fullscreen Toggle Button */}
+            {/* Right side - Fullscreen Toggle */}
             <button
               onClick={toggleFullscreen}
-              className="flex items-center gap-2 bg-gray-600 dark:bg-gray-700 hover:bg-gray-700 dark:hover:bg-gray-800 text-white px-4 py-2 rounded-lg transition-colors font-sans shadow-md"
+              className="flex items-center gap-1.5 bg-gray-600 dark:bg-gray-700 hover:bg-gray-700 dark:hover:bg-gray-800 text-white px-2.5 py-1.5 rounded-md transition-colors font-sans text-xs flex-shrink-0"
               title={isFullscreen ? "Exit Fullscreen" : "Enter Fullscreen"}
             >
               {isFullscreen ? (
                 <>
-                  <Minimize className="w-4 h-4" />
-                  <span>Exit Fullscreen</span>
+                  <Minimize className="w-3 h-3" />
+                  <span className="hidden sm:inline">Exit</span>
                 </>
               ) : (
                 <>
-                  <Maximize className="w-4 h-4" />
-                  <span>Fullscreen</span>
+                  <Maximize className="w-3 h-3" />
+                  <span className="hidden sm:inline">Full</span>
                 </>
               )}
             </button>
@@ -140,9 +142,11 @@ const PracticePage = () => {
         </div>
       </div>
 
-      {/* Practice Component */}
+      {/* Practice Component - Takes remaining height */}
       <div
-        className={`${isFullscreen ? "p-0" : "container mx-auto px-4 py-8"}`}
+        className={`${
+          isFullscreen ? "h-screen" : "h-[calc(100vh-6rem)]"
+        } overflow-y-auto`}
       >
         <PracticeFailedQuestions exerciseId={exerciseId} userId={userId} />
       </div>

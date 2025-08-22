@@ -45,16 +45,18 @@ export default function ExerciseList() {
   };
 
   return (
-    <div className="bg-gradient-to-br from-purple-100 to-purple-200 p-6">
-      <div className="">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-bold text-purple-800">Exercise List</h1>
+    <div className="bg-gradient-to-br from-purple-100 to-purple-200 p-4 md:p-6 min-h-screen">
+      <div className="max-w-7xl mx-auto">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 gap-3">
+          <h1 className="text-lg md:text-xl font-bold text-purple-800">
+            Exercise List
+          </h1>
           <button
             onClick={() => navigate("/admin/activities")}
-            className="bg-green-600 hover:bg-green-700 text-white font-semibold px-6 py-3 rounded-lg transition-colors flex items-center gap-2"
+            className="bg-green-600 hover:bg-green-700 text-white font-semibold px-4 py-2 rounded-lg transition-colors flex items-center justify-center gap-2 w-full sm:w-auto text-sm"
           >
             <svg
-              className="w-5 h-5"
+              className="w-4 h-4"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -71,7 +73,8 @@ export default function ExerciseList() {
           </button>
         </div>
 
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        {/* Responsive grid: 1 col on mobile, 2 on tablet, 4 on desktop */}
+        <div className="grid gap-3 md:gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
           {exercises.map((ex) => (
             <div
               key={ex._id}
@@ -81,12 +84,12 @@ export default function ExerciseList() {
                   : ex.questionCount === 0
                   ? "bg-gradient-to-br from-blue-50 to-blue-100 border-blue-300"
                   : "bg-white border-purple-200"
-              } rounded-xl shadow-lg border p-5 space-y-3 relative`}
+              } rounded-lg shadow-lg border p-3 md:p-4 space-y-2 relative transition-all hover:shadow-xl`}
             >
               {/* Edit Exercise Icon */}
               <button
                 onClick={() => handleEditExercise(ex._id)}
-                className={`absolute top-3 right-3 p-2 ${
+                className={`absolute top-2 right-2 p-1.5 ${
                   !ex.isActive
                     ? "text-gray-400 hover:text-gray-600 hover:bg-gray-100"
                     : "text-gray-500 hover:text-purple-600 hover:bg-purple-50"
@@ -94,7 +97,7 @@ export default function ExerciseList() {
                 title="Edit Exercise"
               >
                 <svg
-                  className="w-5 h-5"
+                  className="w-4 h-4"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -111,8 +114,8 @@ export default function ExerciseList() {
 
               {/* Inactive Badge */}
               {!ex.isActive && (
-                <div className="absolute top-3 left-3">
-                  <span className="bg-gray-500 text-white text-xs font-semibold px-2 py-1 rounded-full">
+                <div className="absolute top-2 left-2">
+                  <span className="bg-gray-500 text-white text-xs font-semibold px-2 py-0.5 rounded-full">
                     Inactive
                   </span>
                 </div>
@@ -120,15 +123,15 @@ export default function ExerciseList() {
 
               {/* Bulk Upload Badge */}
               {ex.isActive && ex.questionCount === 0 && (
-                <div className="absolute top-3 left-3">
-                  <span className="bg-blue-500 text-white text-xs font-semibold px-2 py-1 rounded-full">
+                <div className="absolute top-2 left-2">
+                  <span className="bg-blue-500 text-white text-xs font-semibold px-2 py-0.5 rounded-full">
                     Ready for Upload
                   </span>
                 </div>
               )}
 
               <h2
-                className={`text-xl font-bold pr-8 ${
+                className={`text-base md:text-lg font-bold pr-6 ${
                   !ex.isActive
                     ? "text-gray-600"
                     : ex.questionCount === 0
@@ -138,42 +141,50 @@ export default function ExerciseList() {
               >
                 {ex?.subjectId?.name}
               </h2>
+
               <p
-                className={`text-sm ${
+                className={`text-xs ${
                   !ex.isActive ? "text-gray-500" : "text-gray-600"
                 }`}
               >
                 Class {ex.class}
               </p>
-              <p className={!ex.isActive ? "text-gray-600" : "text-gray-800"}>
-                <strong>Chapter: </strong>
-                {ex?.chapterId?.name ? (
-                  <span className="ml-2">{ex?.chapterId?.name}</span>
-                ) : (
-                  " -----"
-                )}
-              </p>
-              <p className={!ex.isActive ? "text-gray-600" : "text-gray-800"}>
-                <strong>Source: </strong> {ex.source}
-                {!ex?.chapterId?.name && <span> - {ex?.name}</span>}
-              </p>
+
+              <div className="space-y-1.5">
+                <p className={!ex.isActive ? "text-gray-600" : "text-gray-800"}>
+                  <strong className="text-xs">Chapter: </strong>
+                  {ex?.chapterId?.name ? (
+                    <span className="text-xs">{ex?.chapterId?.name}</span>
+                  ) : (
+                    <span className="text-xs text-gray-400">-----</span>
+                  )}
+                </p>
+
+                <p className={!ex.isActive ? "text-gray-600" : "text-gray-800"}>
+                  <strong className="text-xs">Source: </strong>
+                  <span className="text-xs">{ex.source}</span>
+                  {!ex?.chapterId?.name && (
+                    <span className="text-xs"> - {ex?.name}</span>
+                  )}
+                </p>
+              </div>
 
               {ex.questionCount > 0 ? (
                 <button
                   onClick={() => handleEditQuestion(ex._id)}
-                  className={`w-full mt-2 font-semibold py-2 rounded-lg transition ${
+                  className={`w-full mt-3 font-semibold py-2 text-xs rounded-lg transition ${
                     !ex.isActive
                       ? "bg-gray-400 hover:bg-gray-500 text-gray-100"
                       : "bg-purple-600 hover:bg-purple-700 text-white"
                   }`}
                   disabled={!ex.isActive}
                 >
-                  Edit Questions
+                  Edit Questions ({ex.questionCount})
                 </button>
               ) : (
                 <button
                   onClick={() => handleUpload(ex._id)}
-                  className={`w-full mt-2 font-semibold py-2 rounded-lg transition ${
+                  className={`w-full mt-3 font-semibold py-2 text-xs rounded-lg transition ${
                     !ex.isActive
                       ? "bg-gray-600 hover:bg-gray-700 text-white"
                       : "bg-purple-600 hover:bg-purple-700 text-white"

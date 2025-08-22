@@ -3,6 +3,7 @@ import { useFormik } from "formik";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { useApiService } from "../../hooks/useApiService";
+import { Play, Eye } from "lucide-react";
 
 const StartExam = () => {
   const [exercises, setExercises] = useState([]);
@@ -47,7 +48,7 @@ const StartExam = () => {
           navigate(
             `/user/test/${values.exerciseId}?user=${userid}&time=${
               values.totalTime * 60
-            }&submissionId=${data._id}`
+            }&submissionId=${data._id}&examTotalTime=${values.totalTime}`
           );
         } catch (error) {
           console.error("Start Exam Error: ", error);
@@ -139,13 +140,13 @@ const StartExam = () => {
   }
 
   return (
-    <div className="p-6 space-y-8">
-      {/* Start Exam Form */}
+    <div className="p-3 space-y-6">
+      {/* Start Exam Form - Compact */}
       <form
         onSubmit={formik.handleSubmit}
-        className="max-w-lg mx-auto p-6 bg-white dark:bg-dark-bg-secondary rounded-lg shadow-lg dark:shadow-dark border border-gray-200 dark:border-dark-purple-700 space-y-4 transition-colors duration-250"
+        className="w-full max-w-md mx-auto p-4 bg-white dark:bg-dark-bg-secondary rounded-lg shadow-md border border-gray-200 dark:border-dark-purple-700 space-y-3 transition-colors duration-250"
       >
-        <h2 className="text-xl font-bold font-display mb-4 text-center text-primary-700 dark:text-text-dark-primary">
+        <h2 className="text-sm font-bold font-display text-center text-primary-700 dark:text-text-dark-primary">
           {mode === ""
             ? "Choose Action"
             : mode === "exam"
@@ -153,17 +154,17 @@ const StartExam = () => {
             : "Practice Failed Questions"}
         </h2>
 
-        {/* Mode Selection */}
+        {/* Mode Selection - Compact */}
         {mode === "" && (
-          <div className="space-y-4">
-            <p className="text-center text-text-light-secondary dark:text-text-dark-secondary mb-6 font-sans">
+          <div className="space-y-3">
+            <p className="text-center text-xs text-text-light-secondary dark:text-text-dark-secondary font-sans">
               What would you like to do?
             </p>
 
             <button
               type="button"
               onClick={() => setMode("exam")}
-              className="w-full bg-primary-600 dark:bg-dark-purple-500 text-white py-3 rounded-lg hover:bg-primary-700 dark:hover:bg-dark-purple-600 transition-colors font-medium font-sans shadow-md"
+              className="w-full bg-primary-600 dark:bg-dark-purple-500 text-white py-2.5 rounded-md hover:bg-primary-700 dark:hover:bg-dark-purple-600 transition-colors font-medium font-sans shadow-sm text-sm"
             >
               📝 Start New Exam
             </button>
@@ -171,26 +172,26 @@ const StartExam = () => {
             <button
               type="button"
               onClick={() => setMode("practice")}
-              className="w-full bg-orange-600 dark:bg-orange-700 text-white py-3 rounded-lg hover:bg-orange-700 dark:hover:bg-orange-800 transition-colors font-medium font-sans shadow-md"
+              className="w-full bg-orange-600 dark:bg-orange-700 text-white py-2.5 rounded-md hover:bg-orange-700 dark:hover:bg-orange-800 transition-colors font-medium font-sans shadow-sm text-sm"
             >
               🎯 Practice Failed Questions
             </button>
           </div>
         )}
 
-        {/* Form Fields - Show when mode is selected */}
+        {/* Form Fields - Compact */}
         {mode !== "" && (
           <>
             {/* Exercise Dropdown */}
             <div>
-              <label className="block text-sm font-medium text-text-light-primary dark:text-text-dark-primary mb-2 font-sans">
+              <label className="block text-xs font-medium text-text-light-primary dark:text-text-dark-primary mb-1.5 font-sans">
                 Select Exercise
               </label>
               <select
                 name="exerciseId"
                 value={formik.values.exerciseId}
                 onChange={formik.handleChange}
-                className="w-full border border-gray-300 dark:border-dark-purple-600 p-3 rounded-lg bg-white dark:bg-dark-bg-tertiary text-text-light-primary dark:text-text-dark-primary focus:outline-none focus:ring-2 focus:ring-primary-500 dark:focus:ring-dark-purple-400 focus:border-transparent transition-colors font-sans"
+                className="w-full border border-gray-300 dark:border-dark-purple-600 p-1.5 rounded-md bg-white dark:bg-dark-bg-tertiary text-text-light-primary dark:text-text-dark-primary focus:outline-none focus:ring-2 focus:ring-primary-500 dark:focus:ring-dark-purple-400 focus:border-transparent transition-colors font-sans text-sm"
               >
                 <option value="">-- Choose Exercise --</option>
                 {exercises.map((ex) => (
@@ -200,7 +201,7 @@ const StartExam = () => {
                 ))}
               </select>
               {formik.errors.exerciseId && (
-                <p className="text-red-500 dark:text-red-400 text-sm mt-1 font-sans">
+                <p className="text-red-500 dark:text-red-400 text-xs mt-1 font-sans">
                   {formik.errors.exerciseId}
                 </p>
               )}
@@ -209,7 +210,7 @@ const StartExam = () => {
             {/* Total Time Input - Only for exam mode */}
             {mode === "exam" && (
               <div>
-                <label className="block text-sm font-medium text-text-light-primary dark:text-text-dark-primary mb-2 font-sans">
+                <label className="block text-xs font-medium text-text-light-primary dark:text-text-dark-primary mb-1.5 font-sans">
                   Total Time (minutes)
                 </label>
                 <input
@@ -217,30 +218,30 @@ const StartExam = () => {
                   name="totalTime"
                   value={formik.values.totalTime}
                   onChange={formik.handleChange}
-                  className="w-full border border-gray-300 dark:border-dark-purple-600 p-3 rounded-lg bg-white dark:bg-dark-bg-tertiary text-text-light-primary dark:text-text-dark-primary placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-500 dark:focus:ring-dark-purple-400 focus:border-transparent transition-colors font-sans"
+                  className="w-full border border-gray-300 dark:border-dark-purple-600 p-2.5 rounded-md bg-white dark:bg-dark-bg-tertiary text-text-light-primary dark:text-text-dark-primary placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-500 dark:focus:ring-dark-purple-400 focus:border-transparent transition-colors font-sans text-sm"
                   placeholder="Enter exam duration"
                 />
                 {formik.errors.totalTime && (
-                  <p className="text-red-500 dark:text-red-400 text-sm mt-1 font-sans">
+                  <p className="text-red-500 dark:text-red-400 text-xs mt-1 font-sans">
                     {formik.errors.totalTime}
                   </p>
                 )}
               </div>
             )}
 
-            {/* Action Buttons */}
-            <div className="flex space-x-3">
+            {/* Action Buttons - Compact */}
+            <div className="flex gap-2 pt-2">
               <button
                 type="button"
                 onClick={resetForm}
-                className="flex-1 bg-gray-500 dark:bg-gray-600 text-white py-2 rounded-lg hover:bg-gray-600 dark:hover:bg-gray-700 transition-colors font-sans"
+                className="flex-1 bg-gray-500 dark:bg-gray-600 text-white py-2 rounded-md hover:bg-gray-600 dark:hover:bg-gray-700 transition-colors font-sans text-sm"
               >
                 ← Back
               </button>
 
               <button
                 type="submit"
-                className={`flex-1 text-white py-2 rounded-lg transition-colors font-sans ${
+                className={`flex-1 text-white py-2 rounded-md transition-colors font-sans text-sm ${
                   mode === "exam"
                     ? "bg-primary-600 dark:bg-dark-purple-500 hover:bg-primary-700 dark:hover:bg-dark-purple-600"
                     : "bg-orange-600 dark:bg-orange-700 hover:bg-orange-700 dark:hover:bg-orange-800"
@@ -253,69 +254,83 @@ const StartExam = () => {
         )}
       </form>
 
-      {/* Submissions Table */}
-      <div className="bg-white dark:bg-dark-bg-secondary rounded-lg shadow-lg dark:shadow-dark border border-gray-200 dark:border-dark-purple-700 transition-colors duration-250">
-        <div className="p-6 border-b border-gray-200 dark:border-dark-purple-700">
-          <h2 className="text-2xl font-bold font-display text-primary-700 dark:text-text-dark-primary">
+      {/* Submissions Table - Compact */}
+      <div className="bg-white dark:bg-dark-bg-secondary rounded-lg shadow-md border border-gray-200 dark:border-dark-purple-700 transition-colors duration-250">
+        <div className="p-3 border-b border-gray-200 dark:border-dark-purple-700">
+          <h2 className="text-sm font-bold font-display text-primary-700 dark:text-text-dark-primary">
             All Submissions
           </h2>
         </div>
 
         <div className="overflow-x-auto">
           <table className="min-w-full table-auto text-left">
-            <thead className="bg-primary-100 dark:bg-dark-purple-800 text-primary-800 dark:text-text-dark-primary">
+            <thead className="bg-primary-100 dark:bg-dark-purple-900 text-primary-800 dark:text-text-dark-primary">
               <tr>
-                <th className="p-4 font-semibold font-sans">#</th>
-                <th className="p-4 font-semibold font-sans">User</th>
-                <th className="p-4 font-semibold font-sans">Exercise</th>
-                <th className="p-4 font-semibold font-sans">Score</th>
-                <th className="p-4 font-semibold font-sans">
-                  Time Taken (min)
+                <th className="p-2 font-semibold font-sans text-xs">#</th>
+                <th className="p-2 font-semibold font-sans text-xs">User</th>
+                <th className="p-2 font-semibold font-sans text-xs">
+                  Exercise
                 </th>
-                <th className="p-4 font-semibold font-sans">Submitted</th>
-                <th className="p-4 font-semibold font-sans">Action</th>
+                <th className="p-2 font-semibold font-sans text-xs">Score</th>
+                <th className="p-2 font-semibold font-sans text-xs">
+                  Time (min)
+                </th>
+                <th className="p-2 font-semibold font-sans text-xs">
+                  Submitted
+                </th>
+                <th className="p-2 font-semibold font-sans text-xs">Action</th>
               </tr>
             </thead>
             <tbody>
               {submissions.map((sub, idx) => (
                 <tr
                   key={sub._id}
-                  className="border-t border-gray-200 dark:border-dark-purple-700 hover:bg-primary-50 dark:hover:bg-dark-purple-800 transition-colors"
+                  className="border-t border-gray-200 dark:border-dark-purple-700 hover:bg-primary-50 dark:hover:bg-dark-purple-700/20 transition-colors"
                 >
-                  <td className="p-4 text-text-light-primary dark:text-text-dark-primary font-sans">
+                  <td className="p-2 text-text-light-primary dark:text-text-dark-primary font-sans text-xs">
                     {idx + 1}
                   </td>
-                  <td className="p-4 text-text-light-primary dark:text-text-dark-primary font-sans">
-                    {sub.userId?.name || "Unknown"}
+                  <td className="p-2 text-text-light-primary dark:text-text-dark-primary font-sans text-xs">
+                    <div className="truncate max-w-24">
+                      {sub.userId?.name || "Unknown"}
+                    </div>
                   </td>
-                  <td className="p-4 text-text-light-primary dark:text-text-dark-primary font-sans">
-                    {sub.exerciseId?.source} - {sub.exerciseId?.name}
+                  <td className="p-2 text-text-light-primary dark:text-text-dark-primary font-sans text-xs">
+                    <div className="truncate max-w-32">
+                      {sub.exerciseId?.source} - {sub.exerciseId?.name}
+                    </div>
                   </td>
-                  <td className="p-4 text-text-light-primary dark:text-text-dark-primary font-sans">
-                    {sub.score} / {sub.answers.length}
+                  <td className="p-2 text-text-light-primary dark:text-text-dark-primary font-sans text-xs">
+                    <span className="font-medium">
+                      {sub.score} / {sub.answers.length}
+                    </span>
                   </td>
-                  <td className="p-4 text-text-light-primary dark:text-text-dark-primary font-sans">
+                  <td className="p-2 text-text-light-primary dark:text-text-dark-primary font-sans text-xs">
                     {Math.floor(sub.totalTimeTaken / 60)}
                   </td>
-                  <td className="p-4 text-text-light-primary dark:text-text-dark-primary font-sans">
-                    {sub?.endedAt
-                      ? new Date(sub.endedAt).toLocaleString()
-                      : "-"}
+                  <td className="p-2 text-text-light-primary dark:text-text-dark-primary font-sans text-xs">
+                    <div className="truncate max-w-24">
+                      {sub?.endedAt
+                        ? new Date(sub.endedAt).toLocaleDateString()
+                        : "-"}
+                    </div>
                   </td>
-                  <td className="p-4">
+                  <td className="p-2">
                     {sub.status === "paused" ? (
                       <button
-                        className="px-4 py-2 bg-blue-800 dark:bg-blue-700 text-white rounded-lg hover:bg-blue-900 dark:hover:bg-blue-800 transition-colors font-sans text-sm"
+                        className="p-1.5 rounded-md bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 hover:bg-green-200 dark:hover:bg-green-900/50 transition-colors"
                         onClick={() => handleResume(sub)}
+                        title="Resume"
                       >
-                        Resume
+                        <Play size={14} />
                       </button>
                     ) : (
                       <button
-                        className="px-4 py-2 bg-blue-600 dark:bg-blue-600 text-white rounded-lg hover:bg-blue-700 dark:hover:bg-blue-700 transition-colors font-sans text-sm"
+                        className="p-1.5 rounded-md bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 hover:bg-blue-200 dark:hover:bg-blue-900/50 transition-colors"
                         onClick={() => handleReport(sub)}
+                        title="View Report"
                       >
-                        View Report
+                        <Eye size={14} />
                       </button>
                     )}
                   </td>
@@ -326,7 +341,7 @@ const StartExam = () => {
         </div>
 
         {submissions.length === 0 && (
-          <div className="p-8 text-center text-text-light-secondary dark:text-text-dark-secondary font-sans">
+          <div className="p-4 text-center text-text-light-secondary dark:text-text-dark-secondary font-sans text-xs">
             No submissions found.
           </div>
         )}

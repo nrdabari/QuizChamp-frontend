@@ -351,16 +351,16 @@ const ExamPage = () => {
 
   const renderQuestionContent = (question) => {
     return (
-      <div className="space-y-4">
-        <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg p-4 sm:p-6 shadow-lg dark:shadow-xl transition-colors duration-250">
+      <div className="space-y-3">
+        <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg p-3 sm:p-4 shadow-md transition-colors duration-250">
           <div>
             {/* Question with options or grid */}
             {question?.question ||
             question?.options?.length > 0 ||
             question?.gridOptions?.length > 0 ? (
-              <div className="space-y-4">
+              <div className="space-y-3">
                 {question.question && (
-                  <h2 className="text-lg sm:text-xl font-semibold font-display mb-4 text-gray-900 dark:text-white leading-relaxed">
+                  <h2 className="text-sm sm:text-sm lg:text-sm font-semibold font-display mb-3 text-gray-900 dark:text-white leading-relaxed">
                     {/<\/?[a-z][\s\S]*>/i.test(question?.question) ? (
                       <span
                         dangerouslySetInnerHTML={{
@@ -378,24 +378,26 @@ const ExamPage = () => {
                   </h2>
                 )}
 
-                {/* Question Image */}
+                {/* Question Image - Responsive */}
                 {question.imagePath && (
-                  <div className="mb-4 text-center">
+                  <div className="mb-3 text-center">
                     <img
                       src={`${question.imagePath}`}
                       alt="Question"
                       className="max-w-full h-auto rounded-lg shadow-md mx-auto"
-                      style={{ maxHeight: "400px" }}
+                      style={{
+                        maxHeight: window.innerWidth < 640 ? "150px" : "300px",
+                      }}
                       onError={(e) => {
                         e.target.style.display = "none";
                         e.target.nextSibling.style.display = "block";
                       }}
                     />
-                    <div className="hidden bg-gray-100 dark:bg-gray-700 border-2 border-dashed border-gray-300 dark:border-gray-500 rounded-lg p-6 sm:p-8">
-                      <div className="w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-4 text-gray-400 dark:text-gray-500">
+                    <div className="hidden bg-gray-100 dark:bg-gray-700 border-2 border-dashed border-gray-300 dark:border-gray-500 rounded-lg p-4">
+                      <div className="w-8 h-8 mx-auto mb-2 text-gray-400 dark:text-gray-500 text-lg">
                         📷
                       </div>
-                      <p className="text-gray-600 dark:text-gray-300 font-medium font-sans">
+                      <p className="text-gray-600 dark:text-gray-300 font-medium font-sans text-xs sm:text-xs">
                         Image not found
                       </p>
                     </div>
@@ -404,7 +406,7 @@ const ExamPage = () => {
 
                 {/* Sub Question */}
                 {question.subQuestion && (
-                  <h3 className="text-base sm:text-lg font-semibold mb-4 text-gray-700 dark:text-gray-200 font-sans leading-relaxed">
+                  <h3 className="text-xs sm:text-xs lg:text-xs font-semibold mb-3 text-gray-700 dark:text-gray-200 font-sans leading-relaxed">
                     {question.subQuestion.split("\n").map((line, index) => (
                       <React.Fragment key={index}>
                         {line}
@@ -413,20 +415,20 @@ const ExamPage = () => {
                     ))}
                   </h3>
                 )}
-                {/* Grid Type Options */}
+
+                {/* Grid Type Options - Responsive */}
                 {question.optionType === "grid" &&
                 Array.isArray(question.gridOptions) &&
                 question.gridOptions.length > 0 ? (
-                  <div className="mt-4 border border-gray-200 dark:border-gray-600 rounded-lg overflow-hidden bg-white dark:bg-gray-800 transition-colors duration-250">
+                  <div className="mt-3 border border-gray-200 dark:border-gray-600 rounded-lg overflow-hidden bg-white dark:bg-gray-800 transition-colors duration-250">
                     {question.gridOptions.map((row, rowIndex) => {
                       if (rowIndex === 0) {
-                        // Header row
                         return (
                           <div
                             key={rowIndex}
-                            className="flex font-semibold bg-gray-100 dark:bg-gray-700 p-3 border-b border-gray-200 dark:border-gray-600 text-gray-900 dark:text-white font-sans"
+                            className="flex font-semibold bg-gray-100 dark:bg-gray-700 p-2 sm:p-3 border-b border-gray-200 dark:border-gray-600 text-gray-900 dark:text-white font-sans text-xs sm:text-xs"
                           >
-                            <div className="w-12"></div>
+                            <div className="w-8 sm:w-12"></div>
                             {row.map((cell, cellIndex) => (
                               <div
                                 key={cellIndex}
@@ -443,7 +445,7 @@ const ExamPage = () => {
                       return (
                         <label
                           key={rowIndex}
-                          className="flex items-center border-b border-gray-200 dark:border-gray-600 p-3 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-gray-900 dark:text-white font-sans"
+                          className="flex items-center border-b border-gray-200 dark:border-gray-600 p-2 sm:p-3 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-gray-900 dark:text-white font-sans text-xs sm:text-xs"
                         >
                           <input
                             type="radio"
@@ -453,15 +455,15 @@ const ExamPage = () => {
                             onChange={() =>
                               handleAnswerChange(`(${optionLetter})`)
                             }
-                            className="w-4 h-4 text-blue-600 dark:text-blue-400 bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-500 focus:ring-blue-500 dark:focus:ring-blue-400 focus:ring-2 mr-3"
+                            className="w-3 h-3 sm:w-4 sm:h-4 text-blue-600 dark:text-blue-400 bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-500 focus:ring-blue-500 dark:focus:ring-blue-400 focus:ring-2 mr-2 sm:mr-3"
                           />
                           <div
-                            className={`w-8 h-8 rounded border-2 mr-3 flex items-center justify-center text-white font-bold text-sm
-            ${
-              selectedAnswer === `(${optionLetter})`
-                ? "bg-blue-600 dark:bg-blue-500 border-blue-600 dark:border-blue-500"
-                : "bg-gray-400 dark:bg-gray-600 border-gray-400 dark:border-gray-600"
-            }`}
+                            className={`w-6 h-6 sm:w-8 sm:h-8 rounded border-2 mr-2 sm:mr-3 flex items-center justify-center text-white font-bold text-xs sm:text-xs
+                        ${
+                          selectedAnswer === `(${optionLetter})`
+                            ? "bg-blue-600 dark:bg-blue-500 border-blue-600 dark:border-blue-500"
+                            : "bg-gray-400 dark:bg-gray-600 border-gray-400 dark:border-gray-600"
+                        }`}
                           >
                             {optionLetter}
                           </div>
@@ -474,15 +476,14 @@ const ExamPage = () => {
                       );
                     })}
                   </div>
-                ) : // Default Options (A-D) when options array exists
-                question.options && question.options.length > 0 ? (
-                  <ul className="space-y-3 mt-4">
+                ) : question.options && question.options.length > 0 ? (
+                  <ul className="space-y-2 sm:space-y-3 mt-3">
                     {question.options.map((opt, idx) => {
                       const optionLetter = ["(A)", "(B)", "(C)", "(D)"][idx];
                       return (
                         <li key={idx}>
                           <label
-                            className={`flex items-start space-x-3 p-4 rounded-lg border-2 cursor-pointer transition-all duration-200 ${
+                            className={`flex items-start space-x-2 sm:space-x-3 p-3 sm:p-4 rounded-lg border-2 cursor-pointer transition-all duration-200 ${
                               selectedAnswer === optionLetter
                                 ? "border-blue-500 dark:border-blue-400 bg-blue-50 dark:bg-blue-900/30 shadow-md"
                                 : "border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 hover:border-gray-300 dark:hover:border-gray-500 hover:bg-gray-50 dark:hover:bg-gray-700"
@@ -494,10 +495,10 @@ const ExamPage = () => {
                               value={optionLetter}
                               checked={selectedAnswer === optionLetter}
                               onChange={() => handleAnswerChange(optionLetter)}
-                              className="w-4 h-4 text-blue-600 dark:text-blue-400 bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-500 focus:ring-blue-500 dark:focus:ring-blue-400 focus:ring-2 mt-1"
+                              className="w-3 h-3 sm:w-4 sm:h-4 text-blue-600 dark:text-blue-400 bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-500 focus:ring-blue-500 dark:focus:ring-blue-400 focus:ring-2 mt-1"
                             />
-                            <span className="text-base sm:text-lg text-gray-900 dark:text-white font-sans leading-relaxed flex-1">
-                              <span className="font-semibold text-blue-600 dark:text-blue-400 mr-2">
+                            <span className="text-xs sm:text-xs lg:text-xs text-gray-900 dark:text-white font-sans leading-relaxed flex-1">
+                              <span className="font-semibold text-blue-600 dark:text-blue-400 mr-1 sm:mr-2">
                                 {optionLetter}
                               </span>
                               {opt}
@@ -508,14 +509,13 @@ const ExamPage = () => {
                     })}
                   </ul>
                 ) : (
-                  // Fallback A-D options when no specific options provided
-                  <div className="grid grid-cols-2 sm:flex sm:justify-center gap-3 sm:gap-6 mt-6">
+                  <div className="grid grid-cols-2 sm:flex sm:justify-center gap-2 sm:gap-6 mt-4">
                     {["A", "B", "C", "D"].map((option) => {
                       const optionValue = `(${option})`;
                       return (
                         <label
                           key={option}
-                          className={`flex items-center justify-center font-medium text-base sm:text-xl space-x-2 p-3 sm:p-4 rounded-lg border-2 cursor-pointer transition-all duration-200 ${
+                          className={`flex items-center justify-center font-medium text-sm sm:text-sm lg:text-sm space-x-1 sm:space-x-2 p-2 sm:p-3 lg:p-4 rounded-lg border-2 cursor-pointer transition-all duration-200 ${
                             selectedAnswer === optionValue
                               ? "border-blue-500 dark:border-blue-400 bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 shadow-md"
                               : "border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 text-blue-700 dark:text-blue-300 hover:border-blue-300 dark:hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20"
@@ -527,9 +527,11 @@ const ExamPage = () => {
                             value={optionValue}
                             checked={selectedAnswer === optionValue}
                             onChange={() => handleAnswerChange(optionValue)}
-                            className="w-4 h-4 text-blue-600 dark:text-blue-400 bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-500 focus:ring-blue-500 dark:focus:ring-blue-400 focus:ring-2"
+                            className="w-3 h-3 sm:w-4 sm:h-4 text-blue-600 dark:text-blue-400 bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-500 focus:ring-blue-500 dark:focus:ring-blue-400 focus:ring-2"
                           />
-                          <span className="font-sans">Option {option}</span>
+                          <span className="font-sans text-xs sm:text-xs">
+                            Option {option}
+                          </span>
                         </label>
                       );
                     })}
@@ -537,14 +539,15 @@ const ExamPage = () => {
                 )}
               </div>
             ) : question?.imagePath ? (
-              // Image-only questions
-              <div className="flex flex-col items-center space-y-4 sm:space-y-6">
-                <div className="mb-4 text-center w-full">
+              <div className="flex flex-col items-center space-y-3">
+                <div className="mb-3 text-center w-full">
                   <img
                     src={`${question.imagePath}`}
                     alt="Question"
                     className="max-w-full h-auto rounded-lg shadow-md mx-auto"
-                    style={{ maxHeight: "400px" }}
+                    style={{
+                      maxHeight: window.innerWidth < 640 ? "150px" : "300px",
+                    }}
                     onError={(e) => {
                       e.target.style.display = "none";
                       e.target.nextSibling.style.display = "block";
@@ -553,7 +556,7 @@ const ExamPage = () => {
                 </div>
               </div>
             ) : (
-              <p className="text-gray-500 dark:text-gray-400 italic text-center py-8 font-sans">
+              <p className="text-gray-500 dark:text-gray-400 italic text-center py-6 sm:py-8 font-sans text-xs sm:text-xs">
                 No question data available.
               </p>
             )}
@@ -564,291 +567,199 @@ const ExamPage = () => {
   };
 
   return (
-    <div
-      className={`${
-        isFullscreen ? "h-screen" : "h-screen"
-      } bg-gray-50 dark:bg-gray-900 transition-colors duration-250 flex flex-col overflow-hidden`}
-    >
-      {/* Header with Exercise Info */}
+    <div className="h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-250 flex flex-col">
+      {/* Compact Mobile Header / Full Desktop Header */}
       <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-600 shadow-sm flex-shrink-0">
-        <div className="max-w-7xl mx-auto px-4 py-4">
-          <div className="bg-gradient-to-r from-blue-50 via-white to-purple-50 dark:from-gray-800 dark:via-gray-900 dark:to-gray-800 border-b border-gray-200 dark:border-gray-700 shadow-lg">
-            <div className="max-w-7xl mx-auto px-4 py-6">
-              <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-6 lg:space-y-0 gap-8">
-                {/* Exercise Title and Info */}
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center space-x-3 mb-3">
-                    <div className="w-3 h-8 bg-gradient-to-b from-blue-500 to-purple-600 rounded-full"></div>
-                    <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold font-display text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-purple-600 to-blue-800 dark:from-blue-400 dark:via-purple-400 dark:to-blue-300 truncate">
-                      {exerciseData?.source} - {exerciseData?.name}
-                    </h1>
-                  </div>
-
-                  {/* Status indicators */}
-                  <div className="flex flex-wrap items-center gap-3">
-                    <div className="flex items-center space-x-2 bg-green-100 dark:bg-green-900/30 px-3 py-1 rounded-full">
-                      <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                      <span className="text-sm font-medium text-green-700 dark:text-green-300 font-sans">
-                        Exam Active
-                      </span>
-                    </div>
-                    <div className="flex items-center space-x-2 bg-blue-100 dark:bg-blue-900/30 px-3 py-1 rounded-full">
-                      <svg
-                        className="w-4 h-4 text-blue-600 dark:text-blue-400"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C20.832 18.477 19.246 18 17.5 18c-1.746 0-3.332.477-4.5 1.253"
-                        />
-                      </svg>
-                    </div>
-                  </div>
+        <div className="bg-gradient-to-r from-blue-50 via-white to-purple-50 dark:from-gray-800 dark:via-gray-900 dark:to-gray-800 border-b border-gray-200 dark:border-gray-700">
+          <div className="max-w-7xl mx-auto px-2 sm:px-4 py-2 sm:py-2 lg:py-3">
+            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-2 sm:space-y-2 lg:space-y-0 gap-2 sm:gap-4 lg:gap-6">
+              {/* Exercise Title - Compact on Mobile */}
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center space-x-1 sm:space-x-2 mb-1 sm:mb-2">
+                  <div className="w-1 sm:w-2 h-4 sm:h-6 bg-gradient-to-b from-blue-500 to-purple-600 rounded-full"></div>
+                  <h1 className="text-xs sm:text-sm lg:text-sm xl:text-sm font-bold font-display text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-purple-600 to-blue-800 dark:from-blue-400 dark:via-purple-400 dark:to-blue-300 truncate">
+                    {exerciseData?.source} - {exerciseData?.name}
+                  </h1>
                 </div>
 
-                {/* Central Pause/Play Button */}
-                <div className="flex-shrink-0 flex justify-center">
-                  <div className="relative">
-                    {/* Animated ring */}
-                    <div className="absolute inset-0 rounded-full bg-gradient-to-r from-red-400 to-red-600 animate-ping opacity-20"></div>
-                    <div className="absolute inset-0 rounded-full bg-gradient-to-r from-red-400 to-red-600 opacity-30"></div>
-
-                    <button
-                      onClick={() => {
-                        try {
-                          if (isPaused) resumeExam();
-                          else pauseExam();
-                        } catch (error) {
-                          console.log("Pause/Resume failed:", error);
-                        }
-                      }}
-                      className="relative w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-red-500 via-red-600 to-red-700 dark:from-red-600 dark:via-red-700 dark:to-red-800 hover:from-red-600 hover:via-red-700 hover:to-red-800 dark:hover:from-red-700 dark:hover:via-red-800 dark:hover:to-red-900 text-white rounded-full transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:scale-105 group"
-                      title={isPaused ? "Resume Exam" : "Pause Exam"}
+                {/* Status indicators - Hidden on small mobile */}
+                <div className="hidden sm:flex flex-wrap items-center gap-2 sm:gap-2">
+                  <div className="flex items-center space-x-1 sm:space-x-1 bg-green-100 dark:bg-green-900/30 px-2 sm:px-2 py-1 rounded-full">
+                    <div className="w-1.5 sm:w-2 h-1.5 sm:h-2 bg-green-500 rounded-full animate-pulse"></div>
+                    <span className="text-xs sm:text-xs font-medium text-green-700 dark:text-green-300 font-sans">
+                      Exam Active
+                    </span>
+                  </div>
+                  <div className="hidden lg:flex items-center space-x-2 bg-blue-100 dark:bg-blue-900/30 px-2 py-1 rounded-full">
+                    <svg
+                      className="w-4 h-4 text-blue-600 dark:text-blue-400"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
                     >
-                      <div className="absolute inset-2 bg-white/10 rounded-full"></div>
-                      {isPaused ? (
-                        <svg
-                          className="w-8 h-8 sm:w-10 sm:h-10 relative z-10 mx-auto transform group-hover:scale-110 transition-transform duration-200"
-                          fill="currentColor"
-                          viewBox="0 0 20 20"
-                        >
-                          <path
-                            fillRule="evenodd"
-                            d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8.108v3.784a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z"
-                            clipRule="evenodd"
-                          />
-                        </svg>
-                      ) : (
-                        <svg
-                          className="w-8 h-8 sm:w-10 sm:h-10 relative z-10 mx-auto transform group-hover:scale-110 transition-transform duration-200"
-                          fill="currentColor"
-                          viewBox="0 0 20 20"
-                        >
-                          <path
-                            fillRule="evenodd"
-                            d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zM7 8a1 1 0 012 0v4a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v4a1 1 0 102 0V8a1 1 0 00-1-1z"
-                            clipRule="evenodd"
-                          />
-                        </svg>
-                      )}
-
-                      {/* Status text */}
-                      <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 whitespace-nowrap">
-                        <span className="text-xs font-medium text-gray-600 dark:text-gray-400 bg-white dark:bg-gray-800 px-2 py-1 rounded-full shadow-sm">
-                          {isPaused ? "Resume" : "Pause"}
-                        </span>
-                      </div>
-                    </button>
-                  </div>
-                </div>
-
-                {/* Timer and Controls */}
-                <div className="flex-1 flex flex-col sm:flex-row items-center justify-end gap-6">
-                  {/* Timer Cards */}
-                  <div className="flex items-center gap-4">
-                    {/* Remaining Time */}
-                    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-4 min-w-[120px]">
-                      <div className="text-center">
-                        <div className="flex items-center justify-center space-x-1 mb-1">
-                          <svg
-                            className="w-4 h-4 text-red-500"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                            />
-                          </svg>
-                          <span className="text-xs font-medium text-gray-500 dark:text-gray-400 font-sans">
-                            Remaining
-                          </span>
-                        </div>
-                        <div className="text-xl sm:text-2xl font-bold font-mono text-red-600 dark:text-red-400">
-                          {formatTime(timeLeft)}
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Total Time */}
-                    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-4 min-w-[120px]">
-                      <div className="text-center">
-                        <div className="flex items-center justify-center space-x-1 mb-1">
-                          <svg
-                            className="w-4 h-4 text-blue-500"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"
-                            />
-                          </svg>
-                          <span className="text-xs font-medium text-gray-500 dark:text-gray-400 font-sans">
-                            Total Time
-                          </span>
-                        </div>
-                        <div className="text-xl sm:text-2xl font-bold font-mono text-blue-600 dark:text-blue-400">
-                          {(() => {
-                            const minutes = totalTime || 60; // default 60 mins (1 hour)
-                            const hours = Math.floor(minutes / 60);
-                            const mins = minutes % 60;
-                            return `${String(hours).padStart(2, "0")}:${String(
-                              mins
-                            ).padStart(2, "0")}:00`;
-                          })()}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Action Buttons */}
-                  <div className="flex items-center gap-3">
-                    {/* Fullscreen Button */}
-                    <div className="relative group">
-                      <button
-                        onClick={toggleFullscreen}
-                        className="w-12 h-12 bg-gradient-to-br from-gray-600 via-gray-700 to-gray-800 dark:from-gray-700 dark:via-gray-800 dark:to-gray-900 hover:from-gray-700 hover:via-gray-800 hover:to-gray-900 dark:hover:from-gray-800 dark:hover:via-gray-900 dark:hover:to-black text-white rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 flex items-center justify-center group"
-                        title={
-                          isFullscreen ? "Exit Fullscreen" : "Enter Fullscreen"
-                        }
-                      >
-                        {isFullscreen ? (
-                          <svg
-                            className="w-5 h-5 transform group-hover:scale-110 transition-transform duration-200"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"
-                            />
-                          </svg>
-                        ) : (
-                          <svg
-                            className="w-5 h-5 transform group-hover:scale-110 transition-transform duration-200"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"
-                            />
-                          </svg>
-                        )}
-                      </button>
-                      <ConfirmModal
-                        isOpen={showModal}
-                        title="Generate Report?"
-                        message="Are you sure you want to complete the test and generate the report?"
-                        onConfirm={() => {
-                          setShowModal(false);
-                          handleCompleteTest();
-                        }}
-                        onCancel={() => setShowModal(false)}
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C20.832 18.477 19.246 18 17.5 18c-1.746 0-3.332.477-4.5 1.253"
                       />
-                      {/* Tooltip */}
-                      <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                        <div className="bg-gray-900 dark:bg-gray-700 text-white text-xs rounded-lg px-2 py-1 whitespace-nowrap">
-                          {isFullscreen
-                            ? "Exit Fullscreen"
-                            : "Enter Fullscreen"}
-                          <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900 dark:border-t-gray-700"></div>
-                        </div>
-                      </div>
-                    </div>
+                    </svg>
                   </div>
                 </div>
               </div>
 
-              {/* Progress Bar */}
-              <div className="mt-6">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-medium text-gray-600 dark:text-gray-400 font-sans">
+              {/* Compact Mobile Controls Row */}
+              <div className="flex items-center justify-between gap-2 sm:gap-3 lg:gap-4">
+                {/* Timer Cards - Very Compact on Mobile */}
+                <div className="flex items-center gap-1 sm:gap-3">
+                  <div className="bg-white dark:bg-gray-800 rounded sm:rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-1 sm:p-2 min-w-[60px] sm:min-w-[100px]">
+                    <div className="text-center">
+                      <span className="text-xs font-medium text-gray-500 dark:text-gray-400 font-sans block">
+                        <span className="hidden sm:inline">Remaining</span>
+                        <span className="sm:hidden">Left</span>
+                      </span>
+                      <div className="text-xs sm:text-sm lg:text-sm font-bold font-mono text-red-600 dark:text-red-400">
+                        {formatTime(timeLeft)}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-white dark:bg-gray-800 rounded sm:rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-1 sm:p-2 min-w-[60px] sm:min-w-[100px]">
+                    <div className="text-center">
+                      <span className="text-xs font-medium text-gray-500 dark:text-gray-400 font-sans block">
+                        <span className="hidden sm:inline">Total Time</span>
+                        <span className="sm:hidden">Total</span>
+                      </span>
+                      <div className="text-xs sm:text-sm lg:text-sm font-bold font-mono text-blue-600 dark:text-blue-400">
+                        {(() => {
+                          const minutes = totalTime || 60;
+                          const hours = Math.floor(minutes / 60);
+                          const mins = minutes % 60;
+                          return `${String(hours).padStart(2, "0")}:${String(
+                            mins
+                          ).padStart(2, "0")}`;
+                        })()}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Compact Pause Button */}
+                <button
+                  onClick={() => {
+                    try {
+                      if (isPaused) resumeExam();
+                      else pauseExam();
+                    } catch (error) {
+                      console.log("Pause/Resume failed:", error);
+                    }
+                  }}
+                  className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 xl:w-14 xl:h-14 bg-gradient-to-br from-red-500 via-red-600 to-red-700 hover:from-red-600 hover:via-red-700 hover:to-red-800 text-white rounded-full transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 flex items-center justify-center"
+                  title={isPaused ? "Resume Exam" : "Pause Exam"}
+                >
+                  {isPaused ? (
+                    <svg
+                      className="w-4 h-4 sm:w-6 sm:h-6 lg:w-8 lg:h-8 xl:w-10 xl:h-10"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8.108v3.784a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                  ) : (
+                    <svg
+                      className="w-4 h-4 sm:w-6 sm:h-6 lg:w-8 lg:h-8 xl:w-10 xl:h-10"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zM7 8a1 1 0 012 0v4a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v4a1 1 0 102 0V8a1 1 0 00-1-1z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                  )}
+                </button>
+
+                {/* Compact Fullscreen Button */}
+                <button
+                  onClick={toggleFullscreen}
+                  className="w-6 h-6 sm:w-7 sm:h-7 lg:w-8 lg:h-8 bg-gradient-to-br from-gray-600 to-gray-800 hover:from-gray-700 hover:to-gray-900 text-white rounded sm:rounded-lg transition-all duration-300 shadow-sm hover:shadow-lg flex items-center justify-center"
+                  title={isFullscreen ? "Exit Fullscreen" : "Enter Fullscreen"}
+                >
+                  <svg
+                    className="w-3 h-3 sm:w-4 sm:h-4 lg:w-4 lg:h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"
+                    />
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            {/* Compact Progress Bar */}
+            <div className="mt-2 sm:mt-3">
+              <div className="flex items-center justify-between mb-1 sm:mb-1">
+                <span className="text-xs sm:text-xs font-medium text-gray-600 dark:text-gray-400 font-sans">
+                  <span className="sm:hidden">
+                    {currentIndex}/{exerciseData?.questionCount || 50}
+                  </span>
+                  <span className="hidden sm:inline">
                     Progress: {currentIndex} of{" "}
                     {exerciseData?.questionCount || 50} questions
                   </span>
-                  <span className="text-sm font-medium text-blue-600 dark:text-blue-400 font-sans">
-                    {Math.round(
+                </span>
+                <span className="text-xs sm:text-xs font-medium text-blue-600 dark:text-blue-400 font-sans">
+                  {Math.round(
+                    (currentIndex / (exerciseData?.questionCount || 50)) * 100
+                  )}
+                  %
+                </span>
+              </div>
+              <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1.5 sm:h-2 overflow-hidden">
+                <div
+                  className="h-full bg-gradient-to-r from-blue-500 via-purple-500 to-blue-600 rounded-full transition-all duration-500 ease-out"
+                  style={{
+                    width: `${
                       (currentIndex / (exerciseData?.questionCount || 50)) * 100
-                    )}
-                    %
-                  </span>
-                </div>
-                <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3 overflow-hidden">
-                  <div
-                    className="h-full bg-gradient-to-r from-blue-500 via-purple-500 to-blue-600 rounded-full transition-all duration-500 ease-out relative overflow-hidden"
-                    style={{
-                      width: `${
-                        (currentIndex / (exerciseData?.questionCount || 50)) *
-                        100
-                      }%`,
-                    }}
-                  >
-                    <div className="absolute inset-0 bg-white/20 transform -skew-x-12 w-8 animate-pulse"></div>
-                  </div>
-                </div>
+                    }%`,
+                  }}
+                ></div>
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Main Content Area */}
-      <div className="flex flex-col lg:flex-row w-full mx-auto flex-1 lg:overflow-hidden ">
+      {/* Main Content Area - Mobile stacks, Desktop side-by-side */}
+      <div className="flex flex-col lg:flex-row w-full mx-auto flex-1 min-h-0">
         {/* Left Content - Question Area */}
-        <div className="flex-1 lg:w-3/4 flex flex-col lg:overflow-hidden">
-          {/* Question Header */}
-          <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-600 px-4 py-3 flex-shrink-0">
+        <div className="flex-1 lg:w-3/4 flex flex-col min-h-0">
+          {/* Question Header - Compact */}
+          <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-600 px-3 sm:px-4 py-2 sm:py-3 flex-shrink-0">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-              <div className="flex items-center gap-4">
-                <div className="text-lg font-semibold font-display text-gray-900 dark:text-white">
+              <div className="flex items-center gap-3 sm:gap-4">
+                <div className="text-sm sm:text-sm font-semibold font-display text-gray-900 dark:text-white">
                   Q No:{" "}
                   <span className="text-blue-600 dark:text-blue-400">
                     {currentIndex} / {exerciseData?.questionCount || 50}
                   </span>
                 </div>
-                <div className="text-sm text-gray-600 dark:text-gray-400 font-sans">
+                <div className="text-xs sm:text-xs text-gray-600 dark:text-gray-400 font-sans">
                   Marks: <span className="font-medium">1</span>
                 </div>
               </div>
-              <div className="text-sm text-gray-600 dark:text-gray-400 font-sans">
+              <div className="text-xs sm:text-xs text-gray-600 dark:text-gray-400 font-sans">
                 Total Questions:{" "}
                 <span className="font-medium text-gray-900 dark:text-white">
                   {exerciseData?.questionCount || 50}
@@ -856,27 +767,28 @@ const ExamPage = () => {
               </div>
             </div>
           </div>
-
           {/* Section Text */}
           {sectionText && (
-            <div className="bg-green-50 dark:bg-green-900/30 border-l-4 border-green-400 dark:border-green-500 p-3 mx-4 mt-4 rounded-r text-green-800 dark:text-green-200 font-sans text-sm flex-shrink-0">
+            <div className="bg-green-50 dark:bg-green-900/30 border-l-4 border-green-400 dark:border-green-500 p-2 sm:p-3 mx-3 sm:mx-4 mt-2 sm:mt-4 rounded-r text-green-800 dark:text-green-200 font-sans text-xs sm:text-xs flex-shrink-0">
               Sections: {sectionText}
             </div>
           )}
 
           {/* Question Content - Scrollable */}
-          <div className="flex-1 lg:overflow-y-auto p-4">
+          <div className="flex-1 overflow-y-auto p-3 sm:p-4">
             {/* Direction */}
             {direction && (
-              <div className="mb-4 p-3 bg-yellow-100 dark:bg-yellow-900/30 text-sm rounded border border-yellow-300 dark:border-yellow-600 text-yellow-800 dark:text-yellow-200 font-sans">
+              <div className="mb-3 sm:mb-4 p-2 sm:p-3 bg-yellow-100 dark:bg-yellow-900/30 text-xs sm:text-xs rounded border border-yellow-300 dark:border-yellow-600 text-yellow-800 dark:text-yellow-200 font-sans">
                 {directionText && <div className="mb-2">{directionText}</div>}
                 {direction.imagePath && (
-                  <div className="mb-4 text-center">
+                  <div className="mb-2 sm:mb-4 text-center">
                     <img
                       src={`${direction.imagePath}`}
                       alt="Direction"
                       className="max-w-full h-auto rounded-lg shadow-md mx-auto"
-                      style={{ maxHeight: "300px" }}
+                      style={{
+                        maxHeight: window.innerWidth < 640 ? "120px" : "300px",
+                      }}
                     />
                   </div>
                 )}
@@ -885,13 +797,13 @@ const ExamPage = () => {
 
             {/* Header Text */}
             {headerText && (
-              <div className="mb-4 p-3 bg-blue-50 dark:bg-blue-900/30 text-sm border-l-4 border-blue-400 dark:border-blue-500 rounded-r text-blue-800 dark:text-blue-200 font-sans">
+              <div className="mb-3 sm:mb-4 p-2 sm:p-3 bg-blue-50 dark:bg-blue-900/30 text-xs sm:text-xs border-l-4 border-blue-400 dark:border-blue-500 rounded-r text-blue-800 dark:text-blue-200 font-sans">
                 {headerText}
               </div>
             )}
 
             {/* Question Content */}
-            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg p-4 sm:p-6 shadow-lg dark:shadow-xl transition-colors duration-250 mb-6">
+            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg p-3 sm:p-3 lg:p-4 shadow-md sm:shadow-lg transition-colors duration-250 mb-1 sm:mb-6">
               {/* Zoom Button */}
               <button
                 onClick={() => {
@@ -901,10 +813,10 @@ const ExamPage = () => {
                     console.log("Zoom modal failed:", error);
                   }
                 }}
-                className="w-full sm:w-auto px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-lg hover:bg-blue-700 dark:hover:bg-blue-800 transition-colors flex items-center justify-center space-x-2 shadow-md font-sans mb-4"
+                className="w-auto px-3 sm:px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-md sm:rounded-lg hover:bg-blue-700 dark:hover:bg-blue-800 transition-colors flex items-center justify-center space-x-2 shadow-sm sm:shadow-md font-sans mb-3 sm:mb-4 text-xs sm:text-xs"
               >
                 <svg
-                  className="w-4 h-4"
+                  className="w-3 h-3 sm:w-4 sm:h-4"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -923,8 +835,8 @@ const ExamPage = () => {
               {currentQuestion?.question ||
               currentQuestion?.options?.length > 0 ||
               currentQuestion?.gridOptions?.length > 0 ? (
-                <div className="space-y-4">
-                  <h2 className="text-lg sm:text-xl font-semibold mb-4 text-gray-900 dark:text-white font-display leading-relaxed">
+                <div className="space-y-3 sm:space-y-4">
+                  <h2 className="text-sm sm:text-sm lg:text-sm font-semibold mb-3 sm:mb-4 text-gray-900 dark:text-white font-display leading-relaxed">
                     {/<\/?[a-z][\s\S]*>/i.test(currentQuestion?.question) ? (
                       <span
                         dangerouslySetInnerHTML={{
@@ -947,12 +859,15 @@ const ExamPage = () => {
                     <img
                       src={`${currentQuestion.imagePath}`}
                       alt="Question"
-                      className="w-full max-w-md sm:max-w-lg lg:max-w-xl mb-4 rounded-lg shadow-md mx-auto sm:mx-0"
+                      className="w-full max-w-md sm:max-w-lg lg:max-w-xl mb-1 sm:mb-4 rounded-lg shadow-md mx-auto sm:mx-0"
+                      style={{
+                        maxHeight: window.innerWidth < 640 ? "150px" : "300px",
+                      }}
                     />
                   )}
 
                   {currentQuestion.subQuestion && (
-                    <h2 className="text-base sm:text-lg font-semibold mb-4 text-gray-800 dark:text-gray-200 font-sans leading-relaxed">
+                    <h2 className="text-xs sm:text-xs lg:text-xs font-semibold mb-3 sm:mb-4 text-gray-800 dark:text-gray-200 font-sans leading-relaxed">
                       {currentQuestion.subQuestion
                         .split("\n")
                         .map((line, index) => (
@@ -965,24 +880,24 @@ const ExamPage = () => {
                   )}
                 </div>
               ) : currentQuestion?.imagePath ? (
-                <div className="flex flex-col items-center space-y-4">
+                <div className="flex flex-col items-center space-y-3 sm:space-y-4">
                   <img
                     src={`${currentQuestion.imagePath}`}
                     alt={`Q${currentIndex}`}
                     className="max-w-full h-auto rounded-lg shadow-md"
-                    style={{ maxHeight: "400px" }}
+                    style={{
+                      maxHeight: window.innerWidth < 640 ? "150px" : "400px",
+                    }}
                   />
                 </div>
               ) : (
-                <p className="text-gray-500 dark:text-gray-400 italic font-sans text-center py-8">
+                <p className="text-gray-500 dark:text-gray-400 italic font-sans text-center py-6 sm:py-8 text-xs sm:text-xs">
                   No question data available.
                 </p>
               )}
-            </div>
 
-            {/* Options Section */}
-            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg p-4 shadow-md dark:shadow-xl transition-colors duration-250">
-              {/* Grid Type Options */}
+              {/* Options Section */}
+
               {currentQuestion?.optionType === "grid" &&
               Array.isArray(currentQuestion.gridOptions) ? (
                 <div className="overflow-x-auto">
@@ -992,12 +907,12 @@ const ExamPage = () => {
                         return (
                           <div
                             key={rowIndex}
-                            className="flex font-semibold bg-gray-100 dark:bg-gray-700 p-3 text-gray-900 dark:text-white font-sans min-w-max"
+                            className="flex font-semibold bg-gray-100 dark:bg-gray-700 p-2 sm:p-3 text-gray-900 dark:text-white font-sans min-w-max text-xs sm:text-xs"
                           >
                             {row.map((cell, cellIndex) => (
                               <div
                                 key={cellIndex}
-                                className="flex-1 text-center min-w-24"
+                                className="flex-1 text-center min-w-20 sm:min-w-24"
                               >
                                 {cell}
                               </div>
@@ -1010,15 +925,15 @@ const ExamPage = () => {
                       return (
                         <label
                           key={rowIndex}
-                          className="flex items-center border-t border-gray-200 dark:border-gray-600 p-3 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-gray-900 dark:text-white font-sans min-w-max"
+                          className="flex items-center border-t border-gray-200 dark:border-gray-600 p-2 sm:p-3 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-gray-900 dark:text-white font-sans min-w-max text-xs sm:text-xs"
                         >
                           <div
-                            className={`w-8 h-8 rounded border-2 mr-3 flex items-center justify-center text-white font-bold text-sm
-                          ${
-                            selectedAnswer === `(${optionLetter})`
-                              ? "bg-red-500 border-red-500"
-                              : "bg-gray-400 border-gray-400"
-                          }`}
+                            className={`w-6 h-6 sm:w-8 sm:h-8 rounded border-2 mr-2 sm:mr-3 flex items-center justify-center text-white font-bold text-xs sm:text-xs
+                        ${
+                          selectedAnswer === `(${optionLetter})`
+                            ? "bg-red-500 border-red-500"
+                            : "bg-gray-400 border-gray-400"
+                        }`}
                           >
                             {optionLetter}
                           </div>
@@ -1035,7 +950,7 @@ const ExamPage = () => {
                           {row.map((cell, cellIndex) => (
                             <div
                               key={cellIndex}
-                              className="flex-1 text-center min-w-24"
+                              className="flex-1 text-center min-w-20 sm:min-w-24"
                             >
                               {cell}
                             </div>
@@ -1047,7 +962,7 @@ const ExamPage = () => {
                 </div>
               ) : (
                 // Default Options (A-D)
-                <div className="space-y-3">
+                <div className="space-y-2 sm:space-y-3">
                   {(currentQuestion?.options?.length > 0
                     ? currentQuestion.options
                     : ["", "", "", ""]
@@ -1056,15 +971,15 @@ const ExamPage = () => {
                     return (
                       <label
                         key={idx}
-                        className="flex items-start space-x-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors cursor-pointer border border-gray-200 dark:border-gray-600"
+                        className="flex items-start space-x-2 sm:space-x-3 p-2 sm:p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors cursor-pointer border border-gray-200 dark:border-gray-600"
                       >
                         <div
-                          className={`w-8 h-8 rounded border-2 mt-1 flex items-center justify-center text-white font-bold text-sm flex-shrink-0
-                        ${
-                          selectedAnswer === `(${optionLetter})`
-                            ? "bg-red-500 border-red-500"
-                            : "bg-gray-400 border-gray-400"
-                        }`}
+                          className={`w-6 h-6 sm:w-8 sm:h-8 rounded border-2 mt-0.5 sm:mt-1 flex items-center justify-center text-white font-bold text-xs sm:text-xs flex-shrink-0
+                      ${
+                        selectedAnswer === `(${optionLetter})`
+                          ? "bg-red-500 border-red-500"
+                          : "bg-gray-400 border-gray-400"
+                      }`}
                         >
                           {optionLetter}
                         </div>
@@ -1078,7 +993,7 @@ const ExamPage = () => {
                           }
                           className="sr-only"
                         />
-                        <span className="text-gray-900 dark:text-white font-sans leading-relaxed flex-1">
+                        <span className="text-gray-900 dark:text-white font-sans leading-relaxed flex-1 text-xs sm:text-xs">
                           {opt || `Option ${optionLetter}`}
                         </span>
                       </label>
@@ -1087,10 +1002,79 @@ const ExamPage = () => {
                 </div>
               )}
             </div>
+
+            {/* Mobile Question Grid - Only visible on mobile */}
+            <div className="lg:hidden bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg p-3 shadow-md mb-4">
+              <h3 className="text-sm font-bold mb-3 text-gray-900 dark:text-white font-display">
+                Questions: {exerciseData?.questionCount || 50}
+              </h3>
+              <div className="grid grid-cols-10 gap-1.5 mb-3">
+                {Array.from(
+                  { length: exerciseData?.questionCount || 50 },
+                  (_, idx) => {
+                    const qNum = idx + 1;
+                    const isCurrent = qNum === currentIndex;
+                    const isAnswered = attemptedQuestions?.[qNum];
+
+                    return (
+                      <button
+                        key={qNum}
+                        onClick={() => {
+                          try {
+                            setCurrentIndex(qNum);
+                          } catch (error) {
+                            console.log("Question navigation failed:", error);
+                          }
+                        }}
+                        className={`w-6 h-6 rounded-full text-xs font-bold font-sans border-2 transition-all duration-200 flex items-center justify-center
+                  ${
+                    isCurrent
+                      ? "border-blue-600 dark:border-blue-400 bg-blue-600 dark:bg-blue-500 text-white ring-2 ring-blue-200 dark:ring-blue-800"
+                      : isAnswered
+                      ? "border-green-500 bg-green-500 text-white hover:bg-green-600"
+                      : "border-gray-300 dark:border-gray-500 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
+                  }`}
+                        title={`Question ${qNum}${
+                          isCurrent ? " (Current)" : ""
+                        }${isAnswered ? " (Answered)" : ""}`}
+                      >
+                        {qNum > 99 ? qNum.toString().slice(-2) : qNum}
+                      </button>
+                    );
+                  }
+                )}
+              </div>
+              <div className="grid grid-cols-2 gap-2 text-xs">
+                <div className="flex items-center gap-1.5">
+                  <div className="w-3 h-3 rounded-full bg-gray-400 dark:bg-gray-600"></div>
+                  <span className="text-gray-700 dark:text-gray-300 font-sans">
+                    Not Visited
+                  </span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <div className="w-3 h-3 rounded-full bg-green-500"></div>
+                  <span className="text-gray-700 dark:text-gray-300 font-sans">
+                    Answered
+                  </span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
+                  <span className="text-gray-700 dark:text-gray-300 font-sans">
+                    Skipped
+                  </span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <div className="w-3 h-3 rounded-full bg-blue-600 ring-2 ring-blue-200"></div>
+                  <span className="text-gray-700 dark:text-gray-300 font-sans">
+                    Current
+                  </span>
+                </div>
+              </div>
+            </div>
           </div>
 
-          {/* Navigation Buttons - Fixed at bottom */}
-          <div className="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-600 p-4 lg:flex-shrink-0">
+          {/* Navigation Buttons - Always Visible */}
+          <div className="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-600 p-3 sm:p-4 flex-shrink-0">
             <div className="flex justify-between items-center">
               <button
                 onClick={() => {
@@ -1101,12 +1085,13 @@ const ExamPage = () => {
                   }
                 }}
                 disabled={currentIndex <= 1}
-                className="px-6 py-2 bg-green-500 dark:bg-green-600 hover:bg-green-600 dark:hover:bg-green-700 disabled:bg-gray-300 dark:disabled:bg-gray-600 text-white rounded-lg transition-colors shadow-md font-sans font-medium disabled:cursor-not-allowed"
+                className="px-3 sm:px-6 py-2 bg-green-500 dark:bg-green-600 hover:bg-green-600 dark:hover:bg-green-700 disabled:bg-gray-300 dark:disabled:bg-gray-600 text-white rounded-md sm:rounded-lg transition-colors shadow-sm sm:shadow-md font-sans font-medium disabled:cursor-not-allowed text-xs sm:text-xs"
               >
                 ← Prev
               </button>
-              {currentIndex < (exerciseData?.questionCount || 50) && (
-                <div className="flex items-center gap-2">
+
+              <div className="flex items-center gap-2">
+                {currentIndex < (exerciseData?.questionCount || 50) && (
                   <button
                     onClick={() => {
                       try {
@@ -1115,12 +1100,13 @@ const ExamPage = () => {
                         console.log("End test failed:", error);
                       }
                     }}
-                    className="px-4 py-2 bg-red-500 dark:bg-red-600 text-white rounded-lg hover:bg-red-600 dark:hover:bg-red-700 transition-colors shadow-md font-sans font-medium"
+                    className="px-2 sm:px-4 py-2 bg-red-500 dark:bg-red-600 text-white rounded-md sm:rounded-lg hover:bg-red-600 dark:hover:bg-red-700 transition-colors shadow-sm sm:shadow-md font-sans font-medium text-xs sm:text-xs"
                   >
                     End Test
                   </button>
-                </div>
-              )}
+                )}
+              </div>
+
               {currentIndex >= (exerciseData?.questionCount || 50) ? (
                 <button
                   onClick={() => {
@@ -1130,7 +1116,7 @@ const ExamPage = () => {
                       console.log("Submit failed:", error);
                     }
                   }}
-                  className="px-6 py-2 bg-red-500 dark:bg-red-600 text-white rounded-lg hover:bg-red-600 dark:hover:bg-red-700 transition-colors shadow-md font-sans font-medium"
+                  className="px-3 sm:px-6 py-2 bg-red-500 dark:bg-red-600 text-white rounded-md sm:rounded-lg hover:bg-red-600 dark:hover:bg-red-700 transition-colors shadow-sm sm:shadow-md font-sans font-medium text-xs sm:text-xs"
                 >
                   Submit
                 </button>
@@ -1143,7 +1129,7 @@ const ExamPage = () => {
                       console.log("Next failed:", error);
                     }
                   }}
-                  className="px-6 py-2 bg-green-500 dark:bg-green-600 text-white rounded-lg hover:bg-green-600 dark:hover:bg-green-700 transition-colors shadow-md font-sans font-medium"
+                  className="px-3 sm:px-6 py-2 bg-green-500 dark:bg-green-600 text-white rounded-md sm:rounded-lg hover:bg-green-600 dark:hover:bg-green-700 transition-colors shadow-sm sm:shadow-md font-sans font-medium text-xs sm:text-xs"
                 >
                   Next →
                 </button>
@@ -1152,14 +1138,13 @@ const ExamPage = () => {
           </div>
         </div>
 
-        {/* Right Sidebar - Question Grid */}
-        <div className=" lg:w-1/4 bg-white dark:bg-gray-800 border-l border-gray-200 dark:border-gray-600 p-4 lg:overflow-y-auto">
+        {/* Desktop Right Sidebar - Question Grid - Hidden on mobile */}
+        <div className="hidden lg:block lg:w-1/4 bg-white dark:bg-gray-800 border-l border-gray-200 dark:border-gray-600 p-4 lg:overflow-y-auto">
           <div className="sticky top-4">
-            <h3 className="text-lg font-bold mb-4 text-gray-900 dark:text-white font-display">
+            <h3 className="text-sm font-bold mb-4 text-gray-900 dark:text-white font-display">
               Total Questions: {exerciseData?.questionCount || 50}
             </h3>
 
-            {/* Question Grid */}
             <div className="grid grid-cols-7 gap-2 mb-6">
               {Array.from(
                 { length: exerciseData?.questionCount || 50 },
@@ -1179,13 +1164,13 @@ const ExamPage = () => {
                         }
                       }}
                       className={`w-8 h-8 rounded-full text-xs font-bold font-sans border-2 transition-all duration-200 flex items-center justify-center
-                    ${
-                      isCurrent
-                        ? "border-blue-600 dark:border-blue-400 bg-blue-600 dark:bg-blue-500 text-white ring-2 ring-blue-200 dark:ring-blue-800 shadow-lg"
-                        : isAnswered
-                        ? "border-green-500 bg-green-500 text-white hover:bg-green-600"
-                        : "border-gray-300 dark:border-gray-500 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
-                    }`}
+                ${
+                  isCurrent
+                    ? "border-blue-600 dark:border-blue-400 bg-blue-600 dark:bg-blue-500 text-white ring-2 ring-blue-200 dark:ring-blue-800 shadow-lg"
+                    : isAnswered
+                    ? "border-green-500 bg-green-500 text-white hover:bg-green-600"
+                    : "border-gray-300 dark:border-gray-500 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
+                }`}
                       title={`Question ${qNum}${isCurrent ? " (Current)" : ""}${
                         isAnswered ? " (Answered)" : ""
                       }`}
@@ -1197,8 +1182,7 @@ const ExamPage = () => {
               )}
             </div>
 
-            {/* Legend */}
-            <div className="space-y-3 text-sm">
+            <div className="space-y-3 text-xs">
               <div className="flex items-center gap-2">
                 <div className="w-4 h-4 rounded-full bg-gray-400 dark:bg-gray-600"></div>
                 <span className="text-gray-700 dark:text-gray-300 font-sans">
@@ -1217,7 +1201,6 @@ const ExamPage = () => {
                   Skipped
                 </span>
               </div>
-
               <div className="flex items-center gap-2">
                 <div className="w-4 h-4 rounded-full bg-blue-600 ring-2 ring-blue-200"></div>
                 <span className="text-gray-700 dark:text-gray-300 font-sans">
@@ -1229,15 +1212,15 @@ const ExamPage = () => {
         </div>
       </div>
 
-      {/* Modals and other components */}
+      {/* Submit Modal */}
       {showModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 dark:bg-black dark:bg-opacity-70 flex items-center justify-center z-50 p-4">
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl dark:shadow-2xl max-w-md w-full border border-gray-200 dark:border-gray-600">
-            <div className="p-6">
-              <h3 className="text-lg font-bold text-gray-900 dark:text-white font-display mb-4">
+            <div className="p-4 sm:p-6">
+              <h3 className="text-sm font-bold text-gray-900 dark:text-white font-display mb-3 sm:mb-4">
                 Submit Test?
               </h3>
-              <p className="text-gray-600 dark:text-gray-300 font-sans mb-6">
+              <p className="text-gray-600 dark:text-gray-300 font-sans mb-4 sm:mb-6 text-xs sm:text-xs">
                 Are you sure you want to submit the test? You won't be able to
                 change your answers after submission.
               </p>
@@ -1250,7 +1233,7 @@ const ExamPage = () => {
                       console.log("Cancel failed:", error);
                     }
                   }}
-                  className="flex-1 px-4 py-2 bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-400 dark:hover:bg-gray-500 transition-colors font-sans"
+                  className="flex-1 px-4 py-2 bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-400 dark:hover:bg-gray-500 transition-colors font-sans text-xs sm:text-xs"
                 >
                   Cancel
                 </button>
@@ -1263,7 +1246,7 @@ const ExamPage = () => {
                       console.log("Submit test failed:", error);
                     }
                   }}
-                  className="flex-1 px-4 py-2 bg-red-500 dark:bg-red-600 text-white rounded-lg hover:bg-red-600 dark:hover:bg-red-700 transition-colors font-sans"
+                  className="flex-1 px-4 py-2 bg-red-500 dark:bg-red-600 text-white rounded-lg hover:bg-red-600 dark:hover:bg-red-700 transition-colors font-sans text-xs sm:text-xs"
                 >
                   Submit
                 </button>
@@ -1277,20 +1260,18 @@ const ExamPage = () => {
       {isModalOpen && selectedQuestion && (
         <div className="fixed inset-0 bg-black bg-opacity-50 dark:bg-black dark:bg-opacity-70 flex items-center justify-center z-50 p-2 sm:p-4">
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl dark:shadow-2xl max-w-6xl w-full max-h-[95vh] overflow-hidden border border-gray-200 dark:border-gray-600">
-            {/* Modal Header */}
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 sm:p-4 border-b border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 space-y-3 sm:space-y-0">
               <div className="flex items-center space-x-4">
-                <h2 className="text-lg sm:text-xl font-bold text-gray-800 dark:text-white font-display">
+                <h2 className="text-sm sm:text-sm font-bold text-gray-800 dark:text-white font-display">
                   Question {currentIndex} - Zoomed View
                 </h2>
                 {selectedAnswer && (
-                  <span className="px-2 sm:px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 text-xs sm:text-sm rounded-full font-sans">
+                  <span className="px-2 sm:px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 text-xs sm:text-xs rounded-full font-sans">
                     Selected: {selectedAnswer}
                   </span>
                 )}
               </div>
 
-              {/* Zoom Controls */}
               <div className="flex items-center justify-center sm:justify-end space-x-2">
                 <button
                   onClick={() => {
@@ -1317,7 +1298,7 @@ const ExamPage = () => {
                     />
                   </svg>
                 </button>
-                <span className="text-sm font-medium text-gray-600 dark:text-gray-300 min-w-[60px] text-center font-sans">
+                <span className="text-xs font-medium text-gray-600 dark:text-gray-300 min-w-[60px] text-center font-sans">
                   {Math.round((zoomLevel || 1) * 100)}%
                 </span>
                 <button
@@ -1372,7 +1353,6 @@ const ExamPage = () => {
               </div>
             </div>
 
-            {/* Modal Content */}
             <div className="overflow-auto max-h-[calc(95vh-80px)] bg-white dark:bg-gray-800">
               <div
                 className="p-3 sm:p-6 transition-transform duration-200 origin-top-left"
