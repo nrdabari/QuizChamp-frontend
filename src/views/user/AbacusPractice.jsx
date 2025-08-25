@@ -637,7 +637,7 @@ export default function MathPracticeApp() {
                     </button>
                   </div>
                 </>
-              ) : 
+              ) : (
                 <>
                   {/* Horizontal Math Problem (Default for all operations) */}
                   <div className="mx-auto mb-3 max-w-xs rounded-xl bg-gradient-to-b from-amber-100 to-orange-100 dark:from-slate-700 dark:to-slate-600 border-2 border-amber-300 dark:border-purple-400 px-4 py-3 shadow-2xl">
@@ -675,7 +675,7 @@ export default function MathPracticeApp() {
                     </div>
                   </div>
                 </>
-              }
+              )}
             </div>
 
             {/* Recent History */}
