@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useFormik } from "formik";
+import { Editor } from "@tinymce/tinymce-react";
 import {
   Camera,
   Eye,
@@ -19,20 +20,20 @@ export default function AddExercise() {
   const navigate = useNavigate();
   const [subjects, setSubjects] = useState([]);
   const [chapters, setChapters] = useState([]);
-  // const [isLoading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  // const [imageModal, setImageModal] = useState(false);
+  const [useRichEditor, setUseRichEditor] = useState({
+    directions: false,
+    headers: false,
+    sections: false,
+  });
   const { admin, loading } = useApiService();
 
   const handleImageUpload = async (file, idx) => {
     if (!file) return;
-    // setIsUploading(true);
     try {
       await handleDirectionImageUpload(file, idx);
     } catch (error) {
       console.error("Upload error:", error);
-    } finally {
-      // setIsUploading(false);
     }
   };
 
@@ -55,6 +56,7 @@ export default function AddExercise() {
       alert("❌ Network error while removing image");
     }
   };
+
   // Determine if we're in edit mode
   const isEditMode = !!id;
 
@@ -129,6 +131,44 @@ export default function AddExercise() {
     const fetchExercise = async () => {
       try {
         const exerciseData = await admin.getExercise(id);
+
+        // Helper function to detect if content contains HTML tags
+        const containsHTML = (str) => {
+          if (!str) return false;
+          return /<[^>]*>/g.test(str);
+        };
+
+        // Check if any content contains HTML and auto-enable rich editor
+        const directions =
+          exerciseData.directions?.length > 0
+            ? exerciseData.directions
+            : [{ text: "", start: "", end: "", imagePath: "" }];
+
+        const headers =
+          exerciseData.headers?.length > 0
+            ? exerciseData.headers
+            : [{ text: "", start: "", end: "" }];
+
+        const sections =
+          exerciseData.sections?.length > 0
+            ? exerciseData.sections
+            : [{ text: "", start: "", end: "" }];
+
+        // Auto-enable rich editor if content contains HTML
+        const hasHTMLDirections = directions.some((item) =>
+          containsHTML(item.text)
+        );
+        const hasHTMLHeaders = headers.some((item) => containsHTML(item.text));
+        const hasHTMLSections = sections.some((item) =>
+          containsHTML(item.text)
+        );
+
+        setUseRichEditor({
+          directions: hasHTMLDirections,
+          headers: hasHTMLHeaders,
+          sections: hasHTMLSections,
+        });
+
         // Set form values with existing data
         formik.setValues({
           _id: exerciseData._id,
@@ -141,18 +181,9 @@ export default function AddExercise() {
           chapterId:
             exerciseData.chapterId?._id || exerciseData.chapterId || "",
           source: exerciseData.source || "",
-          directions:
-            exerciseData.directions?.length > 0
-              ? exerciseData.directions
-              : [{ text: "", start: "", end: "", imagePath: "" }],
-          headers:
-            exerciseData.headers?.length > 0
-              ? exerciseData.headers
-              : [{ text: "", start: "", end: "" }],
-          sections:
-            exerciseData.sections?.length > 0
-              ? exerciseData.sections
-              : [{ text: "", start: "", end: "" }],
+          directions,
+          headers,
+          sections,
           isActive: exerciseData.isActive ?? true,
         });
       } catch (err) {
@@ -168,7 +199,7 @@ export default function AddExercise() {
   useEffect(() => {
     const fetchSubjects = async () => {
       try {
-        const data = await admin.getSubjects(5); // or whatever the admin service method is
+        const data = await admin.getSubjects(5);
         setSubjects(data);
       } catch (err) {
         console.error("Error fetching subjects", err);
@@ -228,11 +259,87 @@ export default function AddExercise() {
       alert("❌ Network error during upload");
     }
   };
+
+  const toggleRichEditor = (group) => {
+    setUseRichEditor((prev) => ({
+      ...prev,
+      [group]: !prev[group],
+    }));
+  };
+
+  const renderTextInput = (group, idx, placeholder) => {
+    const fieldPath = `${group}[${idx}].text`;
+    const currentValue = formik.values[group][idx]?.text || "";
+
+    return (
+      <div className="col-span-full">
+        <label className="block text-sm font-medium text-purple-700 mb-2">
+          {placeholder}
+        </label>
+        {useRichEditor[group] ? (
+          <Editor
+            key={`${group}-${idx}-${isEditMode}`} // Force re-render in edit mode
+            tinymceScriptSrc="/tinymce/tinymce.min.js"
+            initialValue={currentValue} // Use initialValue instead of value for edit mode
+            value={currentValue}
+            onEditorChange={(content) =>
+              formik.setFieldValue(fieldPath, content)
+            }
+            init={{
+              height: 200,
+              menubar: false,
+              plugins: "autolink codesample image link media table lists code",
+              toolbar:
+                "blocks fontfamily fontsize | bold italic underline | align numlist bullist | forecolor backcolor | image | table | code",
+              block_formats:
+                "Paragraph=p; Heading 1=h1; Heading 2=h2; Heading 3=h3",
+              license_key: "gpl",
+              setup: (editor) => {
+                // Ensure content is loaded after editor initialization
+                editor.on("init", () => {
+                  if (currentValue && currentValue !== editor.getContent()) {
+                    editor.setContent(currentValue);
+                  }
+                });
+              },
+            }}
+          />
+        ) : (
+          <textarea
+            placeholder={placeholder}
+            value={currentValue}
+            onChange={(e) => formik.setFieldValue(fieldPath, e.target.value)}
+            className={inputStyles}
+            rows="4"
+          />
+        )}
+      </div>
+    );
+  };
+
   console.log(formik.values);
 
   const renderGroup = (group, label) => (
     <div className="bg-purple-50 p-6 rounded-lg border-2 border-purple-200 mb-6">
-      <h3 className="text-xl font-bold text-purple-800 mb-4">{label}</h3>
+      <div className="flex items-center justify-between mb-6">
+        <h3 className="text-xl font-bold text-purple-800">{label}</h3>
+        <div className="flex items-center">
+          <input
+            type="checkbox"
+            id={`toggleEditor-${group}`}
+            checked={useRichEditor[group]}
+            onChange={() => toggleRichEditor(group)}
+            className="mr-2 h-4 w-4 text-purple-600 rounded border-gray-300 focus:ring-purple-500"
+          />
+          <label
+            htmlFor={`toggleEditor-${group}`}
+            className="text-purple-800 font-medium text-sm"
+          >
+            Use Rich Text Editor
+          </label>
+        </div>
+      </div>
+
       {formik.values[group].map((_, idx) => (
         <div
           key={idx}
@@ -254,14 +361,7 @@ export default function AddExercise() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <input
-              placeholder="Text"
-              value={formik.values[group][idx]?.text || ""}
-              onChange={(e) =>
-                formik.setFieldValue(`${group}[${idx}].text`, e.target.value)
-              }
-              className={inputStyles}
-            />
+            {renderTextInput(group, idx, "Text")}
             <input
               type="number"
               placeholder="Start"
@@ -281,6 +381,7 @@ export default function AddExercise() {
               className={inputStyles}
             />
           </div>
+
           {group === "directions" && isEditMode && (
             <div className="mt-4">
               <div className="flex items-center justify-between mb-3">
@@ -332,18 +433,6 @@ export default function AddExercise() {
                       className="w-full max-w-md h-48 object-cover rounded-lg shadow-sm border border-gray-200"
                     />
 
-                    {/* Image Overlay */}
-                    {/* <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-all duration-200 rounded-lg flex items-center justify-center opacity-0 group-hover:opacity-100">
-                      <button
-                        type="button"
-                        onClick={() => setImageModal(true)}
-                        className="bg-white text-gray-700 px-3 py-2 rounded-lg shadow-lg hover:bg-gray-50 transition-colors flex items-center gap-2"
-                      >
-                        <Eye size={16} />
-                        <span className="text-sm">View Full Size</span>
-                      </button>
-                    </div> */}
-
                     {/* Success Badge */}
                     <div className="absolute top-2 right-2">
                       <div className="bg-green-500 text-white px-2 py-1 rounded-full text-xs font-medium flex items-center gap-1">
@@ -360,13 +449,6 @@ export default function AddExercise() {
                         <Camera size={14} />
                         Image uploaded successfully
                       </span>
-                      {/* <button
-                        type="button"
-                        onClick={() => setImageModal(true)}
-                        className="text-purple-600 hover:text-purple-800 font-medium"
-                      >
-                        Preview
-                      </button> */}
                     </div>
                   </div>
                 </div>

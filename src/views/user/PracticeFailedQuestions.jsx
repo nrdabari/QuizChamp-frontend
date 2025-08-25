@@ -155,6 +155,11 @@ const PracticeFailedQuestions = ({ exerciseId, userId }) => {
     currentQuestion.id,
     currentQuestion?.exerciseId?.sections
   );
+  const headerText = getTextForRange(
+    currentQuestion.id,
+    currentQuestion?.exerciseId?.headers
+  );
+
   const getDirectionForRange = (index, items = []) =>
     items.find((item) => index >= item.start && index <= item.end) || null;
 
@@ -163,10 +168,6 @@ const PracticeFailedQuestions = ({ exerciseId, userId }) => {
     currentQuestion?.exerciseId?.directions
   );
   const directionText = direction?.text;
-  const headerText = getTextForRange(
-    currentQuestion.id,
-    currentQuestion?.exerciseId?.headers
-  );
 
   const openImageZoom = (imagePath, alt) => {
     setZoomedImage({ src: imagePath, alt });
@@ -282,16 +283,19 @@ const PracticeFailedQuestions = ({ exerciseId, userId }) => {
                 </h3>
               </div>
               <div className="text-text-light-primary dark:text-text-dark-primary text-xs leading-relaxed font-sans">
-                {headerText.split("\n").map((line, index) => (
-                  <React.Fragment key={index}>
-                    {line}
-                    <br />
-                  </React.Fragment>
-                ))}
+                {/<[^>]*>/g.test(headerText) ? (
+                  <div dangerouslySetInnerHTML={{ __html: headerText }} />
+                ) : (
+                  headerText.split("\n").map((line, index) => (
+                    <React.Fragment key={index}>
+                      {line}
+                      <br />
+                    </React.Fragment>
+                  ))
+                )}
               </div>
             </div>
           )}
-
           {/* Compact Question */}
           <div className="mb-4 p-3 bg-gradient-to-r from-gray-50 to-slate-50 dark:from-gray-800/50 dark:to-slate-800/50 rounded-lg border border-gray-200 dark:border-dark-purple-700">
             <h3 className="text-sm font-bold font-display text-text-light-primary dark:text-text-dark-primary mb-3 flex items-center">

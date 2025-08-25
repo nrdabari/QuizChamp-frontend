@@ -61,3 +61,24 @@ export const mockSubjects = [
   { id: 6, name: "Physics", classLevels: [5] },
   { id: 7, name: "Chemistry", classLevels: [5] },
 ];
+
+export const getTextForRange = (questionNumber, items = []) => {
+  const item = items.find(
+    (item) =>
+      questionNumber >= parseInt(item.start) &&
+      questionNumber <= parseInt(item.end)
+  );
+
+  if (!item?.text) return null;
+
+  // Check if text contains HTML tags
+  const containsHTML = /<[^>]*>/g.test(item.text);
+
+  if (containsHTML) {
+    // Return JSX with dangerouslySetInnerHTML for HTML content
+    return <div dangerouslySetInnerHTML={{ __html: item.text }} />;
+  }
+
+  // Return plain text
+  return item.text;
+};

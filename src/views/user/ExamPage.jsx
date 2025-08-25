@@ -4,6 +4,7 @@ import ConfirmModal from "../../components/ConfirmModal";
 import { useApiService } from "../../hooks/useApiService";
 
 import fscreen from "fscreen";
+import { getTextForRange } from "../../helper/helpers";
 
 const ExamPage = () => {
   const { exerciseId } = useParams();
@@ -140,11 +141,6 @@ const ExamPage = () => {
   const zoomOut = () => {
     setZoomLevel((prev) => Math.max(prev - 0.2, 0.5));
   };
-
-  // Utils
-  const getTextForRange = (index, items = []) =>
-    items.find((item) => index >= item.start && index <= item.end)?.text ||
-    null;
 
   // Format time to HH:MM:SS
   const formatTime = (seconds) => {
