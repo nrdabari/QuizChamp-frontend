@@ -13,7 +13,7 @@ import {
 import { ROLES } from "../../../../constants/enum";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { useApiService } from "../../../../hooks/useApiService";
-import * as XLSX from "xlsx";
+import ExcelJS from "exceljs";
 
 const AddUser = () => {
   const [availableSubjects, setAvailableSubjects] = useState([]);
@@ -27,7 +27,7 @@ const AddUser = () => {
   const { admin } = useApiService();
 
   const exportUserToExcel = (userData) => {
-    const wb = XLSX.utils.book_new();
+    const wb = ExcelJS.utils.book_new();
 
     const excelData = [
       {
@@ -40,12 +40,12 @@ const AddUser = () => {
       },
     ];
 
-    const ws = XLSX.utils.json_to_sheet(excelData);
+    const ws = ExcelJS.utils.json_to_sheet(excelData);
 
     // Style the header row
-    const range = XLSX.utils.decode_range(ws["!ref"]);
+    const range = ExcelJS.utils.decode_range(ws["!ref"]);
     for (let C = range.s.c; C <= range.e.c; ++C) {
-      const address = XLSX.utils.encode_col(C) + "1";
+      const address = ExcelJS.utils.encode_col(C) + "1";
       if (!ws[address]) continue;
       ws[address].s = {
         font: { bold: true },
@@ -64,7 +64,7 @@ const AddUser = () => {
       { wch: 25 },
     ];
 
-    XLSX.utils.book_append_sheet(wb, ws, "User Credentials");
+    ExcelJS.utils.book_append_sheet(wb, ws, "User Credentials");
 
     const timestamp = new Date().toISOString().slice(0, 10);
     const filename = `UserCredentials_${userData.name.replace(
@@ -72,7 +72,7 @@ const AddUser = () => {
       "_"
     )}_${timestamp}.xlsx`;
 
-    XLSX.writeFile(wb, filename);
+    ExcelJS.writeFile(wb, filename);
   };
 
   const initialFormValues = {

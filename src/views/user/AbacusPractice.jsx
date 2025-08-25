@@ -637,7 +637,7 @@ export default function MathPracticeApp() {
                     </button>
                   </div>
                 </>
-              ) : (
+              ) : 
                 <>
                   {/* Horizontal Math Problem (Default for all operations) */}
                   <div className="mx-auto mb-3 max-w-xs rounded-xl bg-gradient-to-b from-amber-100 to-orange-100 dark:from-slate-700 dark:to-slate-600 border-2 border-amber-300 dark:border-purple-400 px-4 py-3 shadow-2xl">
@@ -647,7 +647,7 @@ export default function MathPracticeApp() {
                   </div>
 
                   {/* Answer Input */}
-                  <div className="flex items-center justify-center gap-2">
+                  <div className="flex items-center justify-center gap-1">
                     <input
                       ref={answerInputRef}
                       value={ans}
@@ -664,7 +664,7 @@ export default function MathPracticeApp() {
                         onClick={submit}
                         className="inline-flex items-center gap-1 rounded-lg bg-gradient-to-r from-emerald-500 to-green-500 dark:from-purple-500 dark:to-blue-500 px-3 py-2 text-sm font-bold text-white shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105"
                       >
-                        <Play className="h-3 w-3" /> Submit
+                        <Play className="h-3 w-3" /> Sub
                       </button>
                       <button
                         onClick={skip}
@@ -675,7 +675,7 @@ export default function MathPracticeApp() {
                     </div>
                   </div>
                 </>
-              )}
+              }
             </div>
 
             {/* Recent History */}
