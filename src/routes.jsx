@@ -12,7 +12,7 @@ import PDFTextExtractor from "./views/admin/PDFTextExtractor";
 import ChapterAssignmentForm from "./views/admin/ChapterAssignmentForm";
 import Users from "./views/admin/users";
 import AddUser from "./views/admin/users/pages/AddUser";
-import LanguageTutor from "./views/user/LearnLang";
+import AIInterviewAssistant from "./views/user/LearnLang";
 import ImageMerger from "./views/admin/ImageMerger";
 import { AdminPanel } from "./views/admin/AdminPanel";
 import StudentPanel from "./views/user/StudentPanel";
@@ -178,7 +178,7 @@ const routes = [
   //   layout: "/user",
   //   path: "learn",
   //   icon: User,
-  //   component: <LanguageTutor />,
+  //   component: <AIInterviewAssistant />,
   //   sideBarVisible: true,
   //   notificationBarVisible: false,
   //   role: [ROLES.USER],

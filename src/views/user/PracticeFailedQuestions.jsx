@@ -50,6 +50,7 @@ const PracticeFailedQuestions = ({ exerciseId, userId }) => {
     };
 
     initializePractice();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [exerciseId, userId, userServ]);
 
   // Load current question
@@ -180,7 +181,6 @@ const PracticeFailedQuestions = ({ exerciseId, userId }) => {
   return (
     <div className="w-full h-auto max-w-none mx-0 sm:max-w-2xl sm:mx-auto lg:max-w-4xl p-3 bg-white dark:bg-dark-bg-secondary rounded-lg shadow-md transition-colors duration-250">
       <div className="bg-white dark:bg-dark-bg-secondary rounded-lg shadow-lg overflow-hidden border border-gray-100 dark:border-dark-purple-700">
-        {/* Compact Header Section */}
         <div className="bg-gradient-to-r from-blue-600 to-primary-600 dark:from-dark-purple-600 dark:to-dark-purple-500 text-white p-4">
           <div className="flex justify-between items-center mb-3">
             <span className="text-xs font-medium font-sans bg-white/20 dark:bg-white/30 px-2.5 py-1 rounded-full">
@@ -201,7 +201,6 @@ const PracticeFailedQuestions = ({ exerciseId, userId }) => {
         </div>
 
         <div className="p-4">
-          {/* Compact Section Display */}
           {sectionText && (
             <div className="mb-3">
               <span className="inline-flex items-center px-2 py-1 bg-emerald-100 dark:bg-emerald-900 text-emerald-800 dark:text-emerald-200 text-xs font-medium font-sans rounded-full border border-emerald-200 dark:border-emerald-700">
@@ -211,7 +210,6 @@ const PracticeFailedQuestions = ({ exerciseId, userId }) => {
             </div>
           )}
 
-          {/* Compact Direction Section */}
           {(direction?.imagePath || directionText) && (
             <div className="mb-3 p-3 bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 border border-amber-200 dark:border-amber-700 rounded-lg">
               <div className="flex items-center mb-2">
@@ -271,7 +269,6 @@ const PracticeFailedQuestions = ({ exerciseId, userId }) => {
             </div>
           )}
 
-          {/* Compact Header/Passage Section */}
           {headerText && (
             <div className="mb-4 p-3 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border-l-4 border-blue-400 dark:border-blue-500 rounded-r-lg">
               <div className="flex items-center mb-2">
@@ -296,7 +293,7 @@ const PracticeFailedQuestions = ({ exerciseId, userId }) => {
               </div>
             </div>
           )}
-          {/* Compact Question */}
+
           <div className="mb-4 p-3 bg-gradient-to-r from-gray-50 to-slate-50 dark:from-gray-800/50 dark:to-slate-800/50 rounded-lg border border-gray-200 dark:border-dark-purple-700">
             <h3 className="text-sm font-bold font-display text-text-light-primary dark:text-text-dark-primary mb-3 flex items-center">
               <span className="bg-blue-600 dark:bg-blue-700 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs mr-2">
@@ -320,7 +317,6 @@ const PracticeFailedQuestions = ({ exerciseId, userId }) => {
               </div>
             </h3>
 
-            {/* Compact Question Image */}
             {currentQuestion.imagePath && (
               <div className="mb-3 relative group">
                 <img
@@ -337,7 +333,6 @@ const PracticeFailedQuestions = ({ exerciseId, userId }) => {
               </div>
             )}
 
-            {/* Compact Sub Question */}
             {currentQuestion.subQuestion && (
               <p className="text-text-light-secondary dark:text-text-dark-secondary text-xs italic pl-3 border-l-2 border-gray-300 dark:border-dark-purple-600 font-sans">
                 {currentQuestion.subQuestion.split("\n").map((line, index) => (
@@ -350,7 +345,6 @@ const PracticeFailedQuestions = ({ exerciseId, userId }) => {
             )}
           </div>
 
-          {/* Compact Options */}
           {currentQuestion.optionType === "normal" ? (
             <div className="space-y-2 mb-4">
               {currentQuestion.options.map((option, index) => {
@@ -384,7 +378,6 @@ const PracticeFailedQuestions = ({ exerciseId, userId }) => {
               })}
             </div>
           ) : (
-            // Compact Grid options
             <div className="mb-4">
               <div className="grid gap-1 mb-3">
                 {Array.isArray(currentQuestion.gridOptions) && (
@@ -464,7 +457,6 @@ const PracticeFailedQuestions = ({ exerciseId, userId }) => {
               </div>
             )}
 
-          {/* Compact Feedback */}
           {showFeedback && feedbackData && (
             <div
               className={`p-3 rounded-lg mb-4 ${
@@ -499,7 +491,6 @@ const PracticeFailedQuestions = ({ exerciseId, userId }) => {
             </div>
           )}
 
-          {/* Compact Action Buttons */}
           <div className="flex justify-between items-center">
             <div className="text-xs text-text-light-secondary dark:text-text-dark-secondary font-sans">
               {showFeedback ? "Ready for next?" : "Select answer"}
@@ -534,11 +525,9 @@ const PracticeFailedQuestions = ({ exerciseId, userId }) => {
         </div>
       </div>
 
-      {/* Enhanced Image Zoom Modal */}
       {zoomedImage && (
         <div className="fixed inset-0 bg-black/80 dark:bg-black/90 flex items-center justify-center z-50 p-2">
           <div className="relative w-full h-full flex items-center justify-center">
-            {/* Close button - Fixed position for all screen sizes */}
             <button
               onClick={closeImageZoom}
               className="fixed top-4 right-4 bg-white text-black hover:bg-gray-100 dark:bg-gray-800 dark:text-white dark:hover:bg-gray-700 p-2 rounded-full transition-colors z-[60] shadow-lg"
