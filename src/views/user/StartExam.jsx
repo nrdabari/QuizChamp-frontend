@@ -306,245 +306,254 @@ const StartExam = () => {
 
         {/* Form Fields */}
         {mode !== "" && (
-          <>
-            {/* Step 1: Subject Selection with Checkboxes */}
-            <div>
-              <label className="block text-sm font-semibold text-text-light-primary dark:text-text-dark-primary mb-3 font-sans flex items-center gap-2">
-                <span className="bg-primary-600 dark:bg-dark-purple-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs">
-                  1
-                </span>
-                Select Subjects ({formik.values.selectedSubjects?.length || 0}{" "}
-                selected)
-              </label>
+          <div className="space-y-6">
+            {/* Row 1: Subject and Source Selection */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Step 1: Subject Selection with Checkboxes */}
+              <div>
+                <label className="block text-sm font-semibold text-text-light-primary dark:text-text-dark-primary mb-3 font-sans flex items-center gap-2">
+                  <span className="bg-primary-600 dark:bg-dark-purple-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs">
+                    1
+                  </span>
+                  Select Subjects ({formik.values.selectedSubjects?.length || 0}{" "}
+                  selected)
+                </label>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-4 border border-gray-200 dark:border-dark-purple-600 rounded-lg bg-gray-50 dark:bg-dark-bg-tertiary">
-                {subjects.map((subject) => (
-                  <label
-                    key={subject.id}
-                    className="flex items-center gap-3 p-3 rounded-md hover:bg-white dark:hover:bg-dark-bg-secondary cursor-pointer transition-colors border border-transparent hover:border-primary-200 dark:hover:border-dark-purple-500"
-                  >
-                    <div className="relative">
-                      <input
-                        type="checkbox"
-                        checked={
-                          formik.values.selectedSubjects?.includes(
-                            subject.id
-                          ) || false
-                        }
-                        onChange={() => handleSubjectChange(subject.id)}
-                        className="sr-only"
-                      />
-                      <div
-                        className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-colors ${
-                          formik.values.selectedSubjects?.includes(subject.id)
-                            ? "bg-primary-600 dark:bg-dark-purple-500 border-primary-600 dark:border-dark-purple-500"
-                            : "border-gray-300 dark:border-gray-600 bg-white dark:bg-dark-bg-secondary"
-                        }`}
-                      >
-                        {formik.values.selectedSubjects?.includes(
-                          subject.id
-                        ) && <Check size={12} className="text-white" />}
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Users
-                        size={16}
-                        className="text-primary-600 dark:text-dark-purple-400"
-                      />
-                      <span className="text-sm font-medium text-text-light-primary dark:text-text-dark-primary">
-                        {subject.name}
-                      </span>
-                    </div>
-                  </label>
-                ))}
-              </div>
-
-              {formik.errors.selectedSubjects && (
-                <p className="text-red-500 dark:text-red-400 text-xs mt-2 font-sans">
-                  {formik.errors.selectedSubjects}
-                </p>
-              )}
-            </div>
-
-            {/* Step 2: Source Selection with Checkboxes */}
-            <div>
-              <label className="block text-sm font-semibold text-text-light-primary dark:text-text-dark-primary mb-3 font-sans flex items-center gap-2">
-                <span
-                  className={`${
-                    formik.values.selectedSubjects?.length > 0
-                      ? "bg-primary-600 dark:bg-dark-purple-500 text-white"
-                      : "bg-gray-300 dark:bg-gray-600 text-gray-500"
-                  } rounded-full w-6 h-6 flex items-center justify-center text-xs transition-colors`}
-                >
-                  2
-                </span>
-                Select Sources ({formik.values.selectedSources?.length || 0}{" "}
-                selected)
-              </label>
-
-              <div
-                className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 p-4 border border-gray-200 dark:border-dark-purple-600 rounded-lg transition-colors ${
-                  formik.values.selectedSubjects?.length > 0
-                    ? "bg-gray-50 dark:bg-dark-bg-tertiary"
-                    : "bg-gray-100 dark:bg-gray-800"
-                }`}
-              >
-                {formik.values.selectedSubjects?.length === 0 ? (
-                  <div className="col-span-full text-center py-6 text-gray-500 dark:text-gray-400 text-sm">
-                    Please select at least one subject first
-                  </div>
-                ) : availableSources.length === 0 ? (
-                  <div className="col-span-full text-center py-6 text-gray-500 dark:text-gray-400 text-sm">
-                    No sources available for selected subjects
-                  </div>
-                ) : (
-                  availableSources.map((source) => (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-4 border border-gray-200 dark:border-dark-purple-600 rounded-lg bg-gray-50 dark:bg-dark-bg-tertiary max-h-60 overflow-y-auto">
+                  {subjects.map((subject) => (
                     <label
-                      key={source}
+                      key={subject.id}
                       className="flex items-center gap-3 p-3 rounded-md hover:bg-white dark:hover:bg-dark-bg-secondary cursor-pointer transition-colors border border-transparent hover:border-primary-200 dark:hover:border-dark-purple-500"
                     >
                       <div className="relative">
                         <input
                           type="checkbox"
                           checked={
-                            formik.values.selectedSources?.includes(source) ||
-                            false
+                            formik.values.selectedSubjects?.includes(
+                              subject.id
+                            ) || false
                           }
-                          onChange={() => handleSourceChange(source)}
+                          onChange={() => handleSubjectChange(subject.id)}
                           className="sr-only"
                         />
                         <div
                           className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-colors ${
-                            formik.values.selectedSources?.includes(source)
+                            formik.values.selectedSubjects?.includes(subject.id)
                               ? "bg-primary-600 dark:bg-dark-purple-500 border-primary-600 dark:border-dark-purple-500"
                               : "border-gray-300 dark:border-gray-600 bg-white dark:bg-dark-bg-secondary"
                           }`}
                         >
-                          {formik.values.selectedSources?.includes(source) && (
-                            <Check size={12} className="text-white" />
-                          )}
+                          {formik.values.selectedSubjects?.includes(
+                            subject.id
+                          ) && <Check size={12} className="text-white" />}
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
-                        <BookOpen
+                        <Users
                           size={16}
                           className="text-primary-600 dark:text-dark-purple-400"
                         />
                         <span className="text-sm font-medium text-text-light-primary dark:text-text-dark-primary">
-                          {source}
+                          {subject.name}
                         </span>
                       </div>
                     </label>
-                  ))
+                  ))}
+                </div>
+
+                {formik.errors.selectedSubjects && (
+                  <p className="text-red-500 dark:text-red-400 text-xs mt-2 font-sans">
+                    {formik.errors.selectedSubjects}
+                  </p>
                 )}
               </div>
 
-              {formik.errors.selectedSources && (
-                <p className="text-red-500 dark:text-red-400 text-xs mt-2 font-sans">
-                  {formik.errors.selectedSources}
-                </p>
-              )}
-            </div>
-
-            {/* Step 3: Exercise Selection */}
-            <div>
-              <label className="block text-sm font-semibold text-text-light-primary dark:text-text-dark-primary mb-3 font-sans flex items-center gap-2">
-                <span
-                  className={`${
-                    formik.values.selectedSources?.length > 0
-                      ? "bg-primary-600 dark:bg-dark-purple-500 text-white"
-                      : "bg-gray-300 dark:bg-gray-600 text-gray-500"
-                  } rounded-full w-6 h-6 flex items-center justify-center text-xs transition-colors`}
-                >
-                  3
-                </span>
-                Select Exercise
-              </label>
-              <div className="relative">
-                <FileText
-                  size={16}
-                  className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-                />
-                <select
-                  name="exerciseId"
-                  value={formik.values.exerciseId}
-                  onChange={formik.handleChange}
-                  disabled={!formik.values.selectedSources?.length}
-                  className={`w-full pl-10 pr-10 py-3 border ${
-                    formik.errors.exerciseId
-                      ? "border-red-500 dark:border-red-400"
-                      : "border-gray-300 dark:border-dark-purple-600"
-                  } rounded-md bg-white dark:bg-dark-bg-tertiary text-text-light-primary dark:text-text-dark-primary focus:outline-none focus:ring-2 focus:ring-primary-500 dark:focus:ring-dark-purple-400 focus:border-transparent transition-colors font-sans text-sm appearance-none disabled:bg-gray-100 dark:disabled:bg-gray-700 disabled:text-gray-400 dark:disabled:text-gray-500`}
-                >
-                  <option value="">
-                    {!formik.values.selectedSources?.length
-                      ? "-- Select Sources First --"
-                      : "-- Choose Exercise --"}
-                  </option>
-                  {availableExercises.map((exercise) => (
-                    <option key={exercise._id} value={exercise._id}>
-                      {exercise.name ||
-                        exercise.chapterId?.name ||
-                        "Unnamed Exercise"}
-                      {exercise.questionCount &&
-                        ` (${exercise.questionCount} questions)`}
-                      {` - ${exercise.subjectId?.name} - ${exercise.source}`}
-                    </option>
-                  ))}
-                </select>
-                <ChevronDown
-                  size={16}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"
-                />
-              </div>
-              {formik.errors.exerciseId && (
-                <p className="text-red-500 dark:text-red-400 text-xs mt-1 font-sans">
-                  {formik.errors.exerciseId}
-                </p>
-              )}
-            </div>
-
-            {/* Step 4: Total Time Input - Only for exam mode */}
-            {mode === "exam" && (
+              {/* Step 2: Source Selection with Checkboxes */}
               <div>
                 <label className="block text-sm font-semibold text-text-light-primary dark:text-text-dark-primary mb-3 font-sans flex items-center gap-2">
                   <span
                     className={`${
-                      formik.values.exerciseId
+                      formik.values.selectedSubjects?.length > 0
                         ? "bg-primary-600 dark:bg-dark-purple-500 text-white"
                         : "bg-gray-300 dark:bg-gray-600 text-gray-500"
                     } rounded-full w-6 h-6 flex items-center justify-center text-xs transition-colors`}
                   >
-                    4
+                    2
                   </span>
-                  Set Time Duration
+                  Select Sources ({formik.values.selectedSources?.length || 0}{" "}
+                  selected)
                 </label>
-                <div className="relative">
-                  <Clock
-                    size={16}
-                    className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-                  />
-                  <input
-                    type="number"
-                    name="totalTime"
-                    value={formik.values.totalTime}
-                    onChange={formik.handleChange}
-                    disabled={!formik.values.exerciseId}
-                    className={`w-full pl-10 pr-3 py-3 border ${
-                      formik.errors.totalTime
-                        ? "border-red-500 dark:border-red-400"
-                        : "border-gray-300 dark:border-dark-purple-600"
-                    } rounded-md bg-white dark:bg-dark-bg-tertiary text-text-light-primary dark:text-text-dark-primary placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-500 dark:focus:ring-dark-purple-400 focus:border-transparent transition-colors font-sans text-sm disabled:bg-gray-100 dark:disabled:bg-gray-700 disabled:text-gray-400 dark:disabled:text-gray-500`}
-                    placeholder="Enter exam duration in minutes"
-                  />
+
+                <div
+                  className={`grid grid-cols-1 sm:grid-cols-2 gap-3 p-4 border border-gray-200 dark:border-dark-purple-600 rounded-lg transition-colors max-h-60 overflow-y-auto ${
+                    formik.values.selectedSubjects?.length > 0
+                      ? "bg-gray-50 dark:bg-dark-bg-tertiary"
+                      : "bg-gray-100 dark:bg-gray-800"
+                  }`}
+                >
+                  {formik.values.selectedSubjects?.length === 0 ? (
+                    <div className="col-span-full text-center py-8 text-gray-500 dark:text-gray-400 text-sm">
+                      Please select at least one subject first
+                    </div>
+                  ) : availableSources.length === 0 ? (
+                    <div className="col-span-full text-center py-8 text-gray-500 dark:text-gray-400 text-sm">
+                      No sources available for selected subjects
+                    </div>
+                  ) : (
+                    availableSources.map((source) => (
+                      <label
+                        key={source}
+                        className="flex items-center gap-3 p-3 rounded-md hover:bg-white dark:hover:bg-dark-bg-secondary cursor-pointer transition-colors border border-transparent hover:border-primary-200 dark:hover:border-dark-purple-500"
+                      >
+                        <div className="relative">
+                          <input
+                            type="checkbox"
+                            checked={
+                              formik.values.selectedSources?.includes(source) ||
+                              false
+                            }
+                            onChange={() => handleSourceChange(source)}
+                            className="sr-only"
+                          />
+                          <div
+                            className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-colors ${
+                              formik.values.selectedSources?.includes(source)
+                                ? "bg-primary-600 dark:bg-dark-purple-500 border-primary-600 dark:border-dark-purple-500"
+                                : "border-gray-300 dark:border-gray-600 bg-white dark:bg-dark-bg-secondary"
+                            }`}
+                          >
+                            {formik.values.selectedSources?.includes(
+                              source
+                            ) && <Check size={12} className="text-white" />}
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <BookOpen
+                            size={16}
+                            className="text-primary-600 dark:text-dark-purple-400"
+                          />
+                          <span className="text-sm font-medium text-text-light-primary dark:text-text-dark-primary">
+                            {source}
+                          </span>
+                        </div>
+                      </label>
+                    ))
+                  )}
                 </div>
-                {formik.errors.totalTime && (
-                  <p className="text-red-500 dark:text-red-400 text-xs mt-1 font-sans">
-                    {formik.errors.totalTime}
+
+                {formik.errors.selectedSources && (
+                  <p className="text-red-500 dark:text-red-400 text-xs mt-2 font-sans">
+                    {formik.errors.selectedSources}
                   </p>
                 )}
               </div>
-            )}
+            </div>
+
+            {/* Row 2: Exercise Selection and Time Duration */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Step 3: Exercise Selection */}
+              <div>
+                <label className="block text-sm font-semibold text-text-light-primary dark:text-text-dark-primary mb-3 font-sans flex items-center gap-2">
+                  <span
+                    className={`${
+                      formik.values.selectedSources?.length > 0
+                        ? "bg-primary-600 dark:bg-dark-purple-500 text-white"
+                        : "bg-gray-300 dark:bg-gray-600 text-gray-500"
+                    } rounded-full w-6 h-6 flex items-center justify-center text-xs transition-colors`}
+                  >
+                    3
+                  </span>
+                  Select Exercise
+                </label>
+                <div className="relative">
+                  <FileText
+                    size={16}
+                    className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                  />
+                  <select
+                    name="exerciseId"
+                    value={formik.values.exerciseId}
+                    onChange={formik.handleChange}
+                    disabled={!formik.values.selectedSources?.length}
+                    className={`w-full pl-10 pr-10 py-3 border ${
+                      formik.errors.exerciseId
+                        ? "border-red-500 dark:border-red-400"
+                        : "border-gray-300 dark:border-dark-purple-600"
+                    } rounded-md bg-white dark:bg-dark-bg-tertiary text-text-light-primary dark:text-text-dark-primary focus:outline-none focus:ring-2 focus:ring-primary-500 dark:focus:ring-dark-purple-400 focus:border-transparent transition-colors font-sans text-sm appearance-none disabled:bg-gray-100 dark:disabled:bg-gray-700 disabled:text-gray-400 dark:disabled:text-gray-500`}
+                  >
+                    <option value="">
+                      {!formik.values.selectedSources?.length
+                        ? "-- Select Sources First --"
+                        : "-- Choose Exercise --"}
+                    </option>
+                    {availableExercises.map((exercise) => (
+                      <option key={exercise._id} value={exercise._id}>
+                        {exercise.name ||
+                          exercise.chapterId?.name ||
+                          "Unnamed Exercise"}
+                        {exercise.questionCount &&
+                          ` (${exercise.questionCount} questions)`}
+                        {` - ${exercise.subjectId?.name} - ${exercise.source}`}
+                      </option>
+                    ))}
+                  </select>
+                  <ChevronDown
+                    size={16}
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"
+                  />
+                </div>
+                {formik.errors.exerciseId && (
+                  <p className="text-red-500 dark:text-red-400 text-xs mt-1 font-sans">
+                    {formik.errors.exerciseId}
+                  </p>
+                )}
+              </div>
+
+              {/* Step 4: Total Time Input - Only for exam mode */}
+              {mode === "exam" && (
+                <div>
+                  <label className="block text-sm font-semibold text-text-light-primary dark:text-text-dark-primary mb-3 font-sans flex items-center gap-2">
+                    <span
+                      className={`${
+                        formik.values.exerciseId
+                          ? "bg-primary-600 dark:bg-dark-purple-500 text-white"
+                          : "bg-gray-300 dark:bg-gray-600 text-gray-500"
+                      } rounded-full w-6 h-6 flex items-center justify-center text-xs transition-colors`}
+                    >
+                      4
+                    </span>
+                    Set Time Duration
+                  </label>
+                  <div className="relative">
+                    <Clock
+                      size={16}
+                      className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                    />
+                    <input
+                      type="number"
+                      name="totalTime"
+                      value={formik.values.totalTime}
+                      onChange={formik.handleChange}
+                      disabled={!formik.values.exerciseId}
+                      className={`w-full pl-10 pr-3 py-3 border ${
+                        formik.errors.totalTime
+                          ? "border-red-500 dark:border-red-400"
+                          : "border-gray-300 dark:border-dark-purple-600"
+                      } rounded-md bg-white dark:bg-dark-bg-tertiary text-text-light-primary dark:text-text-dark-primary placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-500 dark:focus:ring-dark-purple-400 focus:border-transparent transition-colors font-sans text-sm disabled:bg-gray-100 dark:disabled:bg-gray-700 disabled:text-gray-400 dark:disabled:text-gray-500`}
+                      placeholder="Enter exam duration in minutes"
+                    />
+                  </div>
+                  {formik.errors.totalTime && (
+                    <p className="text-red-500 dark:text-red-400 text-xs mt-1 font-sans">
+                      {formik.errors.totalTime}
+                    </p>
+                  )}
+                </div>
+              )}
+
+              {/* If not exam mode, fill the second column with empty space or additional content */}
+              {mode !== "exam" && <div></div>}
+            </div>
 
             {/* Action Buttons */}
             <div className="flex gap-3 pt-3">
@@ -618,7 +627,7 @@ const StartExam = () => {
                 </div>
               </div>
             )}
-          </>
+          </div>
         )}
       </form>
 
