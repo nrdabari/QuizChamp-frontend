@@ -340,9 +340,9 @@ export default function AddExercise() {
         </div>
       </div>
 
-      {formik.values[group].map((_, idx) => (
+      {formik.values[group].map((item, idx) => (
         <div
-          key={idx}
+          key={`${group}-${idx}-${item._id || "new"}`}
           className="bg-white p-4 rounded-lg mb-4 border border-purple-200"
         >
           <div className="flex justify-between items-center mb-3">
