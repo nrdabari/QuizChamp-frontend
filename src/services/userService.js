@@ -90,4 +90,17 @@ export const userService = {
     const response = await api.get(`/exercises/${id}`);
     return response.data;
   },
+  // ✅ Get Chapter list on subject and class level
+  getChapters: async (subjectId, classLevel) => {
+    const response = await api.get(
+      `/chapters?subjectId=${subjectId}&classLevel=${classLevel}`
+    );
+    return response.data;
+  },
+
+  // ✅ Start chapter exam submission (NEW METHOD)
+  startChapterTest: async (examData) => {
+    const response = await api.put("/submissions/chapter-test", examData);
+    return response.data;
+  },
 };
