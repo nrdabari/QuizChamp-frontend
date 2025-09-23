@@ -9,7 +9,6 @@ import { getTextForRange } from "../../helper/helpers";
 const ExamPage = () => {
   const { exerciseId } = useParams();
   const [searchParams] = useSearchParams();
-
   const userId = searchParams.get("user");
   const time = searchParams.get("time");
   const submissionId = searchParams.get("submissionId");
@@ -793,8 +792,13 @@ const ExamPage = () => {
 
             {/* Header Text */}
             {headerText && (
-              <div className="mb-3 sm:mb-4 p-2 sm:p-3 bg-blue-50 dark:bg-blue-900/30 text-xs sm:text-xs border-l-4 border-blue-400 dark:border-blue-500 rounded-r text-blue-800 dark:text-blue-200 font-sans">
-                {headerText}
+              <div className="mb-3 sm:mb-4 p-2 sm:p-3 bg-blue-50 dark:bg-blue-900/30 text-xs md:text-base border-l-4 border-blue-400 dark:border-blue-500 rounded-r text-blue-800 dark:text-blue-200 font-sans">
+                {headerText.split("\n").map((line, index) => (
+                  <React.Fragment key={index}>
+                    {line}
+                    <br />
+                  </React.Fragment>
+                ))}
               </div>
             )}
 

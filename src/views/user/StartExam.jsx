@@ -644,10 +644,11 @@ const StartExam = () => {
             <thead className="bg-primary-100 dark:bg-dark-purple-900 text-primary-800 dark:text-text-dark-primary">
               <tr>
                 <th className="p-2 font-semibold font-sans text-xs">#</th>
-                <th className="p-2 font-semibold font-sans text-xs">User</th>
+
                 <th className="p-2 font-semibold font-sans text-xs">
                   Exercise
                 </th>
+                <th className="p-2 font-semibold font-sans text-xs">Source</th>
                 <th className="p-2 font-semibold font-sans text-xs">Score</th>
                 <th className="p-2 font-semibold font-sans text-xs">
                   Time (min)
@@ -667,14 +668,19 @@ const StartExam = () => {
                   <td className="p-2 text-text-light-primary dark:text-text-dark-primary font-sans text-xs">
                     {idx + 1}
                   </td>
-                  <td className="p-2 text-text-light-primary dark:text-text-dark-primary font-sans text-xs">
+                  {/* <td className="p-2 text-text-light-primary dark:text-text-dark-primary font-sans text-xs">
                     <div className="truncate max-w-24">
                       {sub.userId?.name || "Unknown"}
+                    </div>
+                  </td> */}
+                  <td className="p-2 text-text-light-primary dark:text-text-dark-primary font-sans text-xs">
+                    <div className="truncate max-w-32">
+                      {sub.exerciseId?.name}
                     </div>
                   </td>
                   <td className="p-2 text-text-light-primary dark:text-text-dark-primary font-sans text-xs">
                     <div className="truncate max-w-32">
-                      {sub.exerciseId?.source} - {sub.exerciseId?.name}
+                      {sub.exerciseId?.source}
                     </div>
                   </td>
                   <td className="p-2 text-text-light-primary dark:text-text-dark-primary font-sans text-xs">

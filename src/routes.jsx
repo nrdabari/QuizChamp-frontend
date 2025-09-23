@@ -93,6 +93,17 @@ const routes = [
     role: [ROLES.USER],
   },
   {
+    name: "Chapter Test",
+    layout: "/user",
+    path: "chapter-test/:chapterId",
+    icon: User,
+    component: <ExamPage />,
+    sideBarVisible: false,
+    notificationBarVisible: false,
+    noLayout: true,
+    role: [ROLES.USER],
+  },
+  {
     name: "Submission Report",
     layout: "/user",
     path: "report/:submissionId",

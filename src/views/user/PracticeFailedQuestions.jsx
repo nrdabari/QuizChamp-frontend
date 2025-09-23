@@ -279,7 +279,7 @@ const PracticeFailedQuestions = ({ exerciseId, userId }) => {
                   Passage
                 </h3>
               </div>
-              <div className="text-text-light-primary dark:text-text-dark-primary text-xs leading-relaxed font-sans">
+              <div className="text-text-light-primary dark:text-text-dark-primary text-xs md:text-base leading-relaxed font-sans">
                 {/<[^>]*>/g.test(headerText) ? (
                   <div dangerouslySetInnerHTML={{ __html: headerText }} />
                 ) : (
