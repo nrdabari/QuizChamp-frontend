@@ -3,7 +3,6 @@ import { useFormik } from "formik";
 import { Editor } from "@tinymce/tinymce-react";
 import {
   Camera,
-  Eye,
   Plus,
   ToggleLeft,
   ToggleRight,

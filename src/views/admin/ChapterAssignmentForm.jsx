@@ -132,16 +132,16 @@ const ChapterAssignmentForm = () => {
   };
 
   const addNewRow = () => {
-    setAssignmentRows([
-      ...assignmentRows,
-      {
-        id: Date.now(),
-        chapterId: null,
-        chapterName: "",
-        chapterNumber: null,
-        questionNumbers: [],
-      },
-    ]);
+    const newRow = {
+      id: Date.now(),
+      chapterId: null,
+      chapterName: "",
+      chapterNumber: null,
+      questionNumbers: [],
+    };
+
+    // Prepend newest row
+    setAssignmentRows((prev) => [newRow, ...prev]);
   };
 
   const removeRow = (index) => {
