@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useParams } from "react-router-dom";
 import {
   CheckCircle,
@@ -11,6 +11,9 @@ import {
   Image,
   Check,
   X,
+  MapPin,
+  FileText,
+  AlertCircle,
 } from "lucide-react";
 import moment from "moment";
 import { useApiService } from "../../hooks/useApiService";
@@ -26,6 +29,78 @@ const TestReport = () => {
   const { userServ } = useApiService();
 
   const [filterType, setFilterType] = useState("all"); // 'all', 'correct', 'wrong'
+  const [directionModal, setDirectionModal] = useState({
+    isOpen: false,
+    content: "",
+  });
+  const [headerModal, setHeaderModal] = useState({
+    isOpen: false,
+    content: "",
+  });
+
+  // Refs for modal management
+  const directionModalRef = useRef(null);
+  const headerModalRef = useRef(null);
+
+  // Close modal when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        directionModalRef.current &&
+        !directionModalRef.current.contains(event.target)
+      ) {
+        setDirectionModal({ isOpen: false, content: "" });
+      }
+      if (
+        headerModalRef.current &&
+        !headerModalRef.current.contains(event.target)
+      ) {
+        setHeaderModal({ isOpen: false, content: "" });
+      }
+    };
+
+    if (directionModal.isOpen || headerModal.isOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+      return () => {
+        document.removeEventListener("mousedown", handleClickOutside);
+      };
+    }
+  }, [directionModal.isOpen, headerModal.isOpen]);
+
+  const openDirectionModal = (content) => {
+    setDirectionModal({ isOpen: true, content });
+  };
+
+  const openHeaderModal = (content) => {
+    setHeaderModal({ isOpen: true, content });
+  };
+
+  const closeDirectionModal = () => {
+    setDirectionModal({ isOpen: false, content: "" });
+  };
+
+  const closeHeaderModal = () => {
+    setHeaderModal({ isOpen: false, content: "" });
+  };
+
+  // Function to check if question has direction
+  const getQuestionDirection = (questionNumber) => {
+    if (!testReport?.submissionDetails?.exerciseId?.directions) return null;
+
+    return testReport.submissionDetails.exerciseId.directions.find(
+      (direction) =>
+        questionNumber >= direction.start && questionNumber <= direction.end
+    );
+  };
+
+  // Function to check if question has header
+  const getQuestionHeader = (questionNumber) => {
+    if (!testReport?.submissionDetails?.exerciseId?.headers) return null;
+
+    return testReport.submissionDetails.exerciseId.headers.find(
+      (header) => questionNumber >= header.start && questionNumber <= header.end
+    );
+  };
 
   // const openModal = (question) => {
   //   setSelectedQuestion(question);
@@ -189,6 +264,79 @@ const TestReport = () => {
 
   return (
     <div className="w-full min-h-screen p-6 bg-gray-50 dark:bg-gray-900 transition-colors duration-250">
+      {/* Direction Modal */}
+      {directionModal.isOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4">
+          <div
+            ref={directionModalRef}
+            className="bg-white dark:bg-gray-800 rounded-lg w-[600px] h-[400px] shadow-2xl border border-gray-300 dark:border-gray-600 overflow-hidden flex flex-col"
+            style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}
+          >
+            {/* Modal Header - Fixed */}
+            <div className="bg-gray-100 dark:bg-gray-700 px-6 py-4 border-b border-gray-300 dark:border-gray-600 flex-shrink-0">
+              <div className="flex items-center space-x-3">
+                <div className="p-2 bg-gray-200 dark:bg-gray-600 rounded">
+                  <MapPin className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                    INSTRUCTIONS
+                  </h3>
+                </div>
+              </div>
+            </div>
+
+            {/* Modal Content - Scrollable */}
+            <div className="flex-1 overflow-y-auto p-6">
+              <div className="h-full">
+                <div className="bg-gray-50 dark:bg-gray-750 border border-gray-200 dark:border-gray-600 rounded p-4">
+                  <pre className="whitespace-pre-wrap text-gray-900 dark:text-gray-100 text-base leading-relaxed font-serif">
+                    {directionModal.content}
+                  </pre>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Header Modal */}
+      {headerModal.isOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4">
+          <div
+            ref={headerModalRef}
+            className="bg-white dark:bg-gray-800 rounded-lg w-[800px] h-[600px] shadow-2xl border border-gray-300 dark:border-gray-600 overflow-hidden flex flex-col"
+            style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}
+          >
+            {/* Modal Header - Fixed */}
+            <div className="bg-gray-100 dark:bg-gray-700 px-6 py-4 border-b border-gray-300 dark:border-gray-600 flex-shrink-0">
+              <div className="flex items-center space-x-3">
+                <div className="p-2 bg-gray-200 dark:bg-gray-600 rounded">
+                  <FileText className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                    READING PASSAGE
+                  </h3>
+                </div>
+              </div>
+            </div>
+
+            {/* Modal Content - Scrollable */}
+            <div className="flex-1 overflow-y-auto p-6">
+              <div className="h-full">
+                <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded p-6">
+                  <div className="text-gray-900 dark:text-gray-100 text-base leading-7">
+                    <pre className="whitespace-pre-wrap font-serif text-justify">
+                      {headerModal.content}
+                    </pre>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
       {/* Header Section */}
       <div className="bg-gradient-to-r from-blue-600 to-primary-600 dark:from-gray-800 dark:to-gray-700 text-white rounded-lg p-6 mb-8 shadow-lg dark:shadow-xl">
         <h1 className="text-3xl font-bold font-display mb-4">Test Report</h1>
@@ -340,241 +488,125 @@ const TestReport = () => {
         <h2 className="text-2xl font-bold font-display text-gray-900 dark:text-white">
           Question Review
         </h2>
-        {getFilteredQuestions().map((question) => (
-          <div
-            key={question.questionId}
-            className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg shadow-md dark:shadow-xl overflow-hidden transition-colors duration-250"
-          >
-            {/* Question Header - Clickable for multiline questions */}
+        {getFilteredQuestions().map((question) => {
+          const questionDirection = getQuestionDirection(question.id);
+          const questionHeader = getQuestionHeader(question.id);
+          return (
             <div
-              className={`px-6 py-4 ${
-                question.isCorrect
-                  ? "bg-green-50 dark:bg-green-900/30 border-b border-green-200 dark:border-green-700"
-                  : "bg-red-50 dark:bg-red-900/30 border-b border-red-200 dark:border-red-700"
-              } ${
-                question.imagePath ||
-                (question.subQuestion && question.subQuestion.trim() !== "") ||
-                (question.gridOptions && question.gridOptions.length > 0)
-                  ? "cursor-pointer hover:opacity-80"
-                  : ""
-              }`}
-              onClick={() =>
-                (question.imagePath ||
+              key={question.questionId}
+              className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg shadow-md dark:shadow-xl overflow-hidden transition-colors duration-250"
+            >
+              {/* Question Header - Clickable for multiline questions */}
+              <div
+                className={`px-6 py-4 ${
+                  question.isCorrect
+                    ? "bg-green-50 dark:bg-green-900/30 border-b border-green-200 dark:border-green-700"
+                    : "bg-red-50 dark:bg-red-900/30 border-b border-red-200 dark:border-red-700"
+                } ${
+                  question.imagePath ||
                   (question.subQuestion &&
                     question.subQuestion.trim() !== "") ||
-                  (question.gridOptions && question.gridOptions.length > 0)) &&
-                toggleAccordion(question.questionId)
-              }
-            >
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-3">
-                  <h3 className="text-lg font-semibold font-display text-gray-900 dark:text-white">
-                    Question {question.id}
-                  </h3>
-                  {(question.subQuestion?.trim() || question.imagePath) && (
-                    <div className="flex items-center space-x-2">
-                      <Image className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-                      <span className="text-sm text-gray-600 dark:text-gray-400 font-sans">
-                        Multiline Question
-                      </span>
-                    </div>
-                  )}
-                </div>
-                <div className="flex items-center space-x-2">
-                  {question.isCorrect ? (
-                    <>
-                      <CheckCircle className="w-6 h-6 text-green-600 dark:text-green-400" />
-                      <span className="text-green-700 dark:text-green-300 font-medium font-sans">
-                        Correct
-                      </span>
-                    </>
-                  ) : (
-                    <>
-                      <XCircle className="w-6 h-6 text-red-600 dark:text-red-400" />
-                      <span className="text-red-700 dark:text-red-300 font-medium font-sans">
-                        Incorrect
-                      </span>
-                    </>
-                  )}
-                  {(question.subQuestion?.trim() || question.imagePath) &&
-                    (openAccordion === question.questionId ? (
-                      <ChevronUp className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-                    ) : (
-                      <ChevronDown className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-                    ))}
-                </div>
-              </div>
-              <p className="text-gray-800 dark:text-gray-200 mt-2 font-sans">
-                {/<[a-z][\s\S]*>/i.test(question.question) ? (
-                  <span
-                    dangerouslySetInnerHTML={{
-                      __html: question.question,
-                    }}
-                  />
-                ) : (
-                  question.question.split("\n").map((line, index) => (
-                    <React.Fragment key={index}>
-                      {line}
-                      <br />
-                    </React.Fragment>
-                  ))
-                )}
-              </p>
-            </div>
-
-            {/* Question Content */}
-            {!question.subQuestion?.trim() && !question.imagePath ? (
-              // Simple Question Layout
-              <div className="p-6">
-                {question.optionType === "grid" ? (
-                  // Grid Options Display
-                  <div className="space-y-4">
-                    <div className="flex items-center space-x-2 mb-4">
-                      <div className="w-2 h-2 bg-blue-500 dark:bg-blue-400 rounded-full"></div>
-                      <span className="text-sm font-medium font-sans text-text-light-secondary dark:text-text-dark-secondary">
-                        Grid Options
-                      </span>
-                    </div>
-                    <table className="w-full table-auto border-collapse border border-gray-200 dark:border-dark-purple-600 rounded-lg overflow-hidden">
-                      <tbody>
-                        {question.gridOptions.map((row, rowIndex) => {
-                          const isCorrectRow = row.includes(
-                            question.correctAnswer
-                          );
-                          const isWrongRow = row.includes(question.userAnswer);
-                          const isFirstRow = rowIndex === 0;
-                          return (
-                            <tr
-                              key={rowIndex}
-                              className={`
-                              ${
-                                isCorrectRow
-                                  ? "bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200"
-                                  : ""
-                              }
-                              ${
-                                isWrongRow && !isCorrectRow
-                                  ? "bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-200"
-                                  : ""
-                              }
-                              ${
-                                isFirstRow &&
-                                "bg-blue-100 dark:bg-blue-900/30 font-semibold text-sm"
-                              }
-                            `}
-                            >
-                              {row.map((cell, cellIndex) => (
-                                <td
-                                  key={cellIndex}
-                                  className="p-2 font-sans text-text-light-primary dark:text-text-dark-primary border-r border-gray-200 dark:border-dark-purple-600 last:border-r-0"
-                                >
-                                  {cell}
-                                </td>
-                              ))}
-                              {(isCorrectRow || isWrongRow) && (
-                                <td className="pl-2">
-                                  {isCorrectRow ? (
-                                    <Check className="text-green-500 dark:text-green-400 w-5 h-5" />
-                                  ) : isWrongRow ? (
-                                    <X className="text-red-500 dark:text-red-400 w-5 h-5" />
-                                  ) : null}
-                                </td>
-                              )}
-                            </tr>
-                          );
-                        })}
-                      </tbody>
-                    </table>
-                  </div>
-                ) : question.options && question.options.length > 0 ? (
-                  <div className="space-y-3">
-                    {question.options.map((option, optionIndex) => (
-                      <div
-                        key={optionIndex}
-                        className={`flex items-center space-x-3 p-4 rounded-lg border-2 transition-all ${getOptionStyle(
-                          question,
-                          optionIndex
-                        )}`}
-                      >
-                        <div className="flex items-center space-x-2 flex-1">
-                          <span className="font-medium font-sans">
-                            {String.fromCharCode(65 + optionIndex)}.
-                          </span>
-                          <span className="font-sans">{option}</span>
-                        </div>
-                        {getOptionIcon(question, optionIndex)}
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  // When options are in image, show message
-                  <div className="text-center py-8 text-text-light-secondary dark:text-text-dark-secondary">
-                    <Image className="w-12 h-12 mx-auto mb-2 text-gray-400 dark:text-gray-500" />
-                    <p className="font-sans">
-                      Options are displayed in the question image above
-                    </p>
-                  </div>
-                )}
-
-                {/* Answer Explanation */}
-                {renderAnswerExplanation(question)}
-              </div>
-            ) : (
-              // Multiline Question with Accordion
-              <div
-                className={`transition-all duration-300 overflow-hidden ${
-                  openAccordion === question.questionId
-                    ? "max-h-none"
-                    : "max-h-0"
+                  (question.gridOptions && question.gridOptions.length > 0)
+                    ? "cursor-pointer hover:opacity-80"
+                    : ""
                 }`}
+                onClick={() =>
+                  (question.imagePath ||
+                    (question.subQuestion &&
+                      question.subQuestion.trim() !== "") ||
+                    (question.gridOptions &&
+                      question.gridOptions.length > 0)) &&
+                  toggleAccordion(question.questionId)
+                }
               >
-                <div className="p-6 border-t border-gray-200 dark:border-dark-purple-700">
-                  {/* Main Question */}
-                  {question.question && (
-                    <div className="mb-4">
-                      <p className="font-medium font-sans text-text-light-primary dark:text-text-dark-primary">
-                        {/<[a-z][\s\S]*>/i.test(question.question) ? (
-                          <span
-                            dangerouslySetInnerHTML={{
-                              __html: question.question,
-                            }}
-                          />
-                        ) : (
-                          question.question.split("\n").map((line, index) => (
-                            <React.Fragment key={index}>
-                              {line}
-                              <br />
-                            </React.Fragment>
-                          ))
-                        )}
-                      </p>
-                    </div>
-                  )}
-                  {/* Image Section */}
-                  {question.imagePath && (
-                    <div className="mb-6">
-                      <img
-                        src={`${question.imagePath}`}
-                        alt="Question illustration"
-                        className="w-52 max-w-2xl mx-auto rounded-lg shadow-md"
-                      />
-                    </div>
-                  )}
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-3">
+                    <h3 className="text-lg font-semibold font-display text-gray-900 dark:text-white">
+                      Question {question.id}
+                    </h3>
+                    {/* Direction and Header Icons */}
+                    <div className="flex items-center space-x-2">
+                      {questionDirection && (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            openDirectionModal(questionDirection.text);
+                          }}
+                          className="p-1 rounded-full bg-blue-100 dark:bg-blue-900/40 hover:bg-blue-200 dark:hover:bg-blue-900/60 transition-colors"
+                          title="View Instruction"
+                        >
+                          <AlertCircle className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                        </button>
+                      )}
 
-                  {/* Sub Questions */}
-                  {question.subQuestion && (
-                    <div className="mb-6">
-                      <h4 className="font-semibold font-display text-text-light-primary dark:text-text-dark-primary mb-3">
-                        {question.subQuestion.split("\n").map((line, index) => (
-                          <React.Fragment key={index}>
-                            {line}
-                            <br />
-                          </React.Fragment>
-                        ))}
-                      </h4>
+                      {questionHeader && (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            openHeaderModal(questionHeader.text);
+                          }}
+                          className="p-1 rounded-full bg-purple-100 dark:bg-purple-900/40 hover:bg-purple-200 dark:hover:bg-purple-900/60 transition-colors"
+                          title="View Header"
+                        >
+                          <FileText className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+                        </button>
+                      )}
                     </div>
+                    {(question.subQuestion?.trim() || question.imagePath) && (
+                      <div className="flex items-center space-x-2">
+                        <Image className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                        <span className="text-sm text-gray-600 dark:text-gray-400 font-sans">
+                          Multiline Question
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    {question.isCorrect ? (
+                      <>
+                        <CheckCircle className="w-6 h-6 text-green-600 dark:text-green-400" />
+                        <span className="text-green-700 dark:text-green-300 font-medium font-sans">
+                          Correct
+                        </span>
+                      </>
+                    ) : (
+                      <>
+                        <XCircle className="w-6 h-6 text-red-600 dark:text-red-400" />
+                        <span className="text-red-700 dark:text-red-300 font-medium font-sans">
+                          Incorrect
+                        </span>
+                      </>
+                    )}
+                    {(question.subQuestion?.trim() || question.imagePath) &&
+                      (openAccordion === question.questionId ? (
+                        <ChevronUp className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                      ) : (
+                        <ChevronDown className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                      ))}
+                  </div>
+                </div>
+                <p className="text-gray-800 dark:text-gray-200 mt-2 font-sans">
+                  {/<[a-z][\s\S]*>/i.test(question.question) ? (
+                    <span
+                      dangerouslySetInnerHTML={{
+                        __html: question.question,
+                      }}
+                    />
+                  ) : (
+                    question.question.split("\n").map((line, index) => (
+                      <React.Fragment key={index}>
+                        {line}
+                        <br />
+                      </React.Fragment>
+                    ))
                   )}
+                </p>
+              </div>
 
+              {/* Question Content */}
+              {!question.subQuestion?.trim() && !question.imagePath ? (
+                // Simple Question Layout
+                <div className="p-6">
                   {question.optionType === "grid" ? (
                     // Grid Options Display
                     <div className="space-y-4">
@@ -598,27 +630,26 @@ const TestReport = () => {
                               <tr
                                 key={rowIndex}
                                 className={`
-                                ${
-                                  isCorrectRow
-                                    ? "bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200"
-                                    : ""
-                                }
-                                ${
-                                  isWrongRow && !isCorrectRow
-                                    ? "bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-200"
-                                    : ""
-                                }
-                                ${
-                                  isFirstRow
-                                    ? "bg-blue-100 dark:bg-blue-900/30 font-semibold text-sm"
-                                    : ""
-                                }
-                              `}
+                              ${
+                                isCorrectRow
+                                  ? "bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200"
+                                  : ""
+                              }
+                              ${
+                                isWrongRow && !isCorrectRow
+                                  ? "bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-200"
+                                  : ""
+                              }
+                              ${
+                                isFirstRow &&
+                                "bg-blue-100 dark:bg-blue-900/30 font-semibold text-sm"
+                              }
+                            `}
                               >
                                 {row.map((cell, cellIndex) => (
                                   <td
                                     key={cellIndex}
-                                    className={`p-2 font-sans border-r border-gray-200 dark:border-dark-purple-600 last:border-r-0`}
+                                    className="p-2 font-sans text-text-light-primary dark:text-text-dark-primary border-r border-gray-200 dark:border-dark-purple-600 last:border-r-0"
                                   >
                                     {cell}
                                   </td>
@@ -639,7 +670,7 @@ const TestReport = () => {
                       </table>
                     </div>
                   ) : question.options && question.options.length > 0 ? (
-                    <div className="space-y-3 mb-4">
+                    <div className="space-y-3">
                       {question.options.map((option, optionIndex) => (
                         <div
                           key={optionIndex}
@@ -659,14 +690,11 @@ const TestReport = () => {
                       ))}
                     </div>
                   ) : (
-                    // When options are in image
-                    <div className="text-center py-6 mb-4 bg-blue-50 dark:bg-blue-900/30 rounded-lg border border-blue-200 dark:border-blue-700">
-                      <Image className="w-10 h-10 mx-auto mb-2 text-blue-500 dark:text-blue-400" />
-                      <p className="text-blue-700 dark:text-blue-300 font-medium font-sans">
-                        Multiple choice options are shown in the image above
-                      </p>
-                      <p className="text-blue-600 dark:text-blue-400 text-sm mt-1 font-sans">
-                        Please refer to the image for options A, B, C, D
+                    // When options are in image, show message
+                    <div className="text-center py-8 text-text-light-secondary dark:text-text-dark-secondary">
+                      <Image className="w-12 h-12 mx-auto mb-2 text-gray-400 dark:text-gray-500" />
+                      <p className="font-sans">
+                        Options are displayed in the question image above
                       </p>
                     </div>
                   )}
@@ -674,10 +702,168 @@ const TestReport = () => {
                   {/* Answer Explanation */}
                   {renderAnswerExplanation(question)}
                 </div>
-              </div>
-            )}
-          </div>
-        ))}
+              ) : (
+                // Multiline Question with Accordion
+                <div
+                  className={`transition-all duration-300 overflow-hidden ${
+                    openAccordion === question.questionId
+                      ? "max-h-none"
+                      : "max-h-0"
+                  }`}
+                >
+                  <div className="p-6 border-t border-gray-200 dark:border-dark-purple-700">
+                    {/* Main Question */}
+                    {question.question && (
+                      <div className="mb-4">
+                        <p className="font-medium font-sans text-text-light-primary dark:text-text-dark-primary">
+                          {/<[a-z][\s\S]*>/i.test(question.question) ? (
+                            <span
+                              dangerouslySetInnerHTML={{
+                                __html: question.question,
+                              }}
+                            />
+                          ) : (
+                            question.question.split("\n").map((line, index) => (
+                              <React.Fragment key={index}>
+                                {line}
+                                <br />
+                              </React.Fragment>
+                            ))
+                          )}
+                        </p>
+                      </div>
+                    )}
+                    {/* Image Section */}
+                    {question.imagePath && (
+                      <div className="mb-6">
+                        <img
+                          src={`${question.imagePath}`}
+                          alt="Question illustration"
+                          className="w-52 max-w-2xl mx-auto rounded-lg shadow-md"
+                        />
+                      </div>
+                    )}
+
+                    {/* Sub Questions */}
+                    {question.subQuestion && (
+                      <div className="mb-6">
+                        <h4 className="font-semibold font-display text-text-light-primary dark:text-text-dark-primary mb-3">
+                          {question.subQuestion
+                            .split("\n")
+                            .map((line, index) => (
+                              <React.Fragment key={index}>
+                                {line}
+                                <br />
+                              </React.Fragment>
+                            ))}
+                        </h4>
+                      </div>
+                    )}
+
+                    {question.optionType === "grid" ? (
+                      // Grid Options Display
+                      <div className="space-y-4">
+                        <div className="flex items-center space-x-2 mb-4">
+                          <div className="w-2 h-2 bg-blue-500 dark:bg-blue-400 rounded-full"></div>
+                          <span className="text-sm font-medium font-sans text-text-light-secondary dark:text-text-dark-secondary">
+                            Grid Options
+                          </span>
+                        </div>
+                        <table className="w-full table-auto border-collapse border border-gray-200 dark:border-dark-purple-600 rounded-lg overflow-hidden">
+                          <tbody>
+                            {question.gridOptions.map((row, rowIndex) => {
+                              const isCorrectRow = row.includes(
+                                question.correctAnswer
+                              );
+                              const isWrongRow = row.includes(
+                                question.userAnswer
+                              );
+                              const isFirstRow = rowIndex === 0;
+                              return (
+                                <tr
+                                  key={rowIndex}
+                                  className={`
+                                ${
+                                  isCorrectRow
+                                    ? "bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200"
+                                    : ""
+                                }
+                                ${
+                                  isWrongRow && !isCorrectRow
+                                    ? "bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-200"
+                                    : ""
+                                }
+                                ${
+                                  isFirstRow
+                                    ? "bg-blue-100 dark:bg-blue-900/30 font-semibold text-sm"
+                                    : ""
+                                }
+                              `}
+                                >
+                                  {row.map((cell, cellIndex) => (
+                                    <td
+                                      key={cellIndex}
+                                      className={`p-2 font-sans border-r border-gray-200 dark:border-dark-purple-600 last:border-r-0`}
+                                    >
+                                      {cell}
+                                    </td>
+                                  ))}
+                                  {(isCorrectRow || isWrongRow) && (
+                                    <td className="pl-2">
+                                      {isCorrectRow ? (
+                                        <Check className="text-green-500 dark:text-green-400 w-5 h-5" />
+                                      ) : isWrongRow ? (
+                                        <X className="text-red-500 dark:text-red-400 w-5 h-5" />
+                                      ) : null}
+                                    </td>
+                                  )}
+                                </tr>
+                              );
+                            })}
+                          </tbody>
+                        </table>
+                      </div>
+                    ) : question.options && question.options.length > 0 ? (
+                      <div className="space-y-3 mb-4">
+                        {question.options.map((option, optionIndex) => (
+                          <div
+                            key={optionIndex}
+                            className={`flex items-center space-x-3 p-4 rounded-lg border-2 transition-all ${getOptionStyle(
+                              question,
+                              optionIndex
+                            )}`}
+                          >
+                            <div className="flex items-center space-x-2 flex-1">
+                              <span className="font-medium font-sans">
+                                {String.fromCharCode(65 + optionIndex)}.
+                              </span>
+                              <span className="font-sans">{option}</span>
+                            </div>
+                            {getOptionIcon(question, optionIndex)}
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      // When options are in image
+                      <div className="text-center py-6 mb-4 bg-blue-50 dark:bg-blue-900/30 rounded-lg border border-blue-200 dark:border-blue-700">
+                        <Image className="w-10 h-10 mx-auto mb-2 text-blue-500 dark:text-blue-400" />
+                        <p className="text-blue-700 dark:text-blue-300 font-medium font-sans">
+                          Multiple choice options are shown in the image above
+                        </p>
+                        <p className="text-blue-600 dark:text-blue-400 text-sm mt-1 font-sans">
+                          Please refer to the image for options A, B, C, D
+                        </p>
+                      </div>
+                    )}
+
+                    {/* Answer Explanation */}
+                    {renderAnswerExplanation(question)}
+                  </div>
+                </div>
+              )}
+            </div>
+          );
+        })}
       </div>
 
       {/* Footer */}
