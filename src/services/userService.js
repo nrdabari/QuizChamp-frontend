@@ -100,7 +100,15 @@ export const userService = {
 
   // ✅ Start chapter exam submission (NEW METHOD)
   startChapterTest: async (examData) => {
-    const response = await api.put("/submissions/chapter-test", examData);
+    const response = await api.post("/submissions/chapter-test", examData);
+    return response.data;
+  },
+
+  // ✅ get chapter exam question (NEW METHOD)
+  getChapterTestQuestion: async (submissionId, questionId) => {
+    const response = await api.get(
+      `/submissions/${submissionId}/chapter-question/${questionId}`
+    );
     return response.data;
   },
 };

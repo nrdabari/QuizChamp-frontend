@@ -7,8 +7,10 @@ import fscreen from "fscreen";
 import { getTextForRange } from "../../helper/helpers";
 
 const ExamPage = () => {
-  const { exerciseId } = useParams();
+  const { exerciseId, chapterId } = useParams(); // Add chapterId
+
   const [searchParams] = useSearchParams();
+  const isChapterTest = chapterId && exerciseId === undefined;
   const userId = searchParams.get("user");
   const time = searchParams.get("time");
   const submissionId = searchParams.get("submissionId");
@@ -32,6 +34,9 @@ const ExamPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [zoomLevel, setZoomLevel] = useState(1);
   const [selectedQuestion, setSelectedQuestion] = useState(null);
+
+  const [questionIds, setQuestionIds] = useState([]); // New state for chapter test questions
+  const [currentQuestionId, setCurrentQuestionId] = useState(null);
 
   const { userServ } = useApiService();
 
@@ -166,53 +171,92 @@ const ExamPage = () => {
 
     return () => clearInterval(timer);
   }, [isPaused]);
-  console.log(loading);
+  
 
   // Fetch current question + exercise + user
   useEffect(() => {
     const fetchData = async () => {
-      // setLoading(true);
       try {
-        const exerciseData = await userServ.getExercise(exerciseId);
-        setExerciseData(exerciseData);
-        setSelectedAnswer(""); // Reset selection
+        if (isChapterTest && chapterId) {
+          const submissionData = await userServ.getExamReport(submissionId);
+          setQuestionIds(submissionData.submissionDetails.questionIds || []);
+          setExerciseData({
+            name: `${submissionData.submissionDetails.chapterName} `,
+            source: "Previous Years Paper",
+            questionCount:
+              submissionData.submissionDetails.questionIds?.length || 0,
+          });
+        } else {
+          // For regular exercise tests - existing logic
+          const exerciseData = await userServ.getExercise(exerciseId);
+          setExerciseData(exerciseData);
+        }
+        setSelectedAnswer("");
       } catch (err) {
-        console.error("❌ Error loading question:", err);
+        console.error("Error loading data:", err);
       } finally {
         setLoading(false);
       }
     };
 
-    if (exerciseId && userId && currentIndex) {
+    if (
+      ((exerciseId && currentIndex) || (isChapterTest && chapterId)) &&
+      userId
+    ) {
       fetchData();
     }
-  }, [exerciseId, userId, userServ]);
+  }, [exerciseId, chapterId, isChapterTest, userId, userServ]);
 
   useEffect(() => {
     const fetchQuestionAndAnswer = async () => {
       // setLoading(true);
       try {
-        const data = await userServ.getExamQuestion(
-          submissionId,
-          exerciseId,
-          currentIndex
-        );
+        let data;
 
+        if (isChapterTest && questionIds.length > 0) {
+          // For chapter tests - use questionId from array
+          const questionId = questionIds[currentIndex - 1];
+          if (!questionId) {
+            throw new Error("Question not found");
+          }
+          setCurrentQuestionId(questionId);
+          data = await userServ.getChapterTestQuestion(
+            submissionId,
+            questionId
+          );
+        } else if (!isChapterTest && exerciseId) {
+          // For exercise tests - use currentIndex
+          data = await userServ.getExamQuestion(
+            submissionId,
+            exerciseId,
+            currentIndex
+          );
+          setCurrentQuestionId(data.question?._id);
+        }
         setCurrentQuestion(data.question);
         setSelectedAnswer(data.userAnswer || "");
         setQuestionEntryTime(Date.now());
       } catch (error) {
-        console.error("❌ Error loading question:", error);
-        // setError(error.response?.data?.message || error.message || "Failed to fetch question");
+        console.error("Error loading question:", error);
       } finally {
         setLoading(false);
       }
     };
 
-    if (exerciseId && submissionId && currentIndex >= 1) {
+    if (
+      (exerciseId && submissionId && currentIndex >= 1) ||
+      (chapterId && submissionId && questionIds.length > 0)
+    ) {
       fetchQuestionAndAnswer();
     }
-  }, [currentIndex, exerciseId, submissionId, userServ]);
+  }, [
+    currentIndex,
+    exerciseId,
+    submissionId,
+    chapterId,
+    questionIds,
+    currentQuestionId,
+  ]);
 
   useEffect(() => {
     const loadAttemptedAnswers = async () => {
@@ -227,9 +271,11 @@ const ExamPage = () => {
           attemptedMap[attempt] = true;
         });
         setAttemptedQuestions(attemptedMap);
-        if (data.attempts.length > 0) {
-          const maxNum = Math.max(...data.attempts);
-          setCurrentIndex(maxNum);
+        if (exerciseId) {
+          if (data.attempts.length > 0) {
+            const maxNum = Math.max(...data.attempts);
+            setCurrentIndex(maxNum);
+          }
         }
         return attemptedMap;
       } catch (error) {
@@ -257,11 +303,17 @@ const ExamPage = () => {
       };
 
       await userServ.submitAnswer(submissionId, answerData);
-
-      setAttemptedQuestions((prev) => ({
-        ...prev,
-        [currentQuestion.id]: true,
-      }));
+      if (exerciseId) {
+        setAttemptedQuestions((prev) => ({
+          ...prev,
+          [currentQuestion.id]: true,
+        }));
+      } else {
+        setAttemptedQuestions((prev) => ({
+          ...prev,
+          [currentQuestion._id]: true,
+        }));
+      }
     } catch (error) {
       console.error("❌ Failed to save answer:", error);
       alert(
@@ -844,7 +896,7 @@ const ExamPage = () => {
                         }}
                       />
                     ) : (
-                      currentQuestion.question
+                      currentQuestion?.question
                         .split("\n")
                         .map((line, index) => (
                           <React.Fragment key={index}>
@@ -1010,30 +1062,49 @@ const ExamPage = () => {
               </h3>
               <div className="grid grid-cols-10 gap-1.5 mb-3">
                 {Array.from(
-                  { length: exerciseData?.questionCount || 50 },
+                  {
+                    length: isChapterTest
+                      ? questionIds.length
+                      : exerciseData?.questionCount || 50,
+                  },
                   (_, idx) => {
                     const qNum = idx + 1;
-                    const isCurrent = qNum === currentIndex;
-                    const isAnswered = attemptedQuestions?.[qNum];
+                    let isCurrent;
+
+                    // Handle different attemptedQuestions structures
+                    let isAnswered;
+                    if (isChapterTest) {
+                      isCurrent = questionIds[idx] === currentQuestionId;
+                      // For chapter tests: attemptedQuestions contains questionIds
+                      const questionId = questionIds[idx];
+                      isAnswered = attemptedQuestions?.[questionId] || false;
+                    } else {
+                      isCurrent = qNum === currentIndex;
+                      // For exercise tests: attemptedQuestions contains indices
+                      isAnswered = attemptedQuestions?.[qNum] || false;
+                    }
 
                     return (
                       <button
                         key={qNum}
                         onClick={() => {
                           try {
+                            if (chapterId) {
+                              setCurrentQuestionId(questionIds[idx]);
+                            }
                             setCurrentIndex(qNum);
                           } catch (error) {
                             console.log("Question navigation failed:", error);
                           }
                         }}
                         className={`w-6 h-6 rounded-full text-xs font-bold font-sans border-2 transition-all duration-200 flex items-center justify-center
-                  ${
-                    isCurrent
-                      ? "border-blue-600 dark:border-blue-400 bg-blue-600 dark:bg-blue-500 text-white ring-2 ring-blue-200 dark:ring-blue-800"
-                      : isAnswered
-                      ? "border-green-500 bg-green-500 text-white hover:bg-green-600"
-                      : "border-gray-300 dark:border-gray-500 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
-                  }`}
+  ${
+    isAnswered && !isCurrent
+      ? "bg-green-500 border-green-500 text-white"
+      : isCurrent
+      ? "bg-blue-600 border-blue-600 text-white"
+      : "bg-gray-100 border-gray-300 text-gray-700"
+  }`}
                         title={`Question ${qNum}${
                           isCurrent ? " (Current)" : ""
                         }${isAnswered ? " (Answered)" : ""}`}
@@ -1147,30 +1218,52 @@ const ExamPage = () => {
 
             <div className="grid grid-cols-7 gap-2 mb-6">
               {Array.from(
-                { length: exerciseData?.questionCount || 50 },
+                {
+                  length: isChapterTest
+                    ? questionIds.length
+                    : exerciseData?.questionCount || 50,
+                },
                 (_, idx) => {
                   const qNum = idx + 1;
-                  const isCurrent = qNum === currentIndex;
-                  const isAnswered = attemptedQuestions?.[qNum];
+
+                  // Handle current question logic
+                  let isCurrent;
+                  if (isChapterTest) {
+                    isCurrent = questionIds[idx] === currentQuestionId;
+                  } else {
+                    isCurrent = qNum === currentIndex;
+                  }
+
+                  // Handle answered questions logic
+                  let isAnswered;
+                  if (isChapterTest) {
+                    const questionId = questionIds[idx];
+                    isAnswered = attemptedQuestions?.[questionId] || false;
+                  } else {
+                    isAnswered = attemptedQuestions?.[qNum] || false;
+                  }
 
                   return (
                     <button
                       key={qNum}
                       onClick={() => {
                         try {
+                          if (isChapterTest) {
+                            setCurrentQuestionId(questionIds[idx]);
+                          }
                           setCurrentIndex(qNum);
                         } catch (error) {
                           console.log("Question navigation failed:", error);
                         }
                       }}
                       className={`w-8 h-8 rounded-full text-xs font-bold font-sans border-2 transition-all duration-200 flex items-center justify-center
-                ${
-                  isCurrent
-                    ? "border-blue-600 dark:border-blue-400 bg-blue-600 dark:bg-blue-500 text-white ring-2 ring-blue-200 dark:ring-blue-800 shadow-lg"
-                    : isAnswered
-                    ? "border-green-500 bg-green-500 text-white hover:bg-green-600"
-                    : "border-gray-300 dark:border-gray-500 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
-                }`}
+          ${
+            isCurrent
+              ? "border-blue-600 dark:border-blue-400 bg-blue-600 dark:bg-blue-500 text-white ring-2 ring-blue-200 dark:ring-blue-800 shadow-lg"
+              : isAnswered
+              ? "border-green-500 bg-green-500 text-white hover:bg-green-600"
+              : "border-gray-300 dark:border-gray-500 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
+          }`}
                       title={`Question ${qNum}${isCurrent ? " (Current)" : ""}${
                         isAnswered ? " (Answered)" : ""
                       }`}
