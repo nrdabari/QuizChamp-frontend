@@ -111,4 +111,11 @@ export const userService = {
     );
     return response.data;
   },
+  // ✅ Get chapter exam report (NEW METHOD)
+  getChapterExamReport: async (submissionId) => {
+    const response = await api.get(
+      `/submissions/chapterTestDetails/${submissionId}`
+    );
+    return response.data;
+  },
 };
