@@ -5,6 +5,7 @@ import { useApiService } from "../../hooks/useApiService";
 
 import fscreen from "fscreen";
 import { getTextForRange } from "../../helper/helpers";
+import QuestionContent from "../../components/QuestionDisplay";
 
 const ExamPage = () => {
   const { exerciseId, chapterId } = useParams();
@@ -347,21 +348,10 @@ const ExamPage = () => {
       }
     };
 
-    if (
-      ((exerciseId && currentIndex) || (isChapterTest && chapterId)) &&
-      userId
-    ) {
+    if ((exerciseId || (isChapterTest && chapterId)) && userId) {
       fetchData();
     }
-  }, [
-    exerciseId,
-    chapterId,
-    isChapterTest,
-    userId,
-    userServ,
-    submissionId,
-    currentIndex,
-  ]);
+  }, [exerciseId, chapterId, isChapterTest, userId, userServ, submissionId]);
 
   // Fetch question data
   useEffect(() => {
@@ -512,21 +502,40 @@ const ExamPage = () => {
     ));
   }, [questionGridData, handleQuestionNavigation]);
 
-  // Memoized derived values for directions/headers
+  // Update the directionInfo useMemo to handle both scenarios
   const directionInfo = useMemo(() => {
     const getDirectionForRange = (index, items = []) =>
       items.find((item) => index >= item.start && index <= item.end) || null;
 
-    const direction = getDirectionForRange(
-      currentIndex,
-      exerciseData?.directions
-    );
-    const directionText = direction?.text;
-    const headerText = getTextForRange(currentIndex, exerciseData?.headers);
-    const sectionText = getTextForRange(currentIndex, exerciseData?.sections);
+    let direction, directionText, headerText, sectionText;
+
+    if (isChapterTest) {
+      // For chapter tests: use question-level directions/headers/sections
+      direction = currentQuestion?.exerciseData.directions?.[0] || null;
+      directionText =
+        direction?.text || currentQuestion?.exerciseData?.directions?.[0]?.text;
+      headerText =
+        currentQuestion?.exerciseData?.headers?.[0]?.text ||
+        currentQuestion?.exerciseData?.headers?.[0]?.text;
+      sectionText =
+        currentQuestion?.exerciseData?.sections?.[0]?.text ||
+        currentQuestion?.exerciseData?.sections?.[0]?.text;
+    } else {
+      // For exercise tests: use exercise-level directions/headers/sections with range logic
+      direction = getDirectionForRange(currentIndex, exerciseData?.directions);
+      directionText = direction?.text;
+      headerText = getTextForRange(currentIndex, exerciseData?.headers);
+      sectionText = getTextForRange(currentIndex, exerciseData?.sections);
+    }
 
     return { direction, directionText, headerText, sectionText };
-  }, [currentIndex, exerciseData?.directions, exerciseData?.headers]);
+  }, [
+    currentIndex,
+    exerciseData?.directions,
+    exerciseData?.headers,
+    currentQuestion,
+    isChapterTest,
+  ]);
 
   const renderQuestionContent = useCallback(
     (question) => {
@@ -540,20 +549,7 @@ const ExamPage = () => {
                 <div className="space-y-3">
                   {question.question && (
                     <h2 className="text-sm sm:text-sm lg:text-sm font-semibold font-display mb-3 text-gray-900 dark:text-white leading-relaxed">
-                      {/<\/?[a-z][\s\S]*>/i.test(question?.question) ? (
-                        <span
-                          dangerouslySetInnerHTML={{
-                            __html: question.question,
-                          }}
-                        />
-                      ) : (
-                        question.question.split("\n").map((line, index) => (
-                          <React.Fragment key={index}>
-                            {line}
-                            <br />
-                          </React.Fragment>
-                        ))
-                      )}
+                      <QuestionContent question={question.question} />
                     </h2>
                   )}
 
@@ -582,12 +578,7 @@ const ExamPage = () => {
 
                   {question.subQuestion && (
                     <h3 className="text-xs sm:text-xs lg:text-xs font-semibold mb-3 text-gray-700 dark:text-gray-200 font-sans leading-relaxed">
-                      {question.subQuestion.split("\n").map((line, index) => (
-                        <React.Fragment key={index}>
-                          {line}
-                          <br />
-                        </React.Fragment>
-                      ))}
+                      <QuestionContent question={question.subQuestion} />
                     </h3>
                   )}
 
@@ -608,7 +599,7 @@ const ExamPage = () => {
                                   key={cellIndex}
                                   className="flex-1 text-center font-medium"
                                 >
-                                  {cell}
+                                  <QuestionContent question={cell} />
                                 </div>
                               ))}
                             </div>
@@ -646,7 +637,7 @@ const ExamPage = () => {
                                 key={cellIndex}
                                 className="flex-1 text-center"
                               >
-                                {cell}
+                                <QuestionContent question={cell} />
                               </div>
                             ))}
                           </label>
@@ -680,7 +671,7 @@ const ExamPage = () => {
                                 <span className="font-semibold text-blue-600 dark:text-blue-400 mr-1 sm:mr-2">
                                   {optionLetter}
                                 </span>
-                                {opt}
+                                <QuestionContent question={opt} />
                               </span>
                             </label>
                           </li>
@@ -744,6 +735,10 @@ const ExamPage = () => {
     },
     [selectedAnswer, handleAnswerChange, imageStyle]
   );
+
+  {
+    loading & <div>Loading ....</div>;
+  }
 
   return (
     <div className="h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-250 flex flex-col">
@@ -991,22 +986,7 @@ const ExamPage = () => {
               currentQuestion?.gridOptions?.length > 0 ? (
                 <div className="space-y-3 sm:space-y-4">
                   <h2 className="text-sm sm:text-sm lg:text-sm font-semibold mb-3 sm:mb-4 text-gray-900 dark:text-white font-display leading-relaxed">
-                    {/<\/?[a-z][\s\S]*>/i.test(currentQuestion?.question) ? (
-                      <span
-                        dangerouslySetInnerHTML={{
-                          __html: currentQuestion.question,
-                        }}
-                      />
-                    ) : (
-                      currentQuestion?.question
-                        ?.split("\n")
-                        .map((line, index) => (
-                          <React.Fragment key={index}>
-                            {line}
-                            <br />
-                          </React.Fragment>
-                        ))
-                    )}
+                    <QuestionContent question={currentQuestion.question} />
                   </h2>
 
                   {currentQuestion.imagePath && (
@@ -1020,14 +1000,7 @@ const ExamPage = () => {
 
                   {currentQuestion.subQuestion && (
                     <h2 className="text-xs sm:text-xs lg:text-xs font-semibold mb-3 sm:mb-4 text-gray-800 dark:text-gray-200 font-sans leading-relaxed">
-                      {currentQuestion.subQuestion
-                        .split("\n")
-                        .map((line, index) => (
-                          <React.Fragment key={index}>
-                            {line}
-                            <br />
-                          </React.Fragment>
-                        ))}
+                      <QuestionContent question={currentQuestion.subQuestion} />
                     </h2>
                   )}
                 </div>
@@ -1062,7 +1035,7 @@ const ExamPage = () => {
                                 key={cellIndex}
                                 className="flex-1 text-center min-w-20 sm:min-w-24"
                               >
-                                {cell}
+                                <QuestionContent question={cell} />
                               </div>
                             ))}
                           </div>
@@ -1100,7 +1073,7 @@ const ExamPage = () => {
                               key={cellIndex}
                               className="flex-1 text-center min-w-20 sm:min-w-24"
                             >
-                              {cell}
+                              <QuestionContent question={cell} />
                             </div>
                           ))}
                         </label>
@@ -1141,7 +1114,8 @@ const ExamPage = () => {
                           className="sr-only"
                         />
                         <span className="text-gray-900 dark:text-white font-sans leading-relaxed flex-1 text-xs sm:text-xs">
-                          {opt || `Option ${optionLetter}`}
+                          {<QuestionContent question={opt} /> ||
+                            `Option ${optionLetter}`}
                         </span>
                       </label>
                     );

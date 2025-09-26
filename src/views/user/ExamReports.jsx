@@ -75,31 +75,40 @@ const TestReport = () => {
     setHeaderModal({ isOpen: true, content });
   };
 
-  const closeDirectionModal = () => {
-    setDirectionModal({ isOpen: false, content: "" });
-  };
+  // const closeDirectionModal = () => {
+  //   setDirectionModal({ isOpen: false, content: "" });
+  // };
 
-  const closeHeaderModal = () => {
-    setHeaderModal({ isOpen: false, content: "" });
-  };
+  // const closeHeaderModal = () => {
+  //   setHeaderModal({ isOpen: false, content: "" });
+  // };
 
   // Function to check if question has direction
-  const getQuestionDirection = (questionNumber) => {
-    if (!testReport?.submissionDetails?.exerciseId?.directions) return null;
+  const getQuestionDirection = (questionNumber, direction) => {
+    if (direction) {
+      return direction;
+    } else {
+      if (!testReport?.submissionDetails?.exerciseId?.directions) return null;
 
-    return testReport.submissionDetails.exerciseId.directions.find(
-      (direction) =>
-        questionNumber >= direction.start && questionNumber <= direction.end
-    );
+      return testReport.submissionDetails.exerciseId.directions.find(
+        (direction) =>
+          questionNumber >= direction.start && questionNumber <= direction.end
+      );
+    }
   };
 
   // Function to check if question has header
-  const getQuestionHeader = (questionNumber) => {
-    if (!testReport?.submissionDetails?.exerciseId?.headers) return null;
+  const getQuestionHeader = (questionNumber, header) => {
+    if (header) {
+      return header;
+    } else {
+      if (!testReport?.submissionDetails?.exerciseId?.headers) return null;
 
-    return testReport.submissionDetails.exerciseId.headers.find(
-      (header) => questionNumber >= header.start && questionNumber <= header.end
-    );
+      return testReport.submissionDetails.exerciseId.headers.find(
+        (header) =>
+          questionNumber >= header.start && questionNumber <= header.end
+      );
+    }
   };
 
   // const openModal = (question) => {
@@ -390,7 +399,8 @@ const TestReport = () => {
       {/* Summary Section */}
       <div className="bg-white dark:bg-gray-800 rounded-lg p-6 mb-8 border border-gray-200 dark:border-gray-700 shadow-md dark:shadow-xl transition-colors duration-250">
         <h2 className="text-xl font-bold font-display mb-4 text-gray-900 dark:text-white">
-          {testReport.submissionDetails.exerciseId?.name}
+          {testReport.submissionDetails.exerciseId?.name ||
+            `${testReport.submissionDetails.chapterName} - Chaptewise Test`}
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
           <div
@@ -489,8 +499,14 @@ const TestReport = () => {
           Question Review
         </h2>
         {getFilteredQuestions().map((question) => {
-          const questionDirection = getQuestionDirection(question.id);
-          const questionHeader = getQuestionHeader(question.id);
+          const questionDirection = getQuestionDirection(
+            question.id,
+            question?.exerciseData?.directions?.[0]
+          );
+          const questionHeader = getQuestionHeader(
+            question.id,
+            question?.exerciseData?.headers?.[0]
+          );
           return (
             <div
               key={question.questionId}
@@ -716,20 +732,7 @@ const TestReport = () => {
                     {question.question && (
                       <div className="mb-4">
                         <p className="font-medium font-sans text-text-light-primary dark:text-text-dark-primary">
-                          {/<[a-z][\s\S]*>/i.test(question.question) ? (
-                            <span
-                              dangerouslySetInnerHTML={{
-                                __html: question.question,
-                              }}
-                            />
-                          ) : (
-                            question.question.split("\n").map((line, index) => (
-                              <React.Fragment key={index}>
-                                {line}
-                                <br />
-                              </React.Fragment>
-                            ))
-                          )}
+                          <QuestionContent question={question.question} />
                         </p>
                       </div>
                     )}
@@ -748,14 +751,7 @@ const TestReport = () => {
                     {question.subQuestion && (
                       <div className="mb-6">
                         <h4 className="font-semibold font-display text-text-light-primary dark:text-text-dark-primary mb-3">
-                          {question.subQuestion
-                            .split("\n")
-                            .map((line, index) => (
-                              <React.Fragment key={index}>
-                                {line}
-                                <br />
-                              </React.Fragment>
-                            ))}
+                          <QuestionContent question={question.subQuestion} />
                         </h4>
                       </div>
                     )}
@@ -805,7 +801,7 @@ const TestReport = () => {
                                       key={cellIndex}
                                       className={`p-2 font-sans border-r border-gray-200 dark:border-dark-purple-600 last:border-r-0`}
                                     >
-                                      {cell}
+                                      <QuestionContent question={cell} />
                                     </td>
                                   ))}
                                   {(isCorrectRow || isWrongRow) && (

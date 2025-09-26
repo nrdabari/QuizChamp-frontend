@@ -4,6 +4,7 @@ import { useFormik } from "formik";
 import { Edit, Save, Trash2, Upload, X, Search, Filter } from "lucide-react";
 import { Editor } from "@tinymce/tinymce-react";
 import { useApiService } from "../../hooks/useApiService";
+import QuestionContent from "../../components/QuestionDisplay";
 
 const EditQuestionList = () => {
   const { exerciseId } = useParams();
@@ -732,15 +733,7 @@ const EditQuestionList = () => {
                         Q{question.id}
                       </span>
                       <h4>
-                        {/<[a-z][\s\S]*>/i.test(question.question) ? (
-                          <span
-                            dangerouslySetInnerHTML={{
-                              __html: question.question,
-                            }}
-                          />
-                        ) : (
-                          question.question
-                        )}
+                        <QuestionContent question={question.question} />
                       </h4>
                     </div>
                     {question.imagePath && (
@@ -777,7 +770,7 @@ const EditQuestionList = () => {
                           >
                             {row.map((cell, cellIndex) => (
                               <td key={cellIndex} className="p-2 ">
-                                {cell}
+                                <QuestionContent question={cell} />
                               </td>
                             ))}
                             {isCorrectRow && (
@@ -804,7 +797,7 @@ const EditQuestionList = () => {
                         <span className="font-medium">
                           {String.fromCharCode(65 + index)}.
                         </span>{" "}
-                        {option}
+                        <QuestionContent question={option} />
                         {index === correctIndex && (
                           <span className="ml-2 text-green-600 font-medium">
                             (Correct)
