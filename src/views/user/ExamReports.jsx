@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import moment from "moment";
 import { useApiService } from "../../hooks/useApiService";
+import QuestionContent from "../../components/QuestionDisplay";
 
 const TestReport = () => {
   const { submissionId } = useParams();
